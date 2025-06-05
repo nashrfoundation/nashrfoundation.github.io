@@ -1113,66 +1113,72 @@ nav {
 
 
 
-/* Ensure Donation Form Dark Theme on Mobile (Forced) */
+/* Ensure Donation Form Dark Theme on Mobile (Revised) */
 @media (max-width: 768px) {
-  body .donation-form-container {
-      background-color: var(--bg-medium) !important;
+  .donation-form-container {
+      background-color: var(--bg-medium); /* Container background */
   }
-  body .donation-tab {
-      background-color: var(--bg-light) !important;
-      color: var(--text-secondary) !important;
+  .donation-tab {
+      background-color: var(--bg-light);
+      color: var(--text-secondary);
   }
-  body .donation-tab.active {
-      background-color: var(--bg-medium) !important;
-      color: var(--text-primary) !important;
+  .donation-tab.active {
+      background-color: var(--bg-medium);
+      color: var(--text-primary);
   }
-  body .payment-method {
-      background-color: var(--bg-medium) !important;
-      border-color: var(--bg-light) !important;
-      color: var(--text-primary) !important;
+  .payment-method {
+      background-color: var(--bg-medium);
+      border-color: var(--bg-light);
+      color: var(--text-primary); /* Ensure text is light */
   }
-  body .payment-method:hover {
-      background-color: var(--bg-light) !important;
-      border-color: var(--primary-light) !important;
+  .payment-method:hover {
+      background-color: var(--bg-light);
+      border-color: var(--primary-light);
   }
-   body .payment-method.active {
-      border-color: var(--primary) !important;
-      background-color: var(--bg-light) !important;
+   .payment-method.active {
+      border-color: var(--primary);
+      background-color: var(--bg-light);
   }
-  body .payment-details {
-      background-color: var(--bg-light) !important;
+  .payment-details {
+      background-color: var(--bg-light);
   }
-  body .form-control {
-      background-color: var(--bg-dark) !important;
-      border-color: var(--bg-light) !important;
-      color: var(--text-primary) !important;
+  .form-control {
+      background-color: var(--bg-dark);
+      border-color: var(--bg-light);
+      color: var(--text-primary); /* Ensure input text is light */
   }
-   body .form-control:focus {
-      background-color: var(--bg-medium) !important;
-      border-color: var(--primary) !important;
+   .form-control:focus {
+      background-color: var(--bg-medium);
+      border-color: var(--primary);
   }
-  body .amount-option {
-      background-color: var(--bg-medium) !important;
-      border-color: var(--bg-light) !important;
-      color: var(--text-primary) !important;
+  .amount-option {
+      background-color: var(--bg-medium);
+      border-color: var(--bg-light);
+      color: var(--text-primary); /* Ensure text is light */
   }
-  body .amount-option:hover {
-      background-color: var(--bg-light) !important;
-      border-color: var(--primary) !important;
+  .amount-option:hover {
+      background-color: var(--bg-light);
+      border-color: var(--primary);
   }
-  body .amount-option.active {
-      background-color: var(--primary) !important;
-      border-color: var(--primary) !important;
-      color: var(--white) !important;
+  .amount-option.active {
+      background-color: var(--primary);
+      border-color: var(--primary);
+      color: var(--white);
   }
-  body .form-group label {
-      color: var(--text-primary) !important;
+  /* Explicitly set label and checkbox text color */
+  .form-group label {
+      color: var(--text-primary); /* Light text for labels */
   }
-  body .checkbox-group {
-      color: var(--text-primary) !important;
+  .checkbox-group {
+      color: var(--text-primary); /* Light text for checkbox labels */
+  }
+  .secure-badge {
+      color: var(--text-secondary); /* Secondary light text */
+  }
+  .secure-badge svg {
+      fill: var(--text-secondary); /* Color the lock icon */
   }
 }
-
 
 
 
