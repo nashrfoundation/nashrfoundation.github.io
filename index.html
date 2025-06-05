@@ -283,55 +283,55 @@
             });
         });
     </script>
-    // Load leaderboard data from CSV
-    function loadLeaderboardData() {
-        fetch('leaderboard.csv')
-            .then(response => response.text())
-            .then(data => {
-                // Parse CSV data
-                const rows = data.split('\n');
-                const headers = rows[0].split(',');
-                const tableBody = document.getElementById('leaderboard-data');
+    <script>
+        // Load leaderboard data from CSV
+        function loadLeaderboardData() {
+            fetch('leaderboard.csv')
+                .then(response => response.text())
+                .then(data => {
+                    // Parse CSV data
+                    const rows = data.split('\n');
+                    const headers = rows[0].split(',');
+                    const tableBody = document.getElementById('leaderboard-data');
             
-                // Clear existing table data
-                tableBody.innerHTML = '';
+                    // Clear existing table data
+                    tableBody.innerHTML = '';
             
-                // Add data rows
-                for (let i = 1; i < rows.length; i++) {
-                    if (rows[i].trim() === '') continue; // Skip empty rows
+                    // Add data rows
+                    for (let i = 1; i < rows.length; i++) {
+                        if (rows[i].trim() === '') continue; // Skip empty rows
                 
-                    const cells = rows[i].split(',');
-                    const row = document.createElement('tr');
+                        const cells = rows[i].split(',');
+                        const row = document.createElement('tr');
                 
-                    // Create cells for each column
-                    for (let j = 0; j < cells.length; j++) {
-                        const cell = document.createElement('td');
+                        // Create cells for each column
+                        for (let j = 0; j < cells.length; j++) {
+                            const cell = document.createElement('td');
                     
-                        // Format amount with currency symbol if it's the amount column
-                        if (j === 2) {
-                            cell.textContent = '₨ ' + Number(cells[j]).toLocaleString();
-                        } else {
-                            cell.textContent = cells[j];
-                        }
+                            // Format amount with currency symbol if it's the amount column
+                            if (j === 2) {
+                                cell.textContent = '₨ ' + Number(cells[j]).toLocaleString();
+                            } else {
+                                cell.textContent = cells[j];
+                            }
                     
-                        row.appendChild(cell);
+                            row.appendChild(cell);
+                        }    
+                
+                        tableBody.appendChild(row);
                     }
-                
-                    tableBody.appendChild(row);
-                }
-            })
-            .catch(error => {
-                console.error('Error loading leaderboard data:', error);
-                document.getElementById('leaderboard-data').innerHTML = '<tr><td colspan="3">Error loading donor data. Please try again later.</td></tr>';
-            });
-    }
+                })
+                .catch(error => {
+                    console.error('Error loading leaderboard data:', error);
+                    document.getElementById('leaderboard-data').innerHTML = '<tr><td colspan="3">Error loading donor data. Please try again later.</td></tr>';
+                });
+        }
 
-    // Call the function when the page loads
-    document.addEventListener('DOMContentLoaded', function() {
-        loadLeaderboardData();
-    
-        // Add this to your existing DOMContentLoaded event handler if you already have one
-    });
+        // Call the function when the page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            loadLeaderboardData();
+        });
+    </script>
 
 </body>
 </html>
