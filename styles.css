@@ -5,19 +5,20 @@
 
 /* ===== Base Styles ===== */
 :root {
-    /* Updated color palette */
-    --primary: #1A6E7C;
-    --primary-light: #2A8D9C;
-    --primary-dark: #0D5965;
-    --accent: #FFB52E;      /* Brighter orange */
-    --accent-light: #FFCA5F; /* Brighter light orange */
-    --white: #FFFFFF;
-    --light-gray: #F8F9FA;
-    --medium-gray: #E0E0E0;
-    --dark-gray: #2D3748;
-    --text-light: #718096;
-    --black: #000000;
-    --overlay-color: rgba(26, 110, 124, 0.7);
+    /* Dark Theme Color Palette */
+    --bg-dark: #1a1a1a;        /* Main background */
+    --bg-medium: #2c2c2c;       /* Section/Card background */
+    --bg-light: #3a3a3a;        /* Borders/Hover */
+    --text-primary: #f0f0f0;    /* Main text */
+    --text-secondary: #b0b0b0;   /* Secondary text */
+    --primary: #2A8D9C;         /* Teal accent */
+    --primary-light: #3AA7B8;    /* Lighter teal */
+    --primary-dark: #1A6E7C;     /* Darker teal */
+    --accent: #FFB52E;         /* Orange accent */
+    --accent-light: #FFCA5F;    /* Lighter orange */
+    --white: #FFFFFF;          /* Pure white (use sparingly) */
+    --black: #000000;          /* Pure black (use sparingly) */
+    --overlay-color: rgba(0, 0, 0, 0.6); /* Darker overlay */
     
     /* Typography */
     --heading-font: 'Merriweather', serif;
@@ -55,8 +56,8 @@ html {
 body {
     font-family: var(--body-font);
     line-height: 1.8;
-    color: var(--dark-gray);
-    background-color: var(--white);
+    color: var(--text-primary); /* Use primary text color */
+    background-color: var(--bg-dark); /* Use dark background */
     overflow-x: hidden;
 }
 
@@ -65,7 +66,7 @@ h1, h2, h3, h4, h5, h6 {
     font-weight: 700;
     line-height: 1.3;
     margin-bottom: var(--spacing-sm);
-    color: var(--primary);
+    color: var(--primary-light); /* Use lighter primary for headings */
 }
 
 h1 {
@@ -98,16 +99,17 @@ h3 {
 
 p {
     margin-bottom: var(--spacing-sm);
+    color: var(--text-secondary); /* Use secondary text color for paragraphs */
 }
 
 a {
-    color: var(--primary);
+    color: var(--accent); /* Use accent color for links */
     text-decoration: none;
     transition: color var(--transition-fast);
 }
 
 a:hover {
-    color: var(--primary-light);
+    color: var(--accent-light); /* Use lighter accent for link hover */
 }
 
 img {
@@ -131,22 +133,22 @@ section {
     display: inline-block;
     padding: 0.9rem 1.8rem;
     background-color: var(--accent);
-    color: var(--dark-gray);
+    color: var(--bg-dark); /* Dark text on bright button */
     border: 2px solid var(--accent);
     border-radius: var(--border-radius-sm);
     font-weight: 600;
     text-align: center;
     cursor: pointer;
     transition: all var(--transition-medium);
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Slightly darker shadow */
 }
 
 .btn:hover {
     background-color: var(--accent-light);
     border-color: var(--accent-light);
-    color: var(--dark-gray);
+    color: var(--bg-dark);
     transform: translateY(-3px);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3); /* Slightly darker shadow */
     animation: pulse 1.5s infinite;
 }
 
@@ -163,7 +165,7 @@ section {
 
 .btn-outline:hover {
     background-color: var(--accent);
-    color: var(--dark-gray);
+    color: var(--bg-dark); /* Dark text on hover */
 }
 
 /* ===== Header ===== */
@@ -172,8 +174,8 @@ header {
     top: 0;
     left: 0;
     width: 100%;
-    background-color: var(--white);
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    background-color: var(--bg-medium); /* Use medium dark background */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3); /* Darker shadow */
     z-index: 1000;
     padding: var(--spacing-xs) 0;
 }
@@ -193,6 +195,7 @@ header .container {
     height: 60px;
     width: auto;
     border-radius: var(--border-radius-md);
+    /* Consider adding a subtle background or border if logo blends too much */
 }
 
 nav ul {
@@ -209,6 +212,7 @@ nav ul li a {
     padding: 0.5rem;
     position: relative;
     transition: color 0.3s ease;
+    color: var(--text-primary); /* Light text for nav links */
 }
 
 nav ul li a::after {
@@ -218,8 +222,13 @@ nav ul li a::after {
     left: 0;
     width: 0;
     height: 2px;
-    background-color: var(--primary);
+    background-color: var(--accent); /* Use accent for underline */
     transition: width var(--transition-medium);
+}
+
+nav ul li a:hover,
+nav ul li a.active {
+    color: var(--accent-light); /* Lighter accent on hover/active */
 }
 
 nav ul li a:hover::after,
@@ -240,10 +249,12 @@ nav ul li a.active::after {
     width: 24px;
     height: 24px;
     transition: transform var(--transition-fast);
+    filter: brightness(0.8) invert(0.9); /* Adjust icons for dark bg */
 }
 
 .social-icons img:hover {
     transform: scale(1.2);
+    filter: brightness(1) invert(1); /* Brighter on hover */
 }
 
 .donate-button {
@@ -264,7 +275,7 @@ nav ul li a.active::after {
     display: block;
     height: 3px;
     width: 100%;
-    background-color: var(--primary);
+    background-color: var(--text-primary); /* Light color for burger icon */
     border-radius: 3px;
     transition: all var(--transition-fast);
 }
@@ -290,7 +301,7 @@ nav ul li a.active::after {
     align-items: center;
     justify-content: center;
     text-align: center;
-    color: var(--white);
+    color: var(--white); /* Keep hero text white for contrast on overlay */
     margin-top: 80px; /* Account for fixed header */
     overflow: hidden;
 }
@@ -316,7 +327,7 @@ nav ul li a.active::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: var(--overlay-color);
+    background-color: var(--overlay-color); /* Use updated dark overlay */
     z-index: -1;
 }
 
@@ -330,19 +341,20 @@ nav ul li a.active::after {
 .hero-content h1 {
     font-size: 3.5rem;
     margin-bottom: var(--spacing-md);
-    color: var(--white);
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    color: var(--white); /* Keep hero h1 white */
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5); /* Slightly stronger shadow */
 }
 
 .hero-content p {
     font-size: 1.4rem;
     margin-bottom: var(--spacing-md);
-    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.2);
+    color: var(--text-primary); /* Use light primary text for hero paragraph */
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
 }
 
 /* ===== Aims Section ===== */
 .aims {
-    background-color: var(--light-gray);
+    background-color: var(--bg-medium); /* Use medium dark background */
     padding: var(--spacing-xl) 0;
 }
 
@@ -353,19 +365,20 @@ nav ul li a.active::after {
 }
 
 .aim-item {
-    background-color: var(--white);
+    background-color: var(--bg-light); /* Use light dark background for cards */
     padding: 2rem;
     border-radius: var(--border-radius-md);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: center;
     height: 100%;
+    border-left: 3px solid transparent; /* Start with transparent border */
 }
 
 .aim-item:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
-    border-left: 3px solid var(--accent);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+    border-left: 3px solid var(--accent); /* Accent border on hover */
 }
 
 .aim-icon {
@@ -377,12 +390,14 @@ nav ul li a.active::after {
 .aim-icon svg {
     width: 100%;
     height: 100%;
+    fill: var(--accent); /* Use accent color for SVG icons */
 }
 
 /* ===== Impact Section ===== */
 .impact {
+    /* Keep the existing gradient, it provides nice contrast */
     background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-    color: var(--white);
+    color: var(--white); /* Keep text white */
     padding: 5rem 0;
     position: relative;
     overflow: hidden;
@@ -395,16 +410,16 @@ nav ul li a.active::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
+    background: linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%); /* Subtle overlay */
     pointer-events: none;
 }
 
 .impact h2 {
-    color: var(--white);
+    color: var(--white); /* Keep heading white */
 }
 
 .impact h2:after {
-    background-color: var(--white);
+    background-color: var(--accent); /* Use accent for underline */
 }
 
 .impact-stats {
@@ -429,24 +444,27 @@ nav ul li a.active::after {
     font-weight: 700;
     margin-bottom: 0.5rem;
     font-family: var(--heading-font);
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    color: var(--white); /* Keep number white */
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     animation: fadeInUp 0.8s ease-out;
 }
 
 .stat-label {
     font-size: 1.25rem;
     opacity: 0.9;
+    color: var(--text-primary); /* Use light primary text */
 }
 
 /* ===== Leaderboard Section ===== */
 .leaderboard {
-    background-color: var(--white);
+    background-color: var(--bg-dark); /* Use dark background */
     padding: var(--spacing-xl) 0;
 }
 
 .leaderboard p {
     text-align: center;
     margin-bottom: var(--spacing-md);
+    color: var(--text-secondary);
 }
 
 .leaderboard-table {
@@ -458,19 +476,21 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-bottom: var(--spacing-md);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Darker shadow */
     border-radius: 8px;
     overflow: hidden;
+    background-color: var(--bg-medium); /* Medium dark background for table */
 }
 
 table th, table td {
     padding: 1rem;
     text-align: left;
-    border-bottom: 1px solid var(--medium-gray);
+    border-bottom: 1px solid var(--bg-light); /* Light border */
+    color: var(--text-primary);
 }
 
 table th {
-    background-color: var(--primary);
+    background-color: var(--primary-dark); /* Darker primary for header */
     color: var(--white);
     font-weight: 500;
 }
@@ -480,20 +500,21 @@ table tr:last-child td {
 }
 
 table tr:nth-child(even) {
-    background-color: var(--light-gray);
+    background-color: var(--bg-light); /* Lighter dark for even rows */
 }
 
 table tr:hover {
-    background-color: rgba(26, 110, 124, 0.05);
+    background-color: rgba(42, 141, 156, 0.15); /* Subtle primary hover */
 }
 
 .leaderboard-cta {
     text-align: center;
 }
 
+
 /* ===== Get Involved Section ===== */
 .get-involved {
-    background-color: var(--light-gray);
+    background-color: var(--bg-medium); /* Use medium dark background */
     padding: var(--spacing-xl) 0;
 }
 
@@ -504,10 +525,10 @@ table tr:hover {
 }
 
 .involvement-option {
-    background-color: var(--white);
+    background-color: var(--bg-light); /* Use light dark background for cards */
     padding: 2.5rem;
     border-radius: var(--border-radius-md);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: center;
     height: 100%;
@@ -518,13 +539,14 @@ table tr:hover {
 
 .involvement-option:hover {
     transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
 }
 
 .involvement-option h3 {
     margin-bottom: 1rem;
     position: relative;
     padding-bottom: 1rem;
+    color: var(--primary-light); /* Use lighter primary for heading */
 }
 
 .involvement-option h3:after {
@@ -535,7 +557,7 @@ table tr:hover {
     transform: translateX(-50%);
     width: 40px;
     height: 2px;
-    background-color: var(--primary);
+    background-color: var(--accent); /* Use accent for underline */
 }
 
 .social-share {
@@ -552,17 +574,20 @@ table tr:hover {
     width: 32px;
     height: 32px;
     transition: transform var(--transition-fast);
+    filter: brightness(0.8) invert(0.9); /* Adjust icons for dark bg */
 }
 
 .social-share img:hover {
     transform: scale(1.2);
+    filter: brightness(1) invert(1); /* Brighter on hover */
 }
 
 /* ===== Footer ===== */
 footer {
-    background-color: var(--primary-dark);
-    color: var(--white);
+    background-color: var(--bg-medium); /* Use medium dark background */
+    color: var(--text-secondary); /* Use secondary text color */
     padding: var(--spacing-lg) 0;
+    border-top: 1px solid var(--bg-light); /* Add subtle top border */
 }
 
 .footer-content {
@@ -577,15 +602,21 @@ footer {
     width: auto;
     border-radius: var(--border-radius-md);
     /* Removed filter that was making the logo white */
+    /* Consider adding a background if logo visibility is poor */
 }
 
 .footer-info p {
     margin-bottom: var(--spacing-xs);
+    color: var(--text-secondary);
 }
 
 .footer-info a {
-    color: var(--white);
+    color: var(--accent); /* Use accent color for links */
     text-decoration: underline;
+}
+
+.footer-info a:hover {
+    color: var(--accent-light);
 }
 
 .footer-social {
@@ -601,22 +632,26 @@ footer {
     width: 32px;
     height: 32px;
     /* Removed filter: brightness(0) invert(1); that was making icons white */
-    transition: transform var(--transition-fast);
+    filter: brightness(0.8) invert(0.9); /* Adjust icons for dark bg */
+    transition: transform var(--transition-fast), filter var(--transition-fast);
 }
 
 .footer-social img:hover {
     transform: scale(1.2);
+    filter: brightness(1) invert(1); /* Brighter on hover */
 }
 
 .footer-bottom {
     text-align: center;
     padding-top: var(--spacing-md);
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--bg-light); /* Use light border */
+    color: var(--text-secondary);
 }
 
 /* ===== Donation Form Styles ===== */
 .donation-section {
     padding: var(--spacing-lg) 0;
+    background-color: var(--bg-dark); /* Dark background for section */
 }
 
 .donation-header {
@@ -628,9 +663,9 @@ footer {
 .donation-form-container {
     max-width: 800px;
     margin: 0 auto;
-    background-color: var(--white);
+    background-color: var(--bg-medium); /* Medium dark background for form container */
     border-radius: var(--border-radius-md);
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25); /* Darker shadow */
     overflow: hidden;
     transition: transform 0.3s ease;
 }
@@ -641,21 +676,28 @@ footer {
 
 .donation-tabs {
     display: flex;
-    border-bottom: 1px solid var(--medium-gray);
+    border-bottom: 1px solid var(--bg-light); /* Light border */
 }
 
 .donation-tab {
     flex: 1;
     padding: var(--spacing-sm);
     text-align: center;
-    background-color: var(--light-gray);
+    background-color: var(--bg-light); /* Light dark background for inactive tabs */
+    color: var(--text-secondary);
     cursor: pointer;
-    transition: background-color var(--transition-fast);
+    transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+.donation-tab:hover {
+    background-color: var(--bg-dark);
+    color: var(--text-primary);
 }
 
 .donation-tab.active {
-    background-color: var(--white);
-    border-bottom: 3px solid var(--primary);
+    background-color: var(--bg-medium); /* Medium dark for active tab */
+    border-bottom: 3px solid var(--primary); /* Primary accent border */
+    color: var(--text-primary);
     font-weight: 500;
 }
 
@@ -671,22 +713,31 @@ footer {
     display: block;
     margin-bottom: var(--spacing-xs);
     font-weight: 500;
+    color: var(--text-primary);
 }
 
 .form-control {
     width: 100%;
     padding: 0.9rem;
-    border: 1px solid var(--medium-gray);
+    border: 1px solid var(--bg-light); /* Light border */
+    background-color: var(--bg-dark); /* Dark background for input */
+    color: var(--text-primary); /* Light text for input */
     border-radius: var(--border-radius-sm);
     font-family: var(--body-font);
     font-size: 1rem;
     transition: all 0.3s ease;
 }
 
+.form-control::placeholder {
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
 .form-control:focus {
     outline: none;
     border-color: var(--primary);
-    box-shadow: 0 0 0 3px rgba(26, 110, 124, 0.1);
+    background-color: var(--bg-medium);
+    box-shadow: 0 0 0 3px rgba(42, 141, 156, 0.2); /* Primary focus shadow */
 }
 
 .amount-options {
@@ -699,7 +750,9 @@ footer {
 .amount-option {
     padding: 1rem;
     text-align: center;
-    border: 2px solid var(--medium-gray);
+    border: 2px solid var(--bg-light); /* Light border */
+    background-color: var(--bg-medium);
+    color: var(--text-primary);
     border-radius: var(--border-radius-sm);
     cursor: pointer;
     transition: all 0.3s ease;
@@ -708,14 +761,14 @@ footer {
 
 .amount-option:hover {
     border-color: var(--primary);
-    background-color: rgba(26, 110, 124, 0.05);
+    background-color: var(--bg-light);
 }
 
 .amount-option.active {
     background-color: var(--primary);
     border-color: var(--primary);
-    color: var(--white);
-    box-shadow: 0 5px 15px rgba(26, 110, 124, 0.2);
+    color: var(--white); /* White text on primary background */
+    box-shadow: 0 5px 15px rgba(42, 141, 156, 0.3); /* Primary shadow */
 }
 
 .payment-methods {
@@ -727,29 +780,33 @@ footer {
     align-items: center;
     margin-bottom: var(--spacing-sm);
     padding: var(--spacing-sm);
-    border: 1px solid var(--medium-gray);
+    border: 1px solid var(--bg-light); /* Light border */
+    background-color: var(--bg-medium);
+    color: var(--text-primary);
     border-radius: var(--border-radius-sm);
     cursor: pointer;
-    transition: border-color var(--transition-fast);
+    transition: border-color var(--transition-fast), background-color var(--transition-fast);
 }
 
 .payment-method:hover {
     border-color: var(--primary-light);
+    background-color: var(--bg-light);
 }
 
 .payment-method.active {
     border-color: var(--primary);
-    background-color: rgba(26, 110, 124, 0.05);
+    background-color: var(--bg-light);
 }
 
 .payment-method input {
     margin-right: var(--spacing-sm);
+    accent-color: var(--primary); /* Style radio button */
 }
 
 .payment-details {
     margin-top: var(--spacing-sm);
     padding: var(--spacing-sm);
-    background-color: var(--light-gray);
+    background-color: var(--bg-light); /* Light dark background */
     border-radius: var(--border-radius-sm);
 }
 
@@ -757,10 +814,12 @@ footer {
     display: flex;
     align-items: center;
     margin-bottom: var(--spacing-sm);
+    color: var(--text-primary);
 }
 
 .checkbox-group input {
     margin-right: var(--spacing-xs);
+    accent-color: var(--primary); /* Style checkbox */
 }
 
 .form-submit {
@@ -779,7 +838,7 @@ footer {
     align-items: center;
     justify-content: center;
     margin-top: var(--spacing-md);
-    color: var(--text-light);
+    color: var(--text-secondary); /* Use secondary text color */
     font-size: 0.9rem;
 }
 
@@ -787,6 +846,7 @@ footer {
     width: 16px;
     height: 16px;
     margin-right: var(--spacing-xs);
+    fill: var(--text-secondary); /* Color the lock icon */
 }
 
 /* ===== Animations ===== */
@@ -847,7 +907,7 @@ footer {
         top: 80px;
         left: 0;
         width: 100%;
-        background-color: var(--white);
+        background-color: var(--bg-medium); /* Use medium dark background for mobile nav */
         box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         padding: 0;
         max-height: 0;
@@ -1049,5 +1109,6 @@ nav {
         display: none;
     }
 }
+
 
 
