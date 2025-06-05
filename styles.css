@@ -985,3 +985,79 @@ footer {
     height: 24px;
   }
 }
+/* Improved header layout and spacing */
+header .container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  padding: 1rem var(--spacing-md);
+}
+
+.logo {
+  flex: 0 0 auto;
+  margin-right: var(--spacing-md);
+}
+
+nav {
+  flex: 1 1 auto;
+  display: flex;
+  justify-content: center;
+}
+
+.social-icons {
+  display: flex;
+  gap: 12px; /* Increased spacing between icons */
+  margin-right: var(--spacing-md);
+}
+
+.donate-button {
+  margin-right: var(--spacing-md);
+}
+
+.mobile-menu-toggle {
+  margin-left: auto;
+}
+
+/* Mobile responsiveness adjustments */
+@media (max-width: 768px) {
+  header .container {
+    justify-content: space-between;
+  }
+  
+  .logo {
+    flex: 0 0 auto;
+  }
+  
+  nav {
+    flex: 0 0 100%;
+    order: 3;
+    display: none;
+  }
+  
+  nav.active {
+    display: block;
+  }
+  
+  .social-icons {
+    flex: 0 0 auto;
+    margin-left: auto;
+    margin-right: var(--spacing-md);
+    gap: 8px; /* Slightly reduced spacing on mobile */
+  }
+  
+  .donate-button {
+    display: none; /* Hide donate button on mobile */
+  }
+  
+  .mobile-menu-toggle {
+    flex: 0 0 auto;
+    margin-left: 0;
+  }
+  
+  /* Make social icons slightly smaller on mobile */
+  .social-icons img {
+    width: 24px;
+    height: 24px;
+  }
+}
