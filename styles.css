@@ -963,28 +963,6 @@ footer {
     }
 }
 
-/* Mobile responsiveness for header elements */
-@media (max-width: 768px) {
-  .donate-button {
-    display: none; /* Hide the donate button on mobile */
-  }
-  
-  /* Ensure logo and social icons remain visible */
-  .logo, .social-icons {
-    display: flex;
-  }
-  
-  /* Adjust spacing for better mobile layout */
-  .social-icons {
-    margin-left: auto;
-  }
-  
-  /* Make social icons slightly smaller on mobile */
-  .social-icons img {
-    width: 24px;
-    height: 24px;
-  }
-}
 /* Improved header layout and spacing */
 header .container {
   display: flex;
