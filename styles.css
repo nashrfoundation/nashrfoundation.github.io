@@ -49,7 +49,7 @@
 }
 
 html {
-    font-size: 16px;
+    font-size: 16.5px; /* Slightly increase base font size */
     scroll-behavior: smooth;
 }
 
@@ -367,18 +367,18 @@ nav ul li a.active::after {
 .aim-item {
     background-color: var(--bg-light); /* Use light dark background for cards */
     padding: 2rem;
-    border-radius: var(--border-radius-md);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: var(--border-radius-lg); /* Softer corners */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-left 0.3s ease;
     text-align: center;
     height: 100%;
-    border-left: 3px solid transparent; /* Start with transparent border */
+    border-left: 4px solid transparent; /* Start with transparent border */
 }
 
 .aim-item:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
-    border-left: 3px solid var(--accent); /* Accent border on hover */
+    transform: translateY(-12px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
+    border-left: 4px solid var(--accent); /* Accent border on hover */
 }
 
 .aim-icon {
@@ -527,8 +527,8 @@ table tr:hover {
 .involvement-option {
     background-color: var(--bg-light); /* Use light dark background for cards */
     padding: 2.5rem;
-    border-radius: var(--border-radius-md);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15); /* Slightly stronger shadow */
+    border-radius: var(--border-radius-lg); /* Softer corners */
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2); /* Enhanced shadow */
     transition: transform 0.3s ease, box-shadow 0.3s ease;
     text-align: center;
     height: 100%;
@@ -538,8 +538,8 @@ table tr:hover {
 }
 
 .involvement-option:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25); /* Stronger shadow on hover */
+    transform: translateY(-12px);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3); /* Stronger shadow on hover */
 }
 
 .involvement-option h3 {
@@ -1109,6 +1109,70 @@ nav {
         display: none;
     }
 }
+
+
+
+
+/* Ensure Donation Form Dark Theme on Mobile (Forced) */
+@media (max-width: 768px) {
+  body .donation-form-container {
+      background-color: var(--bg-medium) !important;
+  }
+  body .donation-tab {
+      background-color: var(--bg-light) !important;
+      color: var(--text-secondary) !important;
+  }
+  body .donation-tab.active {
+      background-color: var(--bg-medium) !important;
+      color: var(--text-primary) !important;
+  }
+  body .payment-method {
+      background-color: var(--bg-medium) !important;
+      border-color: var(--bg-light) !important;
+      color: var(--text-primary) !important;
+  }
+  body .payment-method:hover {
+      background-color: var(--bg-light) !important;
+      border-color: var(--primary-light) !important;
+  }
+   body .payment-method.active {
+      border-color: var(--primary) !important;
+      background-color: var(--bg-light) !important;
+  }
+  body .payment-details {
+      background-color: var(--bg-light) !important;
+  }
+  body .form-control {
+      background-color: var(--bg-dark) !important;
+      border-color: var(--bg-light) !important;
+      color: var(--text-primary) !important;
+  }
+   body .form-control:focus {
+      background-color: var(--bg-medium) !important;
+      border-color: var(--primary) !important;
+  }
+  body .amount-option {
+      background-color: var(--bg-medium) !important;
+      border-color: var(--bg-light) !important;
+      color: var(--text-primary) !important;
+  }
+  body .amount-option:hover {
+      background-color: var(--bg-light) !important;
+      border-color: var(--primary) !important;
+  }
+  body .amount-option.active {
+      background-color: var(--primary) !important;
+      border-color: var(--primary) !important;
+      color: var(--white) !important;
+  }
+  body .form-group label {
+      color: var(--text-primary) !important;
+  }
+  body .checkbox-group {
+      color: var(--text-primary) !important;
+  }
+}
+
 
 
 
