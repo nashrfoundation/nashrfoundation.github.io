@@ -55,7 +55,7 @@ html {
 
 body {
     font-family: var(--body-font);
-    line-height: 1.8;
+    line-height: 1.9; /* Slightly increased line-height for readability */
     color: var(--text-primary); /* Use primary text color */
     background-color: var(--bg-dark); /* Use dark background */
     overflow-x: hidden;
