@@ -1113,72 +1113,59 @@ nav {
 
 
 
-/* Ensure Donation Form Dark Theme on Mobile (Revised) */
-@media (max-width: 768px) {
+/* Mobile responsiveness adjustments */
+
+
+/* Mobile responsiveness adjustments */
+
+  /* Override embedded style for donation form container on mobile */
   .donation-form-container {
-      background-color: var(--bg-medium); /* Container background */
+      background-color: var(--bg-medium) !important; /* Force dark background */
   }
-  .donation-tab {
-      background-color: var(--bg-light);
-      color: var(--text-secondary);
+  /* Ensure text elements inside have correct dark theme colors */
+  .donation-form-container .form-group label,
+  .donation-form-container .checkbox-group label,
+  .donation-form-container .payment-method label {
+      color: var(--text-primary) !important; /* Force light text */
   }
-  .donation-tab.active {
-      background-color: var(--bg-medium);
-      color: var(--text-primary);
+  .donation-form-container .form-control {
+      background-color: var(--bg-dark) !important;
+      border-color: var(--bg-light) !important;
+      color: var(--text-primary) !important;
   }
-  .payment-method {
-      background-color: var(--bg-medium);
-      border-color: var(--bg-light);
-      color: var(--text-primary); /* Ensure text is light */
+  .donation-form-container .form-control::placeholder {
+      color: var(--text-secondary) !important;
+      opacity: 0.7 !important;
   }
-  .payment-method:hover {
-      background-color: var(--bg-light);
-      border-color: var(--primary-light);
+  .donation-form-container .payment-details {
+      background-color: var(--bg-light) !important;
+      color: var(--text-secondary) !important;
   }
-   .payment-method.active {
-      border-color: var(--primary);
-      background-color: var(--bg-light);
+   .donation-form-container .payment-details p {
+       color: var(--text-secondary) !important;
+   }
+   .donation-form-container .payment-details strong {
+       color: var(--text-primary) !important;
+   }
+  .donation-form-container .amount-option {
+      background-color: var(--bg-medium) !important;
+      border-color: var(--bg-light) !important;
+      color: var(--text-primary) !important;
   }
-  .payment-details {
-      background-color: var(--bg-light);
+  .donation-form-container .amount-option.active {
+      background-color: var(--primary) !important;
+      border-color: var(--primary) !important;
+      color: var(--white) !important;
   }
-  .form-control {
-      background-color: var(--bg-dark);
-      border-color: var(--bg-light);
-      color: var(--text-primary); /* Ensure input text is light */
+  .donation-form-container .checkbox-group input[type="checkbox"] {
+       accent-color: var(--primary);
+       border: 1px solid var(--text-secondary);
+       background-color: var(--bg-light);
+   }
+  .donation-form-container .secure-badge {
+      color: var(--text-secondary) !important;
   }
-   .form-control:focus {
-      background-color: var(--bg-medium);
-      border-color: var(--primary);
+  .donation-form-container .secure-badge svg {
+      fill: var(--text-secondary) !important;
   }
-  .amount-option {
-      background-color: var(--bg-medium);
-      border-color: var(--bg-light);
-      color: var(--text-primary); /* Ensure text is light */
-  }
-  .amount-option:hover {
-      background-color: var(--bg-light);
-      border-color: var(--primary);
-  }
-  .amount-option.active {
-      background-color: var(--primary);
-      border-color: var(--primary);
-      color: var(--white);
-  }
-  /* Explicitly set label and checkbox text color */
-  .form-group label {
-      color: var(--text-primary); /* Light text for labels */
-  }
-  .checkbox-group {
-      color: var(--text-primary); /* Light text for checkbox labels */
-  }
-  .secure-badge {
-      color: var(--text-secondary); /* Secondary light text */
-  }
-  .secure-badge svg {
-      fill: var(--text-secondary); /* Color the lock icon */
-  }
-}
-
-
 
