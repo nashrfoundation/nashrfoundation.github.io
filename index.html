@@ -120,31 +120,10 @@
                             <th>Amount</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody id="leaderboard-data">
+                        <!-- Data will be loaded dynamically from leaderboard.csv -->
                         <tr>
-                            <td>1</td>
-                            <td>Ahmed K.</td>
-                            <td>₨ 50,000</td>
-                        </tr>
-                        <tr>
-                            <td>2</td>
-                            <td>Fatima S.</td>
-                            <td>₨ 35,000</td>
-                        </tr>
-                        <tr>
-                            <td>3</td>
-                            <td>Muhammad R.</td>
-                            <td>₨ 25,000</td>
-                        </tr>
-                        <tr>
-                            <td>4</td>
-                            <td>Aisha Z.</td>
-                            <td>₨ 20,000</td>
-                        </tr>
-                        <tr>
-                            <td>5</td>
-                            <td>Omar T.</td>
-                            <td>₨ 15,000</td>
+                            <td colspan="3">Loading donor data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -154,6 +133,7 @@
             </div>
         </div>
     </section>
+
 
     <section class="get-involved">
         <div class="container">
@@ -303,5 +283,55 @@
             });
         });
     </script>
+    // Load leaderboard data from CSV
+    function loadLeaderboardData() {
+        fetch('leaderboard.csv')
+            .then(response => response.text())
+            .then(data => {
+                // Parse CSV data
+                const rows = data.split('\n');
+                const headers = rows[0].split(',');
+                const tableBody = document.getElementById('leaderboard-data');
+            
+                // Clear existing table data
+                tableBody.innerHTML = '';
+            
+                // Add data rows
+                for (let i = 1; i < rows.length; i++) {
+                    if (rows[i].trim() === '') continue; // Skip empty rows
+                
+                    const cells = rows[i].split(',');
+                    const row = document.createElement('tr');
+                
+                    // Create cells for each column
+                    for (let j = 0; j < cells.length; j++) {
+                        const cell = document.createElement('td');
+                    
+                        // Format amount with currency symbol if it's the amount column
+                        if (j === 2) {
+                            cell.textContent = '₨ ' + Number(cells[j]).toLocaleString();
+                        } else {
+                            cell.textContent = cells[j];
+                        }
+                    
+                        row.appendChild(cell);
+                    }
+                
+                    tableBody.appendChild(row);
+                }
+            })
+            .catch(error => {
+                console.error('Error loading leaderboard data:', error);
+                document.getElementById('leaderboard-data').innerHTML = '<tr><td colspan="3">Error loading donor data. Please try again later.</td></tr>';
+            });
+    }
+
+    // Call the function when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        loadLeaderboardData();
+    
+        // Add this to your existing DOMContentLoaded event handler if you already have one
+    });
+
 </body>
 </html>
