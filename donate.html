@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate - Nashr Foundation</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Additional styles specific to donation page */
+        .donation-section {
+            padding: var(--spacing-lg ) 0;
+        }
+        
+        .donation-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto var(--spacing-lg);
+        }
+        
+        .donation-form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: var(--white);
+            border-radius: var(--border-radius-md);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .donation-form-container:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        }
+        
+        .donation-tabs {
+            display: flex;
+            border-bottom: 1px solid var(--medium-gray);
+        }
+        
+        .donation-tab {
+            flex: 1;
+            padding: var(--spacing-sm);
+            text-align: center;
+            background-color: var(--light-gray);
+            cursor: pointer;
+            transition: background-color var(--transition-fast);
+        }
+        
+        .donation-tab.active {
+            background-color: var(--white);
+            border-bottom: 3px solid var(--primary);
+            font-weight: 500;
+        }
+        
+        .donation-form {
+            padding: var(--spacing-md);
+        }
+        
+        .form-group {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: var(--spacing-xs);
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius-sm);
+            font-family: var(--body-font);
+            font-size: 1rem;
+            transition: border-color var(--transition-fast);
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(13, 105, 115, 0.2);
+        }
+        
+        .amount-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .amount-option {
+            padding: var(--spacing-sm);
+            text-align: center;
+            border: 2px solid var(--medium-gray);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        
+        .amount-option:hover {
+            border-color: var(--primary-light);
+            transform: translateY(-2px);
+        }
+        
+        .amount-option.active {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .payment-methods {
+            margin-bottom: var(--spacing-md);
+        }
+        
+        .payment-method {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            border: 1px solid var(--medium-gray);
+            border-radius: var(--border-radius-sm);
+            cursor: pointer;
+            transition: border-color var(--transition-fast);
+        }
+        
+        .payment-method:hover {
+            border-color: var(--primary-light);
+        }
+        
+        .payment-method.active {
+            border-color: var(--primary);
+            background-color: rgba(13, 105, 115, 0.05);
+        }
+        
+        .payment-method input {
+            margin-right: var(--spacing-sm);
+        }
+        
+        .payment-details {
+            margin-top: var(--spacing-sm);
+            padding: var(--spacing-sm);
+            background-color: var(--light-gray);
+            border-radius: var(--border-radius-sm);
+        }
+        
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: var(--spacing-sm);
+        }
+        
+        .checkbox-group input {
+            margin-right: var(--spacing-xs);
+        }
+        
+        .form-submit {
+            text-align: center;
+        }
+        
+        .form-submit .btn {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            width: 100%;
+            max-width: 300px;
+        }
+        
+        .secure-badge {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: var(--spacing-md);
+            color: var(--dark-gray);
+            font-size: 0.9rem;
+        }
+        
+        .secure-badge svg {
+            width: 16px;
+            height: 16px;
+            margin-right: var(--spacing-xs);
+        }
+        
+        @media (max-width: 768px) {
+            .amount-options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .impact-stats {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+            
+            .stat {
+                padding: 1rem;
+            }
+            
+            .stat-number {
+                font-size: 1.8rem;
+            }
+            
+            .stat-label {
+                font-size: 0.9rem;
+            }
+            
+            .donation-form {
+                padding: var(--spacing-sm);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div class="logo">
+                <a href="index.html">
+                    <img src="logo.png" alt="Nashr Foundation Logo">
+                </a>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Home</a></li>
+                    <li><a href="donate.html" class="active">Donate</a></li>
+                </ul>
+            </nav>
+            <div class="social-icons">
+                <a href="https://www.instagram.com/nashrfoundation?igsh=aGlreHQ2Z3h0NWp0" target="_blank">
+                    <img src="instagram_icon.png" alt="Instagram">
+                </a>
+                <a href="#" target="_blank">
+                    <img src="facebook_icon.png" alt="Facebook">
+                </a>
+                <a href="#" target="_blank">
+                    <img src="twitter_icon.png" alt="X">
+                </a>
+                <a href="#" target="_blank">
+                    <img src="linkedin_icon.png" alt="LinkedIn">
+                </a>
+            </div>
+            <div class="donate-button">
+                <a href="donate.html" class="btn">Donate Now</a>
+            </div>
+            <div class="mobile-menu-toggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </header>
+
+    <section class="hero" style="height: 50vh; min-height: 400px;">
+        <div class="hero-image">
+            <img src="hero_background.jpeg" alt="Children accessing clean water">
+        </div>
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1>Make a Difference Today</h1>
+            <p>Your donation helps provide education, food, water, and basic necessities to those in need</p>
+        </div>
+    </section>
+
+    <section class="donation-section">
+        <div class="container">
+            <div class="donation-header">
+                <h2>Your Support Changes Lives</h2>
+                <p>Every contribution, no matter the size, helps us provide essential services to communities in need. Choose your preferred donation method below.</p>
+            </div>
+            
+            <div class="donation-form-container">
+                <div class="donation-tabs">
+                    <div class="donation-tab active" data-tab="one-time">One-time Donation</div>
+                    <div class="donation-tab" data-tab="monthly">Monthly Donation</div>
+                </div>
+                
+                <div class="donation-form">
+                    <!-- Formspree form exactly as specified -->
+                    <form action="https://formspree.io/f/xanjnelw" method="POST" id="donation-form">
+                        <div id="donation-type-display" style="text-align: center; margin-bottom: 20px; font-weight: 500;">One-time Donation</div>
+                        
+                        <input type="hidden" name="donation_type" id="donation-type-input" value="one-time">
+                        
+                        <div class="form-group">
+                            <label>Select Amount</label>
+                            <div class="amount-options">
+                                <div class="amount-option" data-amount="1000">₨ 1,000</div>
+                                <div class="amount-option active" data-amount="2500">₨ 2,500</div>
+                                <div class="amount-option" data-amount="5000">₨ 5,000</div>
+                                <div class="amount-option" data-amount="10000">₨ 10,000</div>
+                                <div class="amount-option" data-amount="custom">Custom</div>
+                            </div>
+                            <input type="hidden" name="donation_amount" id="donation-amount-input" value="2500">
+                            <div id="custom-amount-container" style="display: none;">
+                                <input type="number" class="form-control" id="custom-amount" placeholder="Enter amount in PKR">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Payment Method</label>
+                            <div class="payment-methods">
+                                <div class="payment-method active">
+                                    <input type="radio" name="payment_method" id="jazzcash" value="jazzcash" checked>
+                                    <label for="jazzcash">JazzCash</label>
+                                </div>
+                                <div class="payment-method">
+                                    <input type="radio" name="payment_method" id="easypaisa" value="easypaisa">
+                                    <label for="easypaisa">EasyPaisa</label>
+                                </div>
+                                <div class="payment-method">
+                                    <input type="radio" name="payment_method" id="bank-transfer" value="bank-transfer">
+                                    <label for="bank-transfer">Bank Transfer</label>
+                                </div>
+                            </div>
+                            
+                            <div class="payment-details" id="jazzcash-details">
+                                <p><strong>JazzCash Details:</strong></p>
+                                <p>Account Title: [Placeholder]</p>
+                                <p>Account Number: [Placeholder]</p>
+                                <p>Please include your name in the transaction note.</p>
+                            </div>
+                            
+                            <div class="payment-details" id="easypaisa-details" style="display: none;">
+                                <p><strong>EasyPaisa Details:</strong></p>
+                                <p>Account Title: [Placeholder]</p>
+                                <p>Account Number: [Placeholder]</p>
+                                <p>Please include your name in the transaction note.</p>
+                            </div>
+                            
+                            <div class="payment-details" id="bank-details" style="display: none;">
+                                <p><strong>Bank Transfer Details:</strong></p>
+                                <p>Bank Name: [Placeholder]</p>
+                                <p>Account Title: [Placeholder]</p>
+                                <p>Account Number: [Placeholder]</p>
+                                <p>IBAN: [Placeholder]</p>
+                                <p>Please include your name in the transaction reference.</p>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="donor-name">Your Name</label>
+                            <input type="text" class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="donor-email">Email Address</label>
+                            <input type="email" class="form-control" id="donor-email" name="email" placeholder="Enter your email address" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="leaderboard-consent" name="leaderboard_consent" value="yes" checked>
+                                <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label>
+                            </div>
+                            
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="anonymous-donation" name="anonymous_donation" value="yes">
+                                <label for="anonymous-donation">Make my donation anonymous</label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-submit">
+                            <button type="submit" class="btn">Complete Donation</button>
+                        </div>
+                        
+                        <div class="secure-badge">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <span>Your financial information is secure and will not be stored</span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="impact" style="padding: var(--spacing-lg ) 0;">
+        <div class="container">
+            <h2>Your Donation's Impact</h2>
+            <div class="impact-stats">
+                <div class="stat">
+                    <div class="stat-number">₨ 1,000</div>
+                    <div class="stat-label">Provides school supplies for one child</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">₨ 2,500</div>
+                    <div class="stat-label">Feeds a family for one week</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">₨ 5,000</div>
+                    <div class="stat-label">Provides clean water for a month</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">₨ 10,000</div>
+                    <div class="stat-label">Supports a child's education for a term</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <img src="logo.png" alt="Nashr Foundation Logo">
+                </div>
+                <div class="footer-info">
+                    <p>Nashr Foundation</p>
+                    <p>Established 2025</p>
+                    <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p>
+                </div>
+                <div class="footer-social">
+                    <a href="https://www.instagram.com/nashrfoundation?igsh=aGlreHQ2Z3h0NWp0" target="_blank">
+                        <img src="instagram_icon.png" alt="Instagram">
+                    </a>
+                    <a href="#" target="_blank">
+                        <img src="facebook_icon.png" alt="Facebook">
+                    </a>
+                    <a href="#" target="_blank">
+                        <img src="twitter_icon.png" alt="X">
+                    </a>
+                    <a href="#" target="_blank">
+                        <img src="linkedin_icon.png" alt="LinkedIn">
+                    </a>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Nashr Foundation. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const menuToggle = document.querySelector('.mobile-menu-toggle');
+            const nav = document.querySelector('nav');
+            
+            if (menuToggle && nav) {
+                menuToggle.addEventListener('click', function() {
+                    nav.classList.toggle('active');
+                    menuToggle.classList.toggle('active');
+                });
+            }
+            
+            // Donation amount selection - FIXED
+            const amountOptions = document.querySelectorAll('.amount-option');
+            const customAmountContainer = document.getElementById('custom-amount-container');
+            const donationAmountInput = document.getElementById('donation-amount-input');
+            const customAmountField = document.getElementById('custom-amount');
+            
+            amountOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    amountOptions.forEach(opt => opt.classList.remove('active'));
+                    
+                    // Add active class to clicked option
+                    this.classList.add('active');
+                    
+                    // Show/hide custom amount input
+                    if (this.dataset.amount === 'custom') {
+                        customAmountContainer.style.display = 'block';
+                        // Update hidden input when custom amount changes
+                        customAmountField.addEventListener('input', function() {
+                            donationAmountInput.value = this.value;
+                        });
+                    } else {
+                        customAmountContainer.style.display = 'none';
+                        // Update hidden input with selected amount
+                        donationAmountInput.value = this.dataset.amount;
+                    }
+                });
+            });
+            
+            // Payment method selection
+            const paymentMethods = document.querySelectorAll('.payment-method');
+            const jazzcashDetails = document.getElementById('jazzcash-details');
+            const easypaisaDetails = document.getElementById('easypaisa-details');
+            const bankDetails = document.getElementById('bank-details');
+            
+            paymentMethods.forEach(method => {
+                method.addEventListener('click', function() {
+                    // Set radio button checked
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    // Remove active class from all methods
+                    paymentMethods.forEach(m => m.classList.remove('active'));
+                    
+                    // Add active class to clicked method
+                    this.classList.add('active');
+                    
+                    // Show/hide payment details
+                    jazzcashDetails.style.display = 'none';
+                    easypaisaDetails.style.display = 'none';
+                    bankDetails.style.display = 'none';
+                    
+                    if (radio.value === 'jazzcash') {
+                        jazzcashDetails.style.display = 'block';
+                    } else if (radio.value === 'easypaisa') {
+                        easypaisaDetails.style.display = 'block';
+                    } else if (radio.value === 'bank-transfer') {
+                        bankDetails.style.display = 'block';
+                    }
+                });
+            });
+            
+            // Anonymous donation checkbox
+            const anonymousCheckbox = document.getElementById('anonymous-donation');
+            const leaderboardCheckbox = document.getElementById('leaderboard-consent');
+            
+            anonymousCheckbox.addEventListener('change', function() {
+                if (this.checked) {
+                    leaderboardCheckbox.checked = false;
+                    leaderboardCheckbox.disabled = true;
+                } else {
+                    leaderboardCheckbox.disabled = false;
+                }
+            });
+            
+            // Donation tabs - FIXED
+            const donationTabs = document.querySelectorAll('.donation-tab');
+            const donationTypeDisplay = document.getElementById('donation-type-display');
+            const donationTypeInput = document.getElementById('donation-type-input');
+            
+            donationTabs.forEach(tab => {
+                tab.addEventListener('click', function() {
+                    // Remove active class from all tabs
+                    donationTabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    this.classList.add('active');
+                    
+                    // Update form title based on selected tab
+                    const donationType = this.dataset.tab;
+                    donationTypeDisplay.textContent = donationType === 'monthly' ? 'Monthly Donation' : 'One-time Donation';
+                    
+                    // Update hidden input with donation type
+                    donationTypeInput.value = donationType;
+                });
+            });
+            
+            // Form submission validation
+            const donationForm = document.getElementById('donation-form');
+            
+            donationForm.addEventListener('submit', function(e) {
+                // If custom amount is selected, make sure it has a value
+                const activeAmount = document.querySelector('.amount-option.active');
+                if (activeAmount.dataset.amount === 'custom') {
+                    const customAmount = document.getElementById('custom-amount').value;
+                    if (!customAmount || customAmount <= 0) {
+                        e.preventDefault();
+                        alert('Please enter a valid donation amount.');
+                        return;
+                    }
+                    // Update the hidden input with the custom amount
+                    donationAmountInput.value = customAmount;
+                }
+            });
+            
+            // Dynamic color theme based on time of day
+            const hour = new Date().getHours();
+            const root = document.documentElement;
+
+            if (hour >= 18 || hour < 6) {
+                // Evening/night theme
+                root.style.setProperty('--primary', '#0D5965');
+                root.style.setProperty('--accent', '#FFB52E');
+            } else if (hour >= 6 && hour < 12) {
+                // Morning theme
+                root.style.setProperty('--primary', '#1A6E7C');
+                root.style.setProperty('--accent', '#FFCA5F');
+            } else {
+                // Afternoon theme
+                root.style.setProperty('--primary', '#2A8D9C');
+                root.style.setProperty('--accent', '#FFB52E');
+            }
+
+            // Parallax effect for hero section
+            window.addEventListener('scroll', function() {
+                const scrollPosition = window.pageYOffset;
+                const heroImage = document.querySelector('.hero-image');
+                if (heroImage) {
+                    heroImage.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+                }
+            });
+
+            // Animate stats when they come into view
+            const stats = document.querySelectorAll('.stat-number');
+            const animateStats = () => {
+                stats.forEach(stat => {
+                    const rect = stat.getBoundingClientRect();
+                    const isInView = rect.top <= window.innerHeight && rect.bottom >= 0;
+                    
+                    if (isInView) {
+                        stat.classList.add('animated');
+                    }
+                });
+            };
+
+            window.addEventListener('scroll', animateStats);
+            
+            // Initial call to animate stats that are already in view
+            animateStats();
+        });
+    </script>
+</body>
+</html>
