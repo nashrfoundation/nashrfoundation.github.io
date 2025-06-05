@@ -1039,3 +1039,15 @@ nav {
     height: 24px;
   }
 }
+
+
+
+/* Hide Twitter/X icon specifically on mobile */
+@media (max-width: 768px) {
+    .social-icons a[href*="twitter.com"],
+    .social-icons a[href*="x.com"] {
+        display: none;
+    }
+}
+
+
