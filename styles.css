@@ -1135,3 +1135,28 @@ footer {
     height: 72px;
   }
 }
+/* === Donation Form Dark Mode === */
+.donation-form-container {
+  background-color: #111 !important;
+  color: #fff !important;
+}
+
+.donation-form-container label,
+.donation-form-container p,
+.donation-form-container .form-group label,
+.donation-form-container .payment-details {
+  color: #fff !important;
+}
+
+.donation-form-container input,
+.donation-form-container textarea,
+.donation-form-container select {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+  border: 1px solid #333;
+}
+
+.donation-form-container input::placeholder,
+.donation-form-container textarea::placeholder {
+  color: #ccc;
+}
