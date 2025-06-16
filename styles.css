@@ -1160,3 +1160,45 @@ footer {
 .donation-form-container textarea::placeholder {
   color: #ccc;
 }
+/* === FULL DARK DONATION FORM FIX (Kill f0f0f0 and Light BG) === */
+.donation-form-container {
+  background-color: #111 !important;
+  color: #fff !important;
+}
+
+/* Labels and text */
+.donation-form-container label,
+.donation-form-container p,
+.donation-form-container .form-group label,
+.donation-form-container .payment-details {
+  color: #fff !important;
+}
+
+/* Form controls (inputs, selects, textarea) */
+.donation-form-container input,
+.donation-form-container textarea,
+.donation-form-container select,
+.donation-form-container .form-control {
+  background-color: #1a1a1a !important;
+  color: #fff !important;
+  border: 1px solid #444 !important;
+}
+
+/* Placeholder text */
+.donation-form-container input::placeholder,
+.donation-form-container textarea::placeholder {
+  color: #aaa !important;
+}
+
+/* Radio buttons and checkboxes (optional) */
+.donation-form-container input[type="radio"],
+.donation-form-container input[type="checkbox"] {
+  accent-color: #00b7ff; /* or your theme color */
+}
+
+/* Optional: style button to match */
+.donation-form-container .btn {
+  background-color: #00b7ff;
+  color: white;
+  border: none;
+}
