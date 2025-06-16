@@ -1342,3 +1342,25 @@ header .container {
     height: auto;
     min-height: 40px;
 }
+
+/* === FINAL PATCH: Kill Inherited Filter from Parent Anchors or Containers === */
+
+.social-icons a,
+.social-share a,
+.footer-social a {
+    filter: none !important;
+}
+
+.social-icons a img,
+.social-share a img,
+.footer-social a img {
+    filter: none !important;
+    transition: transform var(--transition-fast) !important;
+}
+
+.social-icons a img:hover,
+.social-share a img:hover,
+.footer-social a img:hover {
+    filter: none !important;
+    transform: scale(1.2) !important;
+}
