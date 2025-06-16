@@ -1483,3 +1483,39 @@ header .container {
     height: 68px;
   }
 }
+
+/* === POLISHING RESPONSIVE LOGO + SOCIAL ICON ALIGNMENT === */
+
+@media (max-width: 768px) {
+  header .container {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+
+  .logo img {
+    height: 52px;
+    margin-top: 0; /* Reset to center logo better */
+  }
+
+  .social-icons {
+    align-items: center;
+  }
+
+  .social-icons img {
+    width: 20px !important;
+    height: 20px !important;
+    margin-top: 2px;
+  }
+
+  .mobile-menu-toggle {
+    margin-top: 2px; /* Align with new logo height */
+  }
+}
+
+@media (min-width: 769px) {
+  .logo img {
+    height: 68px;
+    margin-top: 0;
+  }
+}
+
