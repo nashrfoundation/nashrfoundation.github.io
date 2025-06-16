@@ -692,9 +692,9 @@ footer {
 }
 
 .donation-tab.active {
-    background-color: var(--bg-medium);
+    background-color: var(--primary);
     border-bottom: 3px solid var(--primary);
-    color: var(--text-primary);
+    color: var(--white);
     font-weight: 500;
 }
 
