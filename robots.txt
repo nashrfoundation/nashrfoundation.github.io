@@ -20,9 +20,7 @@ Disallow: /twitter_icon.png
 Disallow: /tik-tok.png
 Disallow: /youtube.png
 
-# Disallow access to unminified CSS files (prefer minified versions)
-Disallow: /styles.css
-Disallow: /styles_enhanced.css
+
 
 # Disallow access to development/backup files
 Disallow: /index_optimized.html
@@ -32,7 +30,6 @@ Disallow: /*.backup$
 
 # Allow access to important files
 Allow: /index.html
-Allow: /index_enhanced.html
 Allow: /donate.html
 Allow: /sitemap.xml
 Allow: /robots.txt
