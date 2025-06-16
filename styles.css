@@ -1240,4 +1240,16 @@ section:not(.hero) {
     border: 1px solid #ccc;
 }
 
+/* --- kill the blue tint on all social icons --- */
+.social-icons img,
+.social-share img,
+.footer-social img {
+  filter: none;           /* normal state */
+}
+
+.social-icons img:hover,
+.social-share img:hover,
+.footer-social img:hover {
+  filter: none;           /* hover state */
+}
 
