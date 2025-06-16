@@ -1402,3 +1402,84 @@ header .container {
     top: 60px; /* shift nav under fixed header */
   }
 }
+/* === FINAL OVERRIDES ===
+   Just add this block at the bottom of your main CSS file (like styles.css) */
+
+/* ===== Slimmer Header Bar Height ===== */
+header {
+    height: 60px;
+    padding: 0;
+    background-color: var(--bg-medium);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+}
+
+header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    padding: 0 var(--spacing-md);
+}
+
+.logo img {
+    height: 60px;
+    margin-top: -4px;
+}
+
+.hero {
+    margin-top: 60px;
+}
+
+/* === Social Icon Overrides (No Blue Tint on All Screens) === */
+.social-icons a,
+.social-share a,
+.footer-social a {
+    filter: none !important;
+}
+
+.social-icons img,
+.social-share img,
+.footer-social img {
+    filter: none !important;
+    transition: transform var(--transition-fast) !important;
+}
+
+.social-icons img:hover,
+.social-share img:hover,
+.footer-social img:hover {
+    filter: none !important;
+    transform: scale(1.2) !important;
+}
+
+/* === Donate Button Height Tweak === */
+.donate-button .btn {
+    padding: 0.4rem 1.2rem !important;
+    font-size: 0.9rem;
+    line-height: 1.2;
+    height: auto !important;
+    min-height: 36px;
+}
+
+/* === MOBILE: Bigger Logo & Smaller Social Icons === */
+@media (max-width: 768px) {
+  .logo img {
+    height: 52px;
+    margin-top: -2px;
+  }
+  .social-icons img,
+  .social-share img,
+  .footer-social img {
+    width: 20px !important;
+    height: 20px !important;
+  }
+}
+
+/* === DESKTOP: Even Bigger Logo === */
+@media (min-width: 769px) {
+  .logo img {
+    height: 68px;
+  }
+}
