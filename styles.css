@@ -1068,3 +1068,70 @@ footer {
     height: 72px;
   }
 }
+/* === Mobile-First Optimized Styling (Max 576px) === */
+@media (max-width: 576px) {
+  section {
+    padding: 2rem 1rem;
+  }
+
+  .hero {
+    min-height: 520px;
+    padding: 1rem 0;
+  }
+
+  .hero-content h1 {
+    font-size: 2rem;
+    line-height: 1.3;
+  }
+
+  .hero-content p {
+    font-size: 1.05rem;
+    line-height: 1.5;
+  }
+
+  .aims-grid,
+  .involvement-options,
+  .impact-stats,
+  .footer-content {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
+
+  .footer-social {
+    justify-content: center;
+    gap: 1rem;
+  }
+
+  .btn {
+    padding: 0.7rem 1.2rem;
+    font-size: 0.95rem;
+  }
+
+  .btn-large {
+    padding: 0.8rem 1.4rem;
+    font-size: 1rem;
+  }
+
+  .logo img {
+    height: 80px;
+  }
+}
+
+/* === Unified Logo Resizing === */
+.logo img {
+  height: 88px;
+  max-height: 100px;
+  transition: height 0.3s ease;
+}
+
+@media (min-width: 1024px) {
+  .logo img {
+    height: 100px;
+  }
+}
+
+@media (max-width: 768px) {
+  .logo img {
+    height: 72px;
+  }
+}
