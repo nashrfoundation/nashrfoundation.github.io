@@ -390,12 +390,29 @@
     </script>
 
 <script>
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  function handleSocialClick(event, desktopUrl, mobileUrl) {
-    event.preventDefault();
-    window.location = isMobile ? mobileUrl : desktopUrl;
+ <script>
+  function openAppOrFallback(appUrl, fallbackUrl) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+    if (!isMobile) {
+      window.location = fallbackUrl;
+      return;
+    }
+
+    const timeout = setTimeout(() => {
+      window.location = fallbackUrl;
+    }, 3000); // 3 seconds delay to allow app to open
+
+    window.location = appUrl;
+
+    window.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") {
+        clearTimeout(timeout);
+      }
+    });
   }
 </script>
+
 
 </body>
 </html>
