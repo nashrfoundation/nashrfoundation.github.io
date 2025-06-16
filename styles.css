@@ -1285,8 +1285,6 @@ header .container {
 }
 
 /* === CORRECTED FINAL OVERRIDES === */
-
-/* ===== Slimmer Header Bar Height ===== */
 header {
     height: 60px;
     padding: 0;
@@ -1312,38 +1310,12 @@ header .container {
 
 .logo img {
     height: 52px;
-    margin-top: -4px; /* lifted logo visually instead of transform */
+    margin-top: -4px;
 }
 
 .hero {
     margin-top: 60px;
 }
-
-/* === Social Icon Overrides (No Blue Tint) === */
-.social-icons img,
-.social-share img,
-.footer-social img {
-    filter: none;
-    transition: transform var(--transition-fast);
-}
-
-.social-icons img:hover,
-.social-share img:hover,
-.footer-social img:hover {
-    filter: none;
-    transform: scale(1.2);
-}
-
-/* === Donate Button Sizing Adjustment === */
-.donate-button .btn {
-    padding: 0.4rem 1.2rem;
-    font-size: 0.95rem;
-    line-height: 1.2;
-    height: auto;
-    min-height: 40px;
-}
-
-/* === FINAL PATCH: Kill Inherited Filter from Parent Anchors or Containers === */
 
 .social-icons a,
 .social-share a,
@@ -1364,8 +1336,17 @@ header .container {
     filter: none !important;
     transform: scale(1.2) !important;
 }
-/* === MOBILE FIX FOR HEADER LOGO + BURGER LINES === */
 
+/* === Donate Button Sizing Adjustment === */
+.donate-button .btn {
+    padding: 0.4rem 1.2rem;
+    font-size: 0.95rem;
+    line-height: 1.2;
+    height: auto;
+    min-height: 40px;
+}
+
+/* === MOBILE FIX FOR HEADER LOGO + BURGER LINES === */
 @media (max-width: 768px) {
   header {
     height: 60px;
@@ -1378,8 +1359,8 @@ header .container {
   }
 
   .logo img {
-    height: 40px; /* smaller logo on mobile */
-    margin-top: -2px; /* gently lifted */
+    height: 40px;
+    margin-top: -2px;
   }
 
   .mobile-menu-toggle {
@@ -1389,7 +1370,7 @@ header .container {
     align-items: center;
     height: 32px;
     width: 32px;
-    margin-top: 2px; /* aligned vertically with logo */
+    margin-top: 2px;
     margin-left: auto;
   }
 
@@ -1399,13 +1380,11 @@ header .container {
   }
 
   nav {
-    top: 60px; /* shift nav under fixed header */
+    top: 60px;
   }
 }
-/* === FINAL OVERRIDES ===
-   Just add this block at the bottom of your main CSS file (like styles.css) */
 
-/* ===== Slimmer Header Bar Height ===== */
+/* === FINAL OVERRIDES === */
 header {
     height: 60px;
     padding: 0;
@@ -1433,13 +1412,6 @@ header .container {
     margin-top: 60px;
 }
 
-/* === Social Icon Overrides (No Blue Tint on All Screens) === */
-.social-icons a,
-.social-share a,
-.footer-social a {
-    filter: none !important;
-}
-
 .social-icons img,
 .social-share img,
 .footer-social img {
@@ -1454,7 +1426,6 @@ header .container {
     transform: scale(1.2) !important;
 }
 
-/* === Donate Button Height Tweak === */
 .donate-button .btn {
     padding: 0.4rem 1.2rem !important;
     font-size: 0.9rem;
@@ -1463,7 +1434,6 @@ header .container {
     min-height: 36px;
 }
 
-/* === MOBILE: Bigger Logo & Smaller Social Icons === */
 @media (max-width: 768px) {
   .logo img {
     height: 52px;
@@ -1477,14 +1447,11 @@ header .container {
   }
 }
 
-/* === DESKTOP: Even Bigger Logo === */
 @media (min-width: 769px) {
   .logo img {
     height: 68px;
   }
 }
-
-/* === POLISHING RESPONSIVE LOGO + SOCIAL ICON ALIGNMENT === */
 
 @media (max-width: 768px) {
   header .container {
@@ -1494,7 +1461,7 @@ header .container {
 
   .logo img {
     height: 52px;
-    margin-top: 0; /* Reset to center logo better */
+    margin-top: 0;
   }
 
   .social-icons {
@@ -1508,7 +1475,7 @@ header .container {
   }
 
   .mobile-menu-toggle {
-    margin-top: 2px; /* Align with new logo height */
+    margin-top: 2px;
   }
 }
 
@@ -1519,20 +1486,18 @@ header .container {
   }
 }
 
-/* === Global Variables === */
 :root {
   --transition-fast: 0.2s ease;
   --spacing-sm: 0.75rem;
   --spacing-md: 1.5rem;
 }
 
-/* ===== Slimmer Header Bar Height & Softer Dark Background ===== */
 header {
     height: 60px;
     padding: 0;
     display: flex;
     align-items: center;
-    background-color: #2a2a2a; /* softer dark—helps black logo stand out */
+    background-color: #2a2a2a;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
     z-index: 1000;
 }
@@ -1545,7 +1510,6 @@ header .container {
     padding: 0 var(--spacing-md);
 }
 
-/* ===== Logo ===== */
 .logo {
     display: flex;
     align-items: center;
@@ -1556,12 +1520,10 @@ header .container {
     transition: height var(--transition-fast);
 }
 
-/* Allow hero section to clear fixed header */
 .hero {
     margin-top: 60px;
 }
 
-/* ===== Social Icons (No Blue Tint) ===== */
 .social-icons a,
 .social-share a,
 .footer-social a {
@@ -1581,10 +1543,9 @@ header .container {
     transform: scale(1.2) !important;
 }
 
-/* ===== Donate Button ===== */
 .donate-button {
     display: flex;
-    align-items: center; /* vertically center it */
+    align-items: center;
     height: 100%;
 }
 
@@ -1595,10 +1556,9 @@ header .container {
     height: auto;
     min-height: 36px;
     position: relative;
-    top: -2px; /* raise slightly */
+    top: -2px;
 }
 
-/* ===== MOBILE: Bigger Logo & Taller Header ===== */
 @media (max-width: 768px) {
     header,
     header .container {
@@ -1606,40 +1566,6 @@ header .container {
     }
 
     .logo img {
-        height: 70px; /* 🔥 up‑sized for mobile */
-    }
-
-    .mobile-menu-toggle {
-        display: flex !important;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        width: 36px;
-        height: 36px;
-        margin-left: auto;
-    }
-
-    .mobile-menu-toggle span {
-        height: 2px;
-        background-color: var(--text-primary);
-    }
-
-    nav {
-        top: 70px; /* shift nav under taller header */
-    }
-
-    /* Right‑size the social icons so the bar doesn’t feel cramped */
-    .social-icons img,
-    .social-share img,
-    .footer-social img {
-        width: 22px !important;
-        height: 22px !important;
-    }
-}
-
-/* ===== DESKTOP: Slightly Larger Logo ===== */
-@media (min-width: 769px) {
-    .logo img {
-        height: 68px;
+        height: 70px;
     }
 }
