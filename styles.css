@@ -1202,3 +1202,14 @@ footer {
   color: white;
   border: none;
 }
+/* === DONATION TAB ACTIVE STATE FIX === */
+.donation-form-container .donation-tab.active {
+    background-color: var(--primary) !important;
+    color: var(--white) !important;
+    border-bottom: 3px solid var(--primary) !important;
+}
+
+.donation-form-container .donation-tab:hover {
+    background-color: var(--primary-light) !important;
+    color: var(--white) !important;
+}
