@@ -1253,3 +1253,34 @@ section:not(.hero) {
   filter: none;           /* hover state */
 }
 
+/* ===== Slimmer Header Bar Height ===== */
+header {
+    height: 60px; /* fixed height for black bar */
+    padding: 0; /* remove extra padding */
+    display: flex;
+    align-items: center;
+}
+
+header .container {
+    padding: 0 var(--spacing-md);
+}
+
+.hero {
+    margin-top: 60px; /* match new header height */
+}
+
+/* === Social Icon Overrides (No Blue Tint) === */
+.social-icons img,
+.social-share img,
+.footer-social img {
+    filter: none;
+    transition: transform var(--transition-fast);
+}
+
+.social-icons img:hover,
+.social-share img:hover,
+.footer-social img:hover {
+    filter: none;
+    transform: scale(1.2);
+}
+
