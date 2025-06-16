@@ -229,21 +229,31 @@
                 </ul>
             </nav>
             <div class="social-icons">
-<a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://www.instagram.com/nashrfoundation?igsh=aGlreHQ2Z3h0NWp0', 'instagram://user?username=nashrfoundation')" aria-label="Instagram">
+<!-- Instagram -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('instagram://user?username=nashrfoundation', 'https://www.instagram.com/nashrfoundation')" aria-label="Instagram">
   <img src="instagram_icon.webp" alt="Instagram">
 </a>
-<a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://www.facebook.com/nashrfoundation', 'fb://page/YOUR_PAGE_ID')" aria-label="Facebook">
+
+<!-- Facebook -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/nashrfoundation')" aria-label="Facebook">
   <img src="facebook_icon.webp" alt="Facebook">
 </a>
-<a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://x.com/Nashrfoundation', 'twitter://user?screen_name=Nashrfoundation')" aria-label="X">
+
+<!-- Twitter / X -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('twitter://user?screen_name=Nashrfoundation', 'https://x.com/Nashrfoundation')" aria-label="X">
   <img src="twitter_icon.webp" alt="X">
 </a>
-<a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1', 'tiktok://user/@nashr756')" aria-label="TikTok">
+
+<!-- TikTok -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('tiktok://user/@nashr756', 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1')" aria-label="TikTok">
   <img src="tik-tok.webp" alt="TikTok">
 </a>
-<a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://youtube.com/@nashrfoundation', 'youtube://channel/UCQ2RTGnVYClM5sYOYbBoP6A')" aria-label="YouTube">
+
+<!-- YouTube -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('vnd.youtube://channel/UCQ2RTGnVYClM5sYOYbBoP6A', 'https://youtube.com/@nashrfoundation')" aria-label="YouTube">
   <img src="youtube.webp" alt="YouTube">
 </a>
+
 
             </div>
             <div class="donate-button">
@@ -425,21 +435,31 @@
                     <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p>
                 </div>
                 <div class="footer-social">
-                    <a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://www.instagram.com/nashrfoundation?igsh=aGlreHQ2Z3h0NWp0', 'instagram://user?username=nashrfoundation')" aria-label="Instagram">
+<!-- Instagram -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('instagram://user?username=nashrfoundation', 'https://www.instagram.com/nashrfoundation')" aria-label="Instagram">
   <img src="instagram_icon.webp" alt="Instagram">
 </a>
-<a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://www.facebook.com/nashrfoundation', 'fb://page/YOUR_PAGE_ID')" aria-label="Facebook">
+
+<!-- Facebook -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/nashrfoundation')" aria-label="Facebook">
   <img src="facebook_icon.webp" alt="Facebook">
 </a>
-<a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://x.com/Nashrfoundation', 'twitter://user?screen_name=Nashrfoundation')" aria-label="X">
+
+<!-- Twitter / X -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('twitter://user?screen_name=Nashrfoundation', 'https://x.com/Nashrfoundation')" aria-label="X">
   <img src="twitter_icon.webp" alt="X">
 </a>
-<a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1', 'tiktok://user/@nashr756')" aria-label="TikTok">
+
+<!-- TikTok -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('tiktok://user/@nashr756', 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1')" aria-label="TikTok">
   <img src="tik-tok.webp" alt="TikTok">
 </a>
-<a href="javascript:void(0)" onclick="handleSocialClick(event, 'https://youtube.com/@nashrfoundation', 'youtube://channel/UCQ2RTGnVYClM5sYOYbBoP6A')" aria-label="YouTube">
+
+<!-- YouTube -->
+<a href="javascript:void(0)" onclick="openAppOrFallback('vnd.youtube://channel/UCQ2RTGnVYClM5sYOYbBoP6A', 'https://youtube.com/@nashrfoundation')" aria-label="YouTube">
   <img src="youtube.webp" alt="YouTube">
 </a>
+
 
                 </div>
             </div>
@@ -624,12 +644,33 @@
         });
     </script>
     <script>
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  function handleSocialClick(event, desktopUrl, mobileUrl) {
-    event.preventDefault();
-    window.location = isMobile ? mobileUrl : desktopUrl;
+  function openAppOrFallback(appUrl, fallbackUrl) {
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    
+    if (!isMobile) {
+      // Desktop → go directly to browser link
+      window.location = fallbackUrl;
+      return;
+    }
+
+    // Try opening the app
+    const timeout = setTimeout(() => {
+      // If app didn't open after 3 sec, go to browser fallback
+      window.location = fallbackUrl;
+    }, 3000); // 3 seconds gives time for app to load
+
+    // Try to open app URL
+    window.location = appUrl;
+
+    // Cancel fallback if user navigates away (app opened)
+    window.addEventListener("visibilitychange", function () {
+      if (document.visibilityState === "hidden") {
+        clearTimeout(timeout);
+      }
+    });
   }
 </script>
+
 
 </body>
 </html>
