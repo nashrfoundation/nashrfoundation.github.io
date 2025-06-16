@@ -1029,3 +1029,22 @@ footer {
         font-size: 0.95rem;
     }
 }
+/* === Bigger Logo on All Screens === */
+.logo img {
+  height: 72px;
+  transition: height 0.3s ease;
+}
+
+/* === Even Bigger on Large Screens === */
+@media (min-width: 1024px) {
+  .logo img {
+    height: 88px;
+  }
+}
+
+/* === Slightly smaller for mobile, but still bigger than default === */
+@media (max-width: 768px) {
+  .logo img {
+    height: 60px;
+  }
+}
