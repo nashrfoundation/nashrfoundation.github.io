@@ -1,0 +1,99 @@
+# Robots.txt for Nashr Foundation Website
+# This file tells search engine crawlers which pages or files they can or can't request from your site.
+
+# Allow all web crawlers to access all content by default
+User-agent: *
+Allow: /
+
+# Disallow access to optimization scripts and temporary files
+Disallow: /optimize_images.py
+Disallow: /minify_css.py
+Disallow: /minify_enhanced_css.py
+Disallow: /*.py$
+
+# Disallow access to original unoptimized images (prefer WebP versions)
+Disallow: /hero_background.jpeg
+Disallow: /logo.png
+Disallow: /facebook_icon.png
+Disallow: /instagram_icon.png
+Disallow: /twitter_icon.png
+Disallow: /tik-tok.png
+Disallow: /youtube.png
+
+# Disallow access to unminified CSS files (prefer minified versions)
+Disallow: /styles.css
+Disallow: /styles_enhanced.css
+
+# Disallow access to development/backup files
+Disallow: /index_optimized.html
+Disallow: /*.bak$
+Disallow: /*.tmp$
+Disallow: /*.backup$
+
+# Allow access to important files
+Allow: /index.html
+Allow: /index_enhanced.html
+Allow: /donate.html
+Allow: /sitemap.xml
+Allow: /robots.txt
+
+# Allow access to optimized images
+Allow: /*.webp$
+
+# Allow access to minified CSS
+Allow: /*.min.css$
+
+# Allow access to JavaScript files
+Allow: /*.js$
+
+# Allow access to CSV data files
+Allow: /*.csv$
+
+# Specify the location of the sitemap
+Sitemap: https://nashrfoundation.github.io/sitemap.xml
+
+# Crawl delay (optional - be respectful to server resources)
+Crawl-delay: 1
+
+# Specific rules for major search engines
+
+# Google
+User-agent: Googlebot
+Allow: /
+Disallow: /*.py$
+Disallow: /styles.css
+Disallow: /styles_enhanced.css
+
+# Bing
+User-agent: Bingbot
+Allow: /
+Disallow: /*.py$
+Disallow: /styles.css
+Disallow: /styles_enhanced.css
+
+# Yahoo
+User-agent: Slurp
+Allow: /
+Disallow: /*.py$
+
+# DuckDuckGo
+User-agent: DuckDuckBot
+Allow: /
+Disallow: /*.py$
+
+# Facebook (for Open Graph)
+User-agent: facebookexternalhit
+Allow: /
+
+# Twitter (for Twitter Cards)
+User-agent: Twitterbot
+Allow: /
+
+# LinkedIn
+User-agent: LinkedInBot
+Allow: /
+
+# WhatsApp
+User-agent: WhatsApp
+Allow: /
+
