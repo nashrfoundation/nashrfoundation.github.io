@@ -1048,3 +1048,23 @@ footer {
     height: 60px;
   }
 }
+/* === MEGA LOGO VIBES === */
+.logo img {
+  height: 88px; /* make this even more if you want beast mode */
+  max-height: 100px;
+  transition: height 0.3s ease;
+}
+
+/* On big screens, go full CEO energy */
+@media (min-width: 1024px) {
+  .logo img {
+    height: 100px;
+  }
+}
+
+/* Mobile still bold but not overpowering */
+@media (max-width: 768px) {
+  .logo img {
+    height: 72px;
+  }
+}
