@@ -4,10 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+    <!--
+        INSTRUCTIONS FOR USER:
+        1. IMAGE DIMENSIONS: Replace placeholder width/height in <img> tags with actual image dimensions.
+        2. FONT PRELOADING: Update placeholder hrefs in <link rel="preload" as="font"> tags
+           with actual .woff2 URLs for Lora, Merriweather, and Playfair Display from your Google Fonts.
+           Find these URLs using browser DevTools (Network tab, filter by Font) when your page loads.
+        3. CSP (CONTENT SECURITY POLICY): The CSP meta tag below is a restrictive STARTING POINT.
+           You MUST test your site thoroughly. If anything breaks (styles, scripts, images not loading),
+           you need to adjust the CSP to allow those resources.
+           Check browser DevTools Console for CSP errors.
+        4. CONSOLE ERRORS & DEPRECATED APIS: Check your browser's DevTools Console for any errors
+           (especially red ones) or deprecation warnings and fix their source. This is crucial
+           for the "Best Practices" score.
+        5. RESPONSIVE HERO IMAGES: Create and optimize:
+           - hero_background_desktop.webp (e.g., 1920px wide)
+           - hero_background_mobile.webp (e.g., 768px wide)
+    -->
+
+    <!-- Basic Content Security Policy (CSP) - NEEDS CAREFUL TESTING AND ADJUSTMENT! -->
+    <meta http-equiv="Content-Security-Policy" 
+          content="default-src 'self' https://nashrfoundation.github.io; 
+                   script-src 'self' 'unsafe-inline' https://unpkg.com https://formspree.io; 
+                   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+                   img-src 'self' https://nashrfoundation.github.io data:; 
+                   font-src 'self' https://fonts.gstatic.com;
+                   connect-src 'self' https://formspree.io;
+                   frame-src https://formspree.io;">
+
     <!-- Primary Meta Tags -->
     <title>Nashr Foundation - Empowering Communities Through Essential Support</title>
     <meta name="title" content="Nashr Foundation - Empowering Communities Through Essential Support">
-    <meta name="description" content="Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.">
+    <meta name="description" content="Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference.">
     <meta name="keywords" content="charity, foundation, donation, zakat, sadaqah, education, healthcare, clean water, Pakistan, community support">
     <meta name="author" content="Nashr Foundation">
     <meta name="robots" content="index, follow">
@@ -15,37 +43,48 @@
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nashrfoundation.github.io/">
-    <meta property="og:title" content="Nashr Foundation - Empowering Communities Through Essential Support">
-    <meta property="og:description" content="Join us in our mission to provide education, food, clean water, and basic necessities to vulnerable communities across Pakistan.">
-    <meta property="og:image" content="https://nashrfoundation.github.io/hero_background.webp">
+    <meta property="og:title" content="Nashr Foundation - Empowering Communities">
+    <meta property="og:description" content="Join our mission to provide education, food, clean water, and basic necessities to vulnerable communities.">
+    <meta property="og:image" content="https://nashrfoundation.github.io/hero_background_desktop.webp"> <!-- Assuming desktop is primary for OG -->
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://nashrfoundation.github.io/">
-    <meta property="twitter:title" content="Nashr Foundation - Empowering Communities Through Essential Support">
-    <meta property="twitter:description" content="Join us in our mission to provide education, food, clean water, and basic necessities to vulnerable communities across Pakistan.">
-    <meta property="twitter:image" content="https://nashrfoundation.github.io/hero_background.webp">
+    <meta property="twitter:title" content="Nashr Foundation - Empowering Communities">
+    <meta property="twitter:description" content="Join our mission to provide education, food, clean water, and basic necessities.">
+    <meta property="twitter:image" content="https://nashrfoundation.github.io/hero_background_desktop.webp">
 
     <!-- Canonical URL -->
     <link rel="canonical" href="https://nashrfoundation.github.io/">
 
-    <!-- Preload LCP Image -->
-    <link rel="preload" as="image" href="hero_background.webp" fetchpriority="high">
+    <!-- Preload LCP Image Candidates (Desktop and Mobile) -->
+    <link rel="preload" as="image" href="hero_background_desktop.webp" fetchpriority="high" media="(min-width: 769px)">
+    <link rel="preload" as="image" href="hero_background_mobile.webp" fetchpriority="high" media="(max-width: 768px)">
+
+    <!-- Preload Critical Fonts (REPLACE placeholder hrefs with actual .woff2 URLs!) -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/lora/v32/0QI6MX1D_JOu_tvrdMHz2zlNV2n_DPm4_As.woff2" as="font" type="font/woff2" crossorigin="anonymous"> <!-- Example: Lora Regular -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/merriweather/v30/u-440qyriQwlOrhSvowK_l5-eR7lXff1jvzRPA.woff2" as="font" type="font/woff2" crossorigin="anonymous"> <!-- Example: Merriweather Bold 700 -->
+    <!-- Add Playfair Display if critical for above-the-fold -->
+    <!-- <link rel="preload" href="YOUR_PLAYFAIR_DISPLAY_REGULAR_WOFF2_URL" as="font" type="font/woff2" crossorigin="anonymous"> -->
+
 
     <!-- Stylesheets - Async loading -->
     <link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="styles.css"></noscript>
     
+    <!-- Google Fonts - ensure font-display=swap is implicitly or explicitly used by Google -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+
 </head>
 <body>
     <header>
         <div class="container">
             <div class="logo">
                 <a href="index.html">
-                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy">
+                    <!-- USER: Replace with actual dimensions of your logo.webp -->
+                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" width="180" height="90"> 
                 </a>
             </div>
             <nav id="main-navigation">
@@ -55,20 +94,21 @@
                 </ul>
             </nav>
             <div class="social-icons">
+                <!-- USER: Replace with actual dimensions of your icons (e.g., 24x24 or 32x32) -->
                 <a href="javascript:void(0)" onclick="openAppOrFallback('instagram://user?username=nashrfoundation', 'https://www.instagram.com/nashrfoundation')" aria-label="Instagram">
-                  <img src="instagram_icon.webp" alt="Instagram" loading="lazy">
+                  <img src="instagram_icon.webp" alt="Instagram" loading="lazy" width="24" height="24">
                 </a>
                 <a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/nashrfoundation')" aria-label="Facebook">
-                  <img src="facebook_icon.webp" alt="Facebook" loading="lazy">
+                  <img src="facebook_icon.webp" alt="Facebook" loading="lazy" width="24" height="24">
                 </a>
                 <a href="javascript:void(0)" onclick="openAppOrFallback('twitter://user?screen_name=Nashrfoundation', 'https://x.com/Nashrfoundation')" aria-label="X">
-                  <img src="twitter_icon.webp" alt="X" loading="lazy">
+                  <img src="twitter_icon.webp" alt="X" loading="lazy" width="24" height="24">
                 </a>
                 <a href="javascript:void(0)" onclick="openAppOrFallback('tiktok://user/@nashr756', 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1')" aria-label="TikTok">
-                  <img src="tik-tok.webp" alt="TikTok" loading="lazy">
+                  <img src="tik-tok.webp" alt="TikTok" loading="lazy" width="24" height="24">
                 </a>
                 <a href="javascript:void(0)" onclick="openAppOrFallback('vnd.youtube://channel/UCQ2RTGnVYClM5sYOYbBoP6A', 'https://youtube.com/@nashrfoundation')" aria-label="YouTube">
-                  <img src="youtube.webp" alt="YouTube" loading="lazy">
+                  <img src="youtube.webp" alt="YouTube" loading="lazy" width="24" height="24">
                 </a>
             </div>
             <div class="donate-button">
@@ -83,9 +123,15 @@
     </header>
 
     <section class="hero">
-        <div class="hero-image">
-            <img src="hero_background.webp" alt="Children joyfully accessing clean water provided by Nashr Foundation">
-        </div>
+        <picture>
+            <!-- USER: Create these specific image files, optimized for size and dimensions -->
+            <source media="(max-width: 768px)" srcset="hero_background_mobile.webp">
+            <source media="(min-width: 769px)" srcset="hero_background_desktop.webp">
+            <!-- Fallback img. USER: Replace with actual intrinsic dimensions of desktop version. -->
+            <img src="hero_background_desktop.webp" 
+                 alt="Children joyfully accessing clean water provided by Nashr Foundation" 
+                 width="1920" height="1080" class="hero-image-tag"> <!-- Added class if specific styling needed beyond .hero-image container -->
+        </picture>
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1>Empowering Communities Through Essential Support</h1>
@@ -98,6 +144,7 @@
         <div class="container">
             <h2>Our Aims</h2>
             <div class="aims-grid">
+                <!-- Aim icons are SVGs; their viewBox attribute defines aspect ratio. CSS should set display size. -->
                 <div class="aim-item" data-aos="fade-up">
                     <div class="aim-icon" aria-hidden="true">
                         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -142,6 +189,8 @@
         <div class="container">
             <h2>Top Donors</h2>
             <p>Join our generous supporters in making a difference</p>
+            <!-- USER: For CLS, consider adding a CSS rule for .leaderboard-table to have a min-height -->
+            <!-- e.g., .leaderboard-table { min-height: 200px; /* Adjust as needed */ } -->
             <div class="leaderboard-table">
                 <table>
                     <thead>
@@ -153,7 +202,7 @@
                     </thead>
                     <tbody id="leaderboard-data">
                         <tr>
-                            <td colspan="3">Loading donor data...</td> <!-- This will be replaced by leaderboard.js -->
+                            <td colspan="3">Loading donor data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -177,26 +226,27 @@
                 <div class="involvement-option" data-aos="fade-up" data-aos-delay="100">
                     <h3>Volunteer</h3>
                     <p>Join our team of dedicated volunteers making a difference in communities.</p>
-                    <a href="#" class="btn btn-outline">Coming Soon</a> <!-- Using href="#" for non-functional links is standard -->
+                    <a href="#" class="btn btn-outline">Coming Soon</a>
                 </div>
                 <div class="involvement-option" data-aos="fade-up" data-aos-delay="200">
                     <h3>Spread Awareness</h3>
                     <p>Share our mission with your network and help us reach more people.</p>
                     <div class="social-share">
+                        <!-- USER: Replace with actual dimensions of your icons -->
                         <a href="javascript:void(0)" onclick="openAppOrFallback('instagram://user?username=nashrfoundation', 'https://www.instagram.com/nashrfoundation')" aria-label="Share on Instagram">
-                          <img src="instagram_icon.webp" alt="Instagram" loading="lazy">
+                          <img src="instagram_icon.webp" alt="Instagram" loading="lazy" width="32" height="32">
                         </a>
-                        <a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnashrfoundation.github.io%2F')" aria-label="Share on Facebook"> <!-- Updated Facebook to use sharer.php as fallback -->
-                          <img src="facebook_icon.webp" alt="Facebook" loading="lazy">
+                        <a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnashrfoundation.github.io%2F')" aria-label="Share on Facebook">
+                          <img src="facebook_icon.webp" alt="Facebook" loading="lazy" width="32" height="32">
                         </a>
-                        <a href="javascript:void(0)" onclick="openAppOrFallback('twitter://intent/tweet?text=Support%20Nashr%20Foundation&url=https%3A%2F%2Fnashrfoundation.github.io%2F&via=Nashrfoundation', 'https://twitter.com/intent/tweet?text=Support%20Nashr%20Foundation&url=https%3A%2F%2Fnashrfoundation.github.io%2F&via=Nashrfoundation')" aria-label="Share on X"> <!-- Updated X/Twitter to use intent URL as fallback -->
-                          <img src="twitter_icon.webp" alt="X" loading="lazy">
+                        <a href="javascript:void(0)" onclick="openAppOrFallback('twitter://intent/tweet?text=Support%20Nashr%20Foundation&url=https%3A%2F%2Fnashrfoundation.github.io%2F&via=Nashrfoundation', 'https://twitter.com/intent/tweet?text=Support%20Nashr%20Foundation&url=https%3A%2F%2Fnashrfoundation.github.io%2F&via=Nashrfoundation')" aria-label="Share on X">
+                          <img src="twitter_icon.webp" alt="X" loading="lazy" width="32" height="32">
                         </a>
                         <a href="javascript:void(0)" onclick="openAppOrFallback('tiktok://user/@nashr756', 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1')" aria-label="Share on TikTok">
-                          <img src="tik-tok.webp" alt="TikTok" loading="lazy">
+                          <img src="tik-tok.webp" alt="TikTok" loading="lazy" width="32" height="32">
                         </a>
                         <a href="javascript:void(0)" onclick="openAppOrFallback('vnd.youtube://channel/UCQ2RTGnVYClM5sYOYbBoP6A', 'https://youtube.com/@nashrfoundation')" aria-label="Share on YouTube">
-                          <img src="youtube.webp" alt="YouTube" loading="lazy">
+                          <img src="youtube.webp" alt="YouTube" loading="lazy" width="32" height="32">
                         </a>
                     </div>
                 </div>
@@ -208,7 +258,8 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy">
+                     <!-- USER: Replace with actual dimensions of your logo.webp -->
+                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" width="160" height="80">
                 </div>
                 <div class="footer-info">
                     <p>Nashr Foundation</p>
@@ -216,20 +267,21 @@
                     <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p>
                 </div>
                 <div class="footer-social">
+                    <!-- USER: Replace with actual dimensions of your icons -->
                     <a href="javascript:void(0)" onclick="openAppOrFallback('instagram://user?username=nashrfoundation', 'https://www.instagram.com/nashrfoundation')" aria-label="Nashr Foundation on Instagram">
-                      <img src="instagram_icon.webp" alt="Instagram" loading="lazy">
+                      <img src="instagram_icon.webp" alt="Instagram" loading="lazy" width="32" height="32">
                     </a>
                     <a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/nashrfoundation')" aria-label="Nashr Foundation on Facebook">
-                      <img src="facebook_icon.webp" alt="Facebook" loading="lazy">
+                      <img src="facebook_icon.webp" alt="Facebook" loading="lazy" width="32" height="32">
                     </a>
                     <a href="javascript:void(0)" onclick="openAppOrFallback('twitter://user?screen_name=Nashrfoundation', 'https://x.com/Nashrfoundation')" aria-label="Nashr Foundation on X">
-                      <img src="twitter_icon.webp" alt="X" loading="lazy">
+                      <img src="twitter_icon.webp" alt="X" loading="lazy" width="32" height="32">
                     </a>
                     <a href="javascript:void(0)" onclick="openAppOrFallback('tiktok://user/@nashr756', 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1')" aria-label="Nashr Foundation on TikTok">
-                      <img src="tik-tok.webp" alt="TikTok" loading="lazy">
+                      <img src="tik-tok.webp" alt="TikTok" loading="lazy" width="32" height="32">
                     </a>
                     <a href="javascript:void(0)" onclick="openAppOrFallback('vnd.youtube://channel/UCQ2RTGnVYClM5sYOYbBoP6A', 'https://youtube.com/@nashrfoundation')" aria-label="Nashr Foundation on YouTube">
-                      <img src="youtube.webp" alt="YouTube" loading="lazy">
+                      <img src="youtube.webp" alt="YouTube" loading="lazy" width="32" height="32">
                     </a>
                 </div>
             </div>
@@ -239,11 +291,16 @@
         </div>
     </footer>
 
+    <!-- Deferred Scripts for Performance -->
     <script src="https://unpkg.com/aos@next/dist/aos.js" defer></script>
-    <script src="leaderboard.js" defer></script> <!-- This will handle leaderboard loading -->
+    <script src="leaderboard.js" defer></script> 
 
     <script>
         document.addEventListener('DOMContentLoaded', function( ) {
+            // CHECK BROWSER CONSOLE FOR ERRORS AND DEPRECATED API WARNINGS!
+            // This is critical for improving your 'Best Practices' score.
+            // Example of a common error: if leaderboard.csv is not found, leaderboard.js will log an error.
+
             // Initialize AOS animation library
             if (typeof AOS !== 'undefined') {
                 AOS.init({
@@ -261,14 +318,14 @@
                 menuToggle.addEventListener('click', function() {
                     const isExpanded = nav.classList.toggle('active');
                     menuToggle.classList.toggle('active');
-                    menuToggle.setAttribute('aria-expanded', isExpanded);
+                    menuToggle.setAttribute('aria-expanded', String(isExpanded)); // Ensure boolean is string
                 });
             }
 
             // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
-                    if (this.hash !== "") {
+                    if (this.hash !== "" && this.pathname === window.location.pathname) { // Ensure same-page link
                         e.preventDefault();
                         const targetElement = document.querySelector(this.hash);
                         if (targetElement) {
@@ -298,46 +355,44 @@
             // Parallax effect for hero section
             window.addEventListener('scroll', function() {
                 const scrollPosition = window.pageYOffset;
-                const heroImageElement = document.querySelector('.hero .hero-image img'); 
+                // Updated selector for hero image inside picture element
+                const heroImageElement = document.querySelector('.hero picture img.hero-image-tag'); 
                 if (heroImageElement) {
-                    heroImageElement.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+                    heroImageElement.style.transform = `translateY(${scrollPosition * 0.3}px)`; // Reduced parallax factor slightly
                 }
             });
 
-            // The 'loadLeaderboardData' function definition and its direct call
-            // have been REMOVED from this inline script.
-            // leaderboard.js (loaded via <script defer src="leaderboard.js"></script>) 
-            // will handle the leaderboard loading.
+            // leaderboard.js is now responsible for calling its own loadLeaderboardData
+            // No need to call it from here if leaderboard.js handles its own initialization.
         });
     </script>
 
-    <!-- The inline leaderboard script has been completely removed. -->
-    <!-- leaderboard.js handles this functionality now. -->
+    <script>
+      // Function to open app or fallback to web URL
+      function openAppOrFallback(appUrl, fallbackUrl) {
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
-<script>
-  function openAppOrFallback(appUrl, fallbackUrl) {
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        if (!isMobile) {
+          window.location.href = fallbackUrl;
+          return;
+        }
 
-    if (!isMobile) {
-      window.location.href = fallbackUrl;
-      return;
-    }
+        const timeout = setTimeout(() => {
+          window.location.href = fallbackUrl;
+        }, 2500); 
 
-    const timeout = setTimeout(() => {
-      window.location.href = fallbackUrl;
-    }, 2500); 
+        // Attempt to open app
+        window.location.href = appUrl;
 
-    window.location.href = appUrl;
-
-    function clearFallbackTimer() {
-        clearTimeout(timeout);
-        window.removeEventListener("pagehide", clearFallbackTimer);
-        window.removeEventListener("blur", clearFallbackTimer);
-    }
-    window.addEventListener("pagehide", clearFallbackTimer);
-    window.addEventListener("blur", clearFallbackTimer);
-  }
-</script>
+        function clearFallbackTimer() {
+            clearTimeout(timeout);
+            window.removeEventListener("pagehide", clearFallbackTimer);
+            window.removeEventListener("blur", clearFallbackTimer);
+        }
+        window.addEventListener("pagehide", clearFallbackTimer);
+        window.addEventListener("blur", clearFallbackTimer); 
+      }
+    </script>
 
 </body>
 </html>
