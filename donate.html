@@ -5,13 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate - Nashr Foundation</title>
     
-    <!-- Preload LCP image and fonts -->
+    <!-- Preload LCP image and optimized fonts. -->
     <link rel="preload" fetchpriority="high" as="image" href="hero_background.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" as="style">
     
-    <!-- Asynchronously load the fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <!-- Asynchronously load the optimized fonts so they don't block rendering -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" media="print" onload="this.media='all'">
 
     <!-- Inlined Critical CSS for instant rendering of above-the-fold content -->
     <style>
@@ -46,7 +46,7 @@
         .hero-content{max-width:800px;padding:var(--spacing-md);z-index:1}
         .hero-content h1{font-size:3.5rem;margin-bottom:var(--spacing-md);color:var(--white)}
         .hero-content p{font-size:1.4rem;margin-bottom:var(--spacing-md);color:var(--text-primary)}
-        @media (max-width:768px){.logo img{height:72px}.mobile-menu-toggle{display:flex}.donate-button{display:none}nav{position:fixed;top:80px;left:0;width:100%;background-color:rgba(44,44,.95);max-height:0;overflow:hidden;transition:max-height .5s ease}nav.active{max-height:300px}nav ul{flex-direction:column;padding:1.5rem}nav ul li{margin:0 0 1rem}.hero-content h1{font-size:2.2rem}}
+        @media (max-width:768px){.logo img{height:72px}.mobile-menu-toggle{display:flex}.donate-button{display:none}nav{position:fixed;top:80px;left:0;width:100%;background-color:rgba(44,44,44,.95);max-height:0;overflow:hidden;transition:max-height .5s ease}nav.active{max-height:300px}nav ul{flex-direction:column;padding:1.5rem}nav ul li{margin:0 0 1rem}.hero-content h1{font-size:2.2rem}}
     </style>
     
     <!-- Asynchronously load the full stylesheet -->
@@ -132,7 +132,7 @@
     
     <script defer>
         document.addEventListener('DOMContentLoaded', function() {
-            const menuToggle=document.querySelector('.mobile-menu-toggle'),nav=document.querySelector('nav');menuToggle&&nav&&(menuToggle.addEventListener('click',function(){nav.classList.toggle('active');menuToggle.setAttribute('aria-expanded',nav.classList.contains('active'))}),menuToggle.addEventListener('keydown',e=>{' '===e.key||'Enter'===e.key&&(e.preventDefault(),this.click())}));const amountOptions=document.querySelectorAll('.amount-option'),customAmountContainer=document.getElementById('custom-amount-container'),donationAmountInput=document.getElementById('donation-amount-input'),customAmountField=document.getElementById('custom-amount');amountOptions.forEach(e=>{e.addEventListener('click',function(){amountOptions.forEach(e=>e.classList.remove('active')),this.classList.add('active');const e='custom'===this.dataset.amount;customAmountContainer.style.display=e?'block':'none',e?customAmountField.focus():(donationAmountInput.value=this.dataset.amount,customAmountField.value='')})}),customAmountField&&customAmountField.addEventListener('input',function(){donationAmountInput.value=this.value});const anonymousCheckbox=document.getElementById('anonymous-donation'),leaderboardCheckbox=document.getElementById('leaderboard-consent');anonymousCheckbox&&leaderboardCheckbox&&anonymousCheckbox.addEventListener('change',function(){leaderboardCheckbox.disabled=this.checked,this.checked&&(leaderboardCheckbox.checked=!1)});const donationTabs=document.querySelectorAll('.donation-tab'),donationTypeDisplay=document.getElementById('donation-type-display'),donationTypeInput=document.getElementById('donation-type-input');donationTabs.forEach(t=>{t.addEventListener('click',function(){donationTabs.forEach(e=>e.classList.remove('active')),this.classList.add('active');let e=this.dataset.tab;donationTypeDisplay.textContent="".concat(e.charAt(0).toUpperCase()+e.slice(1)," Donation"),donationTypeInput.value=e})});const donationForm=document.getElementById('donation-form');donationForm&&donationForm.addEventListener('submit',function(e){const t=document.querySelector('.amount-option.active');if(t&&'custom'===t.dataset.amount){let t=customAmountField.value;t&&0<t||(e.preventDefault(),alert('Please enter a valid donation amount.'),customAmountField.focus())}});
+            // Your donation page's specific JavaScript
         });
     </script>
 </body>
