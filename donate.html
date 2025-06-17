@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://*.github.io; font-src 'self' https://fonts.gstatic.com; connect-src 'self' *.github.io; frame-src https://formspree.io;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate - Nashr Foundation</title>
@@ -231,27 +232,27 @@
             <div class="social-icons">
 <!-- Instagram -->
 <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-  <img src="instagram_icon.webp" alt="Instagram">
+  <img src="instagram_icon.webp" alt="Instagram" loading="lazy">
 </a>
 
 <!-- Facebook -->
 <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-  <img src="facebook_icon.webp" alt="Facebook">
+  <img src="facebook_icon.webp" alt="Facebook" loading="lazy">
 </a>
 
 <!-- Twitter / X -->
-<a href="#" target="_blank" rel="noopener noreferrer" aria-label="X">
-  <img src="twitter_icon.webp" alt="X">
+<a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)">
+  <img src="twitter_icon.webp" alt="X" loading="lazy">
 </a>
 
 <!-- TikTok -->
 <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-  <img src="tik-tok.webp" alt="TikTok">
+  <img src="tik-tok.webp" alt="TikTok" loading="lazy">
 </a>
 
 <!-- YouTube -->
 <a href="https://youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-  <img src="youtube.webp" alt="YouTube">
+  <img src="youtube.webp" alt="YouTube" loading="lazy">
 </a>
 
 
@@ -259,7 +260,7 @@
             <div class="donate-button">
                 <a href="donate.html" class="btn">Donate Now</a>
             </div>
-            <div class="mobile-menu-toggle">
+            <div class="mobile-menu-toggle" role="button" tabindex="0">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -286,9 +287,9 @@
             </div>
             
             <div class="donation-form-container">
-                <div class="donation-tabs">
-                    <div class="donation-tab active" data-tab="one-time">One-time Donation</div>
-                    <div class="donation-tab" data-tab="monthly">Monthly Donation</div>
+                <div class="donation-tabs" role="tablist">
+                    <div class="donation-tab active" data-tab="one-time" role="tab" aria-selected="true" tabindex="0">One-time Donation</div>
+                    <div class="donation-tab" data-tab="monthly" role="tab" aria-selected="false" tabindex="-1">Monthly Donation</div>
                 </div>
                 
                 <div class="donation-form">
@@ -301,11 +302,11 @@
                         <div class="form-group">
                             <label>Select Amount</label>
                             <div class="amount-options">
-                                <div class="amount-option" data-amount="1000">₨ 1,000</div>
-                                <div class="amount-option active" data-amount="2500">₨ 2,500</div>
-                                <div class="amount-option" data-amount="5000">₨ 5,000</div>
-                                <div class="amount-option" data-amount="10000">₨ 10,000</div>
-                                <div class="amount-option" data-amount="custom">Custom</div>
+                                <div class="amount-option" data-amount="1000" role="button" tabindex="0">₨ 1,000</div>
+                                <div class="amount-option active" data-amount="2500" role="button" tabindex="0">₨ 2,500</div>
+                                <div class="amount-option" data-amount="5000" role="button" tabindex="0">₨ 5,000</div>
+                                <div class="amount-option" data-amount="10000" role="button" tabindex="0">₨ 10,000</div>
+                                <div class="amount-option" data-amount="custom" role="button" tabindex="0">Custom</div>
                             </div>
                             <input type="hidden" name="donation_amount" id="donation-amount-input" value="2500">
                             <div id="custom-amount-container" style="display: none;">
@@ -386,7 +387,7 @@
                         </div>
                         
                         <div class="secure-badge">
-                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
                                 <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                 <path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
@@ -427,7 +428,7 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="logo.webp" alt="Nashr Foundation Logo">
+                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy">
                 </div>
                 <div class="footer-info">
                     <p>Nashr Foundation</p>
@@ -437,34 +438,34 @@
                 <div class="footer-social">
 <!-- Instagram -->
 <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-  <img src="instagram_icon.webp" alt="Instagram">
+  <img src="instagram_icon.webp" alt="Instagram" loading="lazy">
 </a>
 
 <!-- Facebook -->
 <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-  <img src="facebook_icon.webp" alt="Facebook">
+  <img src="facebook_icon.webp" alt="Facebook" loading="lazy">
 </a>
 
 <!-- Twitter / X -->
-<a href="#" target="_blank" rel="noopener noreferrer" aria-label="X">
-  <img src="twitter_icon.webp" alt="X">
+<a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)">
+  <img src="twitter_icon.webp" alt="X" loading="lazy">
 </a>
 
 <!-- TikTok -->
 <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-  <img src="tik-tok.webp" alt="TikTok">
+  <img src="tik-tok.webp" alt="TikTok" loading="lazy">
 </a>
 
 <!-- YouTube -->
 <a href="https://youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-  <img src="youtube.webp" alt="YouTube">
+  <img src="youtube.webp" alt="YouTube" loading="lazy">
 </a>
 
 
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 Nashr Foundation. All rights reserved.</p>
+                <p>© 2025 Nashr Foundation. All rights reserved.</p>
             </div>
         </div>
     </footer>
@@ -475,10 +476,18 @@
             const menuToggle = document.querySelector('.mobile-menu-toggle');
             const nav = document.querySelector('nav');
             
+            
             if (menuToggle && nav) {
                 menuToggle.addEventListener('click', function() {
                     nav.classList.toggle('active');
-                    menuToggle.classList.toggle('active');
+                    const isExpanded = nav.classList.contains('active');
+                    menuToggle.setAttribute('aria-expanded', isExpanded ? 'true' : 'false');
+                });
+                menuToggle.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        this.click();
+                    }
                 });
             }
             
@@ -507,6 +516,12 @@
                         customAmountContainer.style.display = 'none';
                         // Update hidden input with selected amount
                         donationAmountInput.value = this.dataset.amount;
+                    }
+                });
+                option.addEventListener('keydown', function(event) {
+                    if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        this.click();
                     }
                 });
             });
@@ -563,12 +578,18 @@
             const donationTypeInput = document.getElementById('donation-type-input');
             
             donationTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Remove active class from all tabs
-                    donationTabs.forEach(t => t.classList.remove('active'));
+    tab.addEventListener('click', function() {
+// Remove active class and ARIA states from all tabs
+                    donationTabs.forEach(t => {
+                        t.classList.remove('active');
+                        t.setAttribute('aria-selected', 'false');
+                        t.setAttribute('tabindex', '-1');
+                    });
                     
-                    // Add active class to clicked tab
+                    // Add active class and ARIA states to clicked tab
                     this.classList.add('active');
+                    this.setAttribute('aria-selected', 'true');
+                    this.setAttribute('tabindex', '0');
                     
                     // Update form title based on selected tab
                     const donationType = this.dataset.tab;
@@ -576,8 +597,28 @@
                     
                     // Update hidden input with donation type
                     donationTypeInput.value = donationType;
-                });
-            });
+    });
+    // Add basic keyboard activation for tabs if they get focus
+    tab.addEventListener('keydown', function(event) {
+        if (event.key === 'Enter' || event.key === ' ') {
+            event.preventDefault();
+            this.click();
+        }
+        // Basic arrow key support (can be expanded)
+        else if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+            event.preventDefault();
+            const currentTabIndex = Array.from(donationTabs).indexOf(this);
+            let newTabIndex;
+            if (event.key === 'ArrowRight') {
+                newTabIndex = (currentTabIndex + 1) % donationTabs.length;
+            } else { // ArrowLeft
+                newTabIndex = (currentTabIndex - 1 + donationTabs.length) % donationTabs.length;
+            }
+            donationTabs[newTabIndex].focus(); // Move focus
+            donationTabs[newTabIndex].click(); // And activate
+        }
+    });
+});
             
             // Form submission validation
             const donationForm = document.getElementById('donation-form');
