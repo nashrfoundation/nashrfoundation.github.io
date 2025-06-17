@@ -3,11 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!--
+        INSTRUCTIONS FOR USER:
+        1. IMAGE DIMENSIONS: Replace placeholder width/height in <img> tags with actual image dimensions.
+        2. FONT PRELOADING: Update placeholder hrefs in <link rel="preload" as="font"> tags
+           with actual .woff2 URLs for Lora, Merriweather, and Playfair Display.
+        3. CSP (CONTENT SECURITY POLICY): Test and adjust the CSP meta tag. It must allow Formspree.
+        4. HERO IMAGE: Update <picture> sources if this page uses a different hero than index.html.
+           If using same hero images, file names hero_background_desktop.webp and hero_background_mobile.webp apply.
+           Ensure these files are created and optimized.
+        5. CONSOLE ERRORS & DEPRECATED APIS: Check DevTools Console for errors/warnings.
+    -->
+
+    <!-- Basic Content Security Policy (CSP) - NEEDS CAREFUL TESTING AND ADJUSTMENT! -->
+    <meta http-equiv="Content-Security-Policy" 
+    content="default-src 'self' https://nashrfoundation.github.io; 
+             script-src 'self' 'unsafe-inline' https://unpkg.com https://formspree.io; 
+             style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; 
+             img-src 'self' https://nashrfoundation.github.io data:; 
+             font-src 'self' https://fonts.gstatic.com;
+             connect-src 'self' https://formspree.io;
+             form-action 'self' https://formspree.io;
+             frame-src https://formspree.io;"> <!-- Added form-action -->
+
     <title>Donate - Nashr Foundation</title>
-    <!-- SEO Meta Tags specific to Donate page - consider adding -->
-    <meta name="description" content="Support Nashr Foundation by making a one-time or monthly donation. Your contribution helps us empower communities in Pakistan.">
-    
-    <link rel="preload" as="image" href="hero_background.webp" fetchpriority="high">
+    <meta name="description" content="Support Nashr Foundation. Your donation helps empower communities in Pakistan through education, food, and clean water projects.">
+    <meta name="robots" content="index, follow"> <!-- Or noindex, follow if you don't want donate page indexed directly -->
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nashrfoundation.github.io/donate.html">
+    <meta property="og:title" content="Donate to Nashr Foundation">
+    <meta property="og:description" content="Help us make a difference. Every contribution counts.">
+    <meta property="og:image" content="https://nashrfoundation.github.io/hero_background_desktop.webp"> <!-- Use appropriate image -->
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://nashrfoundation.github.io/donate.html">
+    <meta property="twitter:title" content="Donate to Nashr Foundation">
+    <meta property="twitter:description" content="Help us make a difference. Every contribution counts.">
+    <meta property="twitter:image" content="https://nashrfoundation.github.io/hero_background_desktop.webp">
+
+    <link rel="canonical" href="https://nashrfoundation.github.io/donate.html">
+
+    <!-- Preload LCP Image Candidates for this page -->
+    <!-- USER: Update these if donate.html has a DIFFERENT hero image -->
+    <link rel="preload" as="image" href="hero_background_desktop.webp" fetchpriority="high" media="(min-width: 769px)">
+    <link rel="preload" as="image" href="hero_background_mobile.webp" fetchpriority="high" media="(max-width: 768px)">
+
+    <!-- Preload Critical Fonts (REPLACE placeholder hrefs!) -->
+    <link rel="preload" href="https://fonts.gstatic.com/s/lora/v32/0QI6MX1D_JOu_tvrdMHz2zlNV2n_DPm4_As.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+    <link rel="preload" href="https://fonts.gstatic.com/s/merriweather/v30/u-440qyriQwlOrhSvowK_l5-eR7lXff1jvzRPA.woff2" as="font" type="font/woff2" crossorigin="anonymous">
     
     <link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="styles.css"></noscript>
@@ -15,16 +62,14 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
-    
-    <!-- Removed inline <style> block; styles will come from styles.css -->
-
 </head>
 <body>
     <header>
         <div class="container">
             <div class="logo">
                 <a href="index.html">
-                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy">
+                    <!-- USER: Replace with actual dimensions of your logo.webp -->
+                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" width="180" height="90">
                 </a>
             </div>
             <nav id="main-navigation">
@@ -34,26 +79,27 @@
                 </ul>
             </nav>
             <div class="social-icons">
+                 <!-- USER: Replace with actual dimensions of your icons -->
                 <a href="javascript:void(0)" onclick="openAppOrFallback('instagram://user?username=nashrfoundation', 'https://www.instagram.com/nashrfoundation')" aria-label="Instagram">
-                    <img src="instagram_icon.webp" alt="Instagram" loading="lazy">
+                    <img src="instagram_icon.webp" alt="Instagram" loading="lazy" width="24" height="24">
                 </a>
                 <a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/nashrfoundation')" aria-label="Facebook">
-                    <img src="facebook_icon.webp" alt="Facebook" loading="lazy">
+                    <img src="facebook_icon.webp" alt="Facebook" loading="lazy" width="24" height="24">
                 </a>
                 <a href="javascript:void(0)" onclick="openAppOrFallback('twitter://user?screen_name=Nashrfoundation', 'https://x.com/Nashrfoundation')" aria-label="X">
-                    <img src="twitter_icon.webp" alt="X" loading="lazy">
+                    <img src="twitter_icon.webp" alt="X" loading="lazy" width="24" height="24">
                 </a>
                 <a href="javascript:void(0)" onclick="openAppOrFallback('tiktok://user/@nashr756', 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1')" aria-label="TikTok">
-                    <img src="tik-tok.webp" alt="TikTok" loading="lazy">
+                    <img src="tik-tok.webp" alt="TikTok" loading="lazy" width="24" height="24">
                 </a>
                 <a href="javascript:void(0)" onclick="openAppOrFallback('vnd.youtube://channel/UCQ2RTGnVYClM5sYOYbBoP6A', 'https://youtube.com/@nashrfoundation')" aria-label="YouTube">
-                    <img src="youtube.webp" alt="YouTube" loading="lazy">
+                    <img src="youtube.webp" alt="YouTube" loading="lazy" width="24" height="24">
                 </a>
             </div>
             <div class="donate-button">
                 <a href="donate.html" class="btn">Donate Now</a>
             </div>
-            <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="main-navigation">
+             <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="main-navigation">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -61,167 +107,172 @@
         </div>
     </header>
 
-    <section class="hero" style="height: 50vh; min-height: 400px;">
-        <div class="hero-image">
-            <img src="hero_background.webp" alt="Hands offering support, symbolizing donation impact"> <!-- Alt text improved -->
-        </div>
-        <div class="hero-overlay"></div>
-        <div class="hero-content">
-            <h1>Make a Difference Today</h1>
-            <p>Your donation helps provide education, food, water, and basic necessities to those in need</p>
-        </div>
-    </section>
-
-    <section class="donation-section">
-        <div class="container">
-            <div class="donation-header">
-                <h2>Your Support Changes Lives</h2>
-                <p>Every contribution, no matter the size, helps us provide essential services to communities in need. Choose your preferred donation method below.</p>
+    <main>
+        <!-- Hero section with specific styling for donate page via class & inline style if absolutely needed -->
+        <section class="hero donate-page-hero" style="--hero-height: 50vh; --hero-min-height: 400px;"> <!-- CSS variables if needed -->
+             <picture>
+                <!-- USER: Update srcset if donate.html uses different hero images -->
+                <source media="(max-width: 768px)" srcset="hero_background_mobile.webp">
+                <source media="(min-width: 769px)" srcset="hero_background_desktop.webp">
+                <!-- Fallback img. USER: Replace with actual intrinsic dimensions. -->
+                <img src="hero_background_desktop.webp" 
+                     alt="Hands offering support, symbolizing the impact of donations" 
+                     width="1920" height="1080" class="hero-image-tag">
+            </picture>
+            <div class="hero-overlay"></div>
+            <div class="hero-content">
+                <h1>Make a Difference Today</h1>
+                <p>Your donation helps provide education, food, water, and basic necessities to those in need</p>
             </div>
-            
-            <div class="donation-form-container">
-                <div class="donation-tabs">
-                    <div class="donation-tab active" data-tab="one-time">One-time Donation</div>
-                    <div class="donation-tab" data-tab="monthly">Monthly Donation</div>
+        </section>
+
+        <section class="donation-section">
+            <div class="container">
+                <div class="donation-header">
+                    <h2>Your Support Changes Lives</h2>
+                    <p>Every contribution, no matter the size, helps us provide essential services to communities in need. Choose your preferred donation intention below.</p>
                 </div>
                 
-                <div class="donation-form">
-                    <form action="https://formspree.io/f/xanjnelw" method="POST" id="donation-form">
-                        <div id="donation-type-display" style="text-align: center; margin-bottom: 20px; font-weight: 500; color: var(--text-primary);">One-time Donation</div>
-                        
-                        <input type="hidden" name="donation_type" id="donation-type-input" value="one-time">
-                        
-                        <div class="form-group">
-                            <label for="donation-amount-selector">Select Amount</label> <!-- Added for attribute -->
-                            <div class="amount-options" id="donation-amount-selector">
-                                <div class="amount-option" data-amount="1000" role="button" tabindex="0">₨ 1,000</div>
-                                <div class="amount-option active" data-amount="2500" role="button" tabindex="0">₨ 2,500</div>
-                                <div class="amount-option" data-amount="5000" role="button" tabindex="0">₨ 5,000</div>
-                                <div class="amount-option" data-amount="10000" role="button" tabindex="0">₨ 10,000</div>
-                                <div class="amount-option" data-amount="custom" role="button" tabindex="0">Custom</div>
-                            </div>
-                            <input type="hidden" name="donation_amount" id="donation-amount-input" value="2500">
-                            <div id="custom-amount-container" style="display: none; margin-top: 10px;">
-                                <label for="custom-amount" class="sr-only">Custom Donation Amount in PKR</label> <!-- sr-only for accessibility if label is visually hidden by design -->
-                                <input type="number" class="form-control" id="custom-amount" name="custom_donation_amount_pkr" placeholder="Enter amount in PKR" min="1">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <p><strong>Payment Method</strong></p> <!-- Changed label to p for group title -->
-                            <div class="payment-methods" style="display: none;"> <!-- Hidden until functionality is ready -->
-                                <div class="payment-method active" role="radio" aria-checked="true" tabindex="0">
-                                    <input type="radio" name="payment_method" id="jazzcash" value="jazzcash" checked>
-                                    <label for="jazzcash">JazzCash</label>
+                <div class="donation-form-container">
+                    <div class="donation-tabs">
+                        <div class="donation-tab active" data-tab="one-time" role="tab" aria-selected="true" tabindex="0">One-time Donation</div>
+                        <div class="donation-tab" data-tab="monthly" role="tab" aria-selected="false" tabindex="-1">Monthly Donation</div>
+                    </div>
+                    
+                    <div class="donation-form">
+                        <form action="https://formspree.io/f/xanjnelw" method="POST" id="donation-form">
+                            <div id="donation-type-display" style="text-align: center; margin-bottom: 20px; font-weight: 500; color: var(--text-primary);">One-time Donation</div>
+                            <input type="hidden" name="donation_type" id="donation-type-input" value="one-time">
+                            
+                            <fieldset class="form-group">
+                                <legend>Select Amount (PKR)</legend>
+                                <div class="amount-options" id="donation-amount-selector">
+                                    <div class="amount-option" data-amount="1000" role="button" tabindex="0">₨ 1,000</div>
+                                    <div class="amount-option active" data-amount="2500" role="button" tabindex="0">₨ 2,500</div>
+                                    <div class="amount-option" data-amount="5000" role="button" tabindex="0">₨ 5,000</div>
+                                    <div class="amount-option" data-amount="10000" role="button" tabindex="0">₨ 10,000</div>
+                                    <div class="amount-option" data-amount="custom" role="button" tabindex="0">Custom</div>
                                 </div>
-                                <div class="payment-method" role="radio" aria-checked="false" tabindex="0">
-                                    <input type="radio" name="payment_method" id="easypaisa" value="easypaisa">
-                                    <label for="easypaisa">EasyPaisa</label>
+                                <input type="hidden" name="donation_amount_pkr" id="donation-amount-input" value="2500">
+                                <div id="custom-amount-container" style="display: none; margin-top: 10px;">
+                                    <label for="custom-amount" class="sr-only">Custom Donation Amount in PKR</label>
+                                    <input type="number" class="form-control" id="custom-amount" name="custom_donation_amount_pkr_field" placeholder="Enter amount in PKR" min="100" step="100"> <!-- Added min/step -->
                                 </div>
-                                <div class="payment-method" role="radio" aria-checked="false" tabindex="0">
-                                    <input type="radio" name="payment_method" id="bank-transfer" value="bank-transfer">
-                                    <label for="bank-transfer">Bank Transfer</label>
+                            </fieldset>
+                            
+                            <fieldset class="form-group">
+                                <legend>Payment Method Intention</legend>
+                                <!-- Payment options are currently visually hidden by CSS (display: none in .payment-methods style).-->
+                                <!-- When ready, remove display:none from .payment-methods in styles.css -->
+                                <!-- Or control visibility via JS based on actual integration readiness -->
+                                <div class="payment-methods" style="/* display: none; */"> <!-- Comment out to show; JS handles showing details based on selection -->
+                                    <div class="payment-method active" role="radio" aria-checked="true" tabindex="0">
+                                        <input type="radio" name="payment_method_intention" id="jazzcash" value="jazzcash" checked>
+                                        <label for="jazzcash">JazzCash</label>
+                                    </div>
+                                    <div class="payment-method" role="radio" aria-checked="false" tabindex="0">
+                                        <input type="radio" name="payment_method_intention" id="easypaisa" value="easypaisa">
+                                        <label for="easypaisa">EasyPaisa</label>
+                                    </div>
+                                    <div class="payment-method" role="radio" aria-checked="false" tabindex="0">
+                                        <input type="radio" name="payment_method_intention" id="bank-transfer" value="bank-transfer">
+                                        <label for="bank-transfer">Bank Transfer</label>
+                                    </div>
                                 </div>
+                                
+                                <div class="payment-details" id="jazzcash-details" style="display: none;"> <!-- JS will toggle this -->
+                                    <p><strong>JazzCash Details:</strong></p>
+                                    <p>Account Title: [Placeholder Name]</p>
+                                    <p>Account Number: [Placeholder 03xxxxxxxxx]</p>
+                                    <p>Please include your name in the transaction note.</p>
+                                </div>
+                                <div class="payment-details" id="easypaisa-details" style="display: none;">
+                                    <p><strong>EasyPaisa Details:</strong></p>
+                                    <p>Account Title: [Placeholder Name]</p>
+                                    <p>Account Number: [Placeholder 03xxxxxxxxx]</p>
+                                    <p>Please include your name in the transaction note.</p>
+                                </div>
+                                <div class="payment-details" id="bank-details" style="display: none;">
+                                    <p><strong>Bank Transfer Details:</strong></p>
+                                    <p>Bank Name: [Placeholder Bank]</p>
+                                    <p>Account Title: [Placeholder Name]</p>
+                                    <p>Account Number: [Placeholder Number]</p>
+                                    <p>IBAN: [Placeholder IBAN]</p>
+                                    <p>Please include your name in the transaction reference.</p>
+                                </div>
+                                <div class="coming-soon-message"> <!-- This message shows if .payment-methods is display:none OR JS controls its display-->
+                                    <p><strong>Online payment processing is coming soon!</strong></p>
+                                    <p>For now, please submit your details. We will contact you to arrange payment via your preferred method.</p>
+                                </div>
+                            </fieldset>
+                            
+                            <div class="form-group">
+                                <label for="donor-name">Your Name</label>
+                                <input type="text" class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required autocomplete="name">
                             </div>
                             
-                            <div class="payment-details" id="jazzcash-details" style="display: none;">
-                                <p><strong>JazzCash Details:</strong></p>
-                                <p>Account Title: [Placeholder]</p>
-                                <p>Account Number: [Placeholder]</p>
-                                <p>Please include your name in the transaction note.</p>
+                            <div class="form-group">
+                                <label for="donor-email">Email Address</label>
+                                <input type="email" class="form-control" id="donor-email" name="email" placeholder="Enter your email address" required autocomplete="email">
                             </div>
                             
-                            <div class="payment-details" id="easypaisa-details" style="display: none;">
-                                <p><strong>EasyPaisa Details:</strong></p>
-                                <p>Account Title: [Placeholder]</p>
-                                <p>Account Number: [Placeholder]</p>
-                                <p>Please include your name in the transaction note.</p>
+                            <fieldset class="form-group">
+                                <legend class="sr-only">Display Preferences</legend>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="leaderboard-consent" name="leaderboard_consent" value="yes" checked>
+                                    <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="anonymous-donation" name="anonymous_donation" value="yes">
+                                    <label for="anonymous-donation">Make my donation anonymous (will not appear on leaderboard)</label>
+                                </div>
+                            </fieldset>
+                            
+                            <div class="form-submit">
+                                <button type="submit" class="btn">Submit Donation Intention</button>
                             </div>
                             
-                            <div class="payment-details" id="bank-details" style="display: none;">
-                                <p><strong>Bank Transfer Details:</strong></p>
-                                <p>Bank Name: [Placeholder]</p>
-                                <p>Account Title: [Placeholder]</p>
-                                <p>Account Number: [Placeholder]</p>
-                                <p>IBAN: [Placeholder]</p>
-                                <p>Please include your name in the transaction reference.</p>
+                            <div class="secure-badge">
+                                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg>
+                                <span>Your personal information will be kept secure.</span>
                             </div>
-                            <div class="coming-soon-message">
-                                <p><strong>Payment options are coming soon!</strong></p>
-                                <p>We are currently setting up secure payment accounts. Thank you for your patience.</p>
-                                <p>In the meantime, you can still submit your donation details below, and we'll contact you with payment information or to complete the process.</p>
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="donor-name">Your Name</label>
-                            <input type="text" class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required autocomplete="name">
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="donor-email">Email Address</label>
-                            <input type="email" class="form-control" id="donor-email" name="email" placeholder="Enter your email address" required autocomplete="email">
-                        </div>
-                        
-                        <fieldset class="form-group"> <!-- Group checkboxes -->
-                            <legend class="sr-only">Display Preferences</legend> <!-- For screen readers -->
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="leaderboard-consent" name="leaderboard_consent" value="yes" checked>
-                                <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label>
-                            </div>
-                            
-                            <div class="checkbox-group">
-                                <input type="checkbox" id="anonymous-donation" name="anonymous_donation" value="yes">
-                                <label for="anonymous-donation">Make my donation anonymous (will not appear on leaderboard)</label>
-                            </div>
-                        </fieldset>
-                        
-                        <div class="form-submit">
-                            <button type="submit" class="btn">Complete Donation Intention</button> <!-- Wording adjusted as payments are not live -->
-                        </div>
-                        
-                        <div class="secure-badge">
-                            <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="width: 16px; height: 16px; margin-right: var(--spacing-xs); fill: currentColor;">
-                                <!-- Simple lock icon or info icon -->
-                                <path d="M12 11.57C12.89 11.57 13.57 12.24 13.57 13.21C13.57 14.19 12.89 14.86 12 14.86C11.11 14.86 10.43 14.19 10.43 13.21C10.43 12.24 11.11 11.57 12 11.57ZM12 2C6.48 2 2 6.48 2 12C2 17.52 6.48 22 12 22C17.52 22 22 17.52 22 12C22 6.48 17.52 2 12 2ZM12 20C7.59 20 4 16.41 4 12C4 7.59 7.59 4 12 4C16.41 4 20 7.59 20 12C20 16.41 16.41 20 12 20ZM12 6.28C11.11 6.28 10.43 6.96 10.43 7.93C10.43 8.91 11.11 9.58 12 9.58C12.89 9.58 13.57 8.91 13.57 7.93C13.57 6.96 12.89 6.28 12 6.28Z" fill="currentColor"/>
-                            </svg>
-                            <span>Your personal information will be kept secure.</span> <!-- Adjusted message -->
-                        </div>
-                    </form>
+                        </form>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
 
-    <section class="impact" style="padding: var(--spacing-lg ) 0;">
-        <div class="container">
-            <h2>Your Donation's Impact</h2>
-            <div class="impact-stats">
-                <div class="stat">
-                    <div class="stat-number">₨ 1,000</div>
-                    <div class="stat-label">Provides school supplies for one child</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">₨ 2,500</div>
-                    <div class="stat-label">Feeds a family for one week</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">₨ 5,000</div>
-                    <div class="stat-label">Provides clean water for a month</div>
-                </div>
-                <div class="stat">
-                    <div class="stat-number">₨ 10,000</div>
-                    <div class="stat-label">Supports a child's education for a term</div>
+        <section class="impact" style="padding: var(--spacing-lg) 0;"> <!-- Re-added style for consistency -->
+            <div class="container">
+                <h2>Your Donation's Impact</h2>
+                <div class="impact-stats">
+                    <div class="stat">
+                        <div class="stat-number">₨ 1,000</div>
+                        <div class="stat-label">Provides school supplies for one child</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">₨ 2,500</div>
+                        <div class="stat-label">Feeds a family for one week</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">₨ 5,000</div>
+                        <div class="stat-label">Contributes to clean water access</div>
+                    </div>
+                    <div class="stat">
+                        <div class="stat-number">₨ 10,000</div>
+                        <div class="stat-label">Supports a child's education for a term</div>
+                    </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
 
     <footer>
         <div class="container">
             <div class="footer-content">
                 <div class="footer-logo">
-                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy">
+                    <!-- USER: Replace with actual dimensions -->
+                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" width="160" height="80">
                 </div>
                 <div class="footer-info">
                     <p>Nashr Foundation</p>
@@ -229,20 +280,21 @@
                     <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p>
                 </div>
                 <div class="footer-social">
+                    <!-- USER: Replace with actual dimensions -->
                     <a href="javascript:void(0)" onclick="openAppOrFallback('instagram://user?username=nashrfoundation', 'https://www.instagram.com/nashrfoundation')" aria-label="Instagram">
-                      <img src="instagram_icon.webp" alt="Instagram" loading="lazy">
+                      <img src="instagram_icon.webp" alt="Instagram" loading="lazy" width="32" height="32">
                     </a>
                     <a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/nashrfoundation')" aria-label="Facebook">
-                      <img src="facebook_icon.webp" alt="Facebook" loading="lazy">
+                      <img src="facebook_icon.webp" alt="Facebook" loading="lazy" width="32" height="32">
                     </a>
                     <a href="javascript:void(0)" onclick="openAppOrFallback('twitter://user?screen_name=Nashrfoundation', 'https://x.com/Nashrfoundation')" aria-label="X">
-                      <img src="twitter_icon.webp" alt="X" loading="lazy">
+                      <img src="twitter_icon.webp" alt="X" loading="lazy" width="32" height="32">
                     </a>
                     <a href="javascript:void(0)" onclick="openAppOrFallback('tiktok://user/@nashr756', 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1')" aria-label="TikTok">
-                      <img src="tik-tok.webp" alt="TikTok" loading="lazy">
+                      <img src="tik-tok.webp" alt="TikTok" loading="lazy" width="32" height="32">
                     </a>
                     <a href="javascript:void(0)" onclick="openAppOrFallback('vnd.youtube://channel/UCQ2RTGnVYClM5sYOYbBoP6A', 'https://youtube.com/@nashrfoundation')" aria-label="YouTube">
-                      <img src="youtube.webp" alt="YouTube" loading="lazy">
+                      <img src="youtube.webp" alt="YouTube" loading="lazy" width="32" height="32">
                     </a>
                 </div>
             </div>
@@ -251,40 +303,31 @@
             </div>
         </div>
     </footer>
+    
+    <!-- sr-only style helper, could be moved to styles.css -->
+    <style class="sr-only-helper">
+      .sr-only {position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border-width: 0;}
+    </style>
+
     <script>
-    // General class for sr-only, useful for accessibility
-    const style = document.createElement('style');
-    style.innerHTML = `
-      .sr-only {
-        position: absolute;
-        width: 1px;
-        height: 1px;
-        padding: 0;
-        margin: -1px;
-        overflow: hidden;
-        clip: rect(0, 0, 0, 0);
-        white-space: nowrap;
-        border-width: 0;
-      }
-    `;
-    document.head.appendChild(style);
-    </script>
-    <script>
+        // Placed specific donate.html JS here. 
+        // Global scripts like openAppOrFallback, AOS, parallax are in index.html (or should be in a shared common.js)
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu toggle
+            // CHECK BROWSER CONSOLE FOR ERRORS AND DEPRECATED API WARNINGS!
+
+            // Mobile menu toggle (if not in a shared common.js)
             const menuToggle = document.querySelector('.mobile-menu-toggle');
-            const nav = document.querySelector('#main-navigation'); // Target by ID
-            
+            const nav = document.querySelector('#main-navigation');
             if (menuToggle && nav) {
                 menuToggle.addEventListener('click', function() {
                     const isExpanded = nav.classList.toggle('active');
                     menuToggle.classList.toggle('active');
-                    menuToggle.setAttribute('aria-expanded', isExpanded);
+                    menuToggle.setAttribute('aria-expanded', String(isExpanded));
                 });
             }
-            
-            // Donation amount selection
-            const amountOptions = document.querySelectorAll('.amount-option');
+
+            // --- Donation Form Specific JS ---
+            const amountOptions = document.querySelectorAll('.donation-form .amount-option');
             const customAmountContainer = document.getElementById('custom-amount-container');
             const donationAmountInput = document.getElementById('donation-amount-input');
             const customAmountField = document.getElementById('custom-amount');
@@ -295,39 +338,44 @@
                     this.classList.add('active');
                     
                     if (this.dataset.amount === 'custom') {
-                        customAmountContainer.style.display = 'block';
-                        customAmountField.focus();
-                        donationAmountInput.value = customAmountField.value || ''; // Set to current custom value or empty
-                        // Event listener for custom amount field is now separate for clarity
+                        if(customAmountContainer) customAmountContainer.style.display = 'block';
+                        if(customAmountField) customAmountField.focus();
+                        if(donationAmountInput && customAmountField) donationAmountInput.value = customAmountField.value || '';
                     } else {
-                        customAmountContainer.style.display = 'none';
-                        donationAmountInput.value = this.dataset.amount;
-                        customAmountField.value = ''; // Clear custom field if a preset is chosen
+                        if(customAmountContainer) customAmountContainer.style.display = 'none';
+                        if(donationAmountInput) donationAmountInput.value = this.dataset.amount;
+                        if(customAmountField) customAmountField.value = ''; 
                     }
                 });
-                // Keyboard accessibility for amount options
-                option.addEventListener('keydown', function(e) {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.click();
-                    }
-                });
+                option.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }});
             });
 
             if (customAmountField) {
                  customAmountField.addEventListener('input', function() {
-                    donationAmountInput.value = this.value;
+                    if(donationAmountInput) donationAmountInput.value = this.value;
                 });
             }
             
-            // Payment method selection (currently hidden visually, kept for future use)
-            const paymentMethods = document.querySelectorAll('.payment-method');
+            const paymentMethods = document.querySelectorAll('.donation-form .payment-method');
             const paymentDetailsDivs = {
                 'jazzcash': document.getElementById('jazzcash-details'),
                 'easypaisa': document.getElementById('easypaisa-details'),
                 'bank-transfer': document.getElementById('bank-details')
             };
+            const comingSoonMessage = document.querySelector('.donation-form .coming-soon-message');
+            const actualPaymentMethodsContainer = document.querySelector('.donation-form .payment-methods');
+
+            // Logic to show payment methods or coming soon message
+            // For now, let's assume payment methods are NOT ready and show coming soon
+            // If they WERE ready, you'd hide comingSoonMessage and show actualPaymentMethodsContainer
+            if (actualPaymentMethodsContainer) actualPaymentMethodsContainer.style.display = 'none'; // Initially hide actual methods
+            if (comingSoonMessage) comingSoonMessage.style.display = 'block'; // Show coming soon
             
+            // --- Below JS would be active if payment methods are LIVE ---
+            /* 
+            if (actualPaymentMethodsContainer) actualPaymentMethodsContainer.style.display = 'block'; // Show actual methods
+            if (comingSoonMessage) comingSoonMessage.style.display = 'none'; // Hide coming soon
+
             paymentMethods.forEach(method => {
                 method.addEventListener('click', function() {
                     const radio = this.querySelector('input[type="radio"]');
@@ -341,127 +389,95 @@
                         paymentDetailsDivs[radio.value].style.display = 'block';
                     }
                 });
-                method.addEventListener('keydown', function(e) { // Keyboard accessibility
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        this.click();
-                    }
-                });
+                method.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }});
             });
-            
-            // Anonymous donation checkbox logic
+            // Show details for initially checked payment method
+            const initialPaymentRadio = document.querySelector('.payment-method input[type="radio"]:checked');
+            if (initialPaymentRadio && paymentDetailsDivs[initialPaymentRadio.value]) {
+                paymentDetailsDivs[initialPaymentRadio.value].style.display = 'block';
+            }
+            */
+            // --- End of LIVE payment methods JS ---
+
             const anonymousCheckbox = document.getElementById('anonymous-donation');
             const leaderboardCheckbox = document.getElementById('leaderboard-consent');
-            
             if (anonymousCheckbox && leaderboardCheckbox) {
                 anonymousCheckbox.addEventListener('change', function() {
-                    if (this.checked) {
-                        leaderboardCheckbox.checked = false;
-                        leaderboardCheckbox.disabled = true;
-                    } else {
-                        leaderboardCheckbox.disabled = false;
-                    }
+                    leaderboardCheckbox.disabled = this.checked;
+                    if (this.checked) leaderboardCheckbox.checked = false;
                 });
             }
             
-            // Donation tabs
             const donationTabs = document.querySelectorAll('.donation-tab');
             const donationTypeDisplay = document.getElementById('donation-type-display');
             const donationTypeInput = document.getElementById('donation-type-input');
-            
             donationTabs.forEach(tab => {
                 tab.addEventListener('click', function() {
-                    donationTabs.forEach(t => t.classList.remove('active'));
+                    donationTabs.forEach(t => { t.classList.remove('active'); t.setAttribute('aria-selected', 'false'); t.setAttribute('tabindex', '-1'); });
                     this.classList.add('active');
-                    
+                    this.setAttribute('aria-selected', 'true');
+                    this.setAttribute('tabindex', '0');
                     const donationType = this.dataset.tab;
                     if(donationTypeDisplay) donationTypeDisplay.textContent = donationType === 'monthly' ? 'Monthly Donation' : 'One-time Donation';
                     if(donationTypeInput) donationTypeInput.value = donationType;
                 });
+                tab.addEventListener('keydown', function(e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); this.click(); }});
             });
             
-            // Form submission validation
             const donationForm = document.getElementById('donation-form');
             if (donationForm) {
                 donationForm.addEventListener('submit', function(e) {
-                    const activeAmountOption = document.querySelector('.amount-option.active');
+                    const activeAmountOption = document.querySelector('.donation-form .amount-option.active');
                     if (activeAmountOption && activeAmountOption.dataset.amount === 'custom') {
-                        const customAmountValue = customAmountField.value;
+                        const customAmountValue = customAmountField ? customAmountField.value : '';
                         if (!customAmountValue || parseFloat(customAmountValue) <= 0) {
                             e.preventDefault();
                             alert('Please enter a valid positive donation amount.');
-                            customAmountField.focus();
+                            if(customAmountField) customAmountField.focus();
                             return;
                         }
-                        donationAmountInput.value = customAmountValue;
+                        if(donationAmountInput) donationAmountInput.value = customAmountValue;
                     }
+                    // Add further validation if needed (e.g. for specific payment fields when live)
                 });
             }
             
-            // Dynamic color theme based on time of day (copied from index)
+            // Dynamic color theme
             const hour = new Date().getHours();
             const root = document.documentElement;
+            if (hour >= 18 || hour < 6) { root.style.setProperty('--primary', '#0D5965'); root.style.setProperty('--accent', '#F9A826'); }
+            else if (hour >= 6 && hour < 12) { root.style.setProperty('--primary', '#1A6E7C'); root.style.setProperty('--accent', '#FFBE55'); }
+            else { root.style.setProperty('--primary', '#2A8D9C'); root.style.setProperty('--accent', '#F9A826'); }
 
-            if (hour >= 18 || hour < 6) {
-                root.style.setProperty('--primary', '#0D5965'); root.style.setProperty('--accent', '#F9A826'); // Evening
-            } else if (hour >= 6 && hour < 12) {
-                root.style.setProperty('--primary', '#1A6E7C'); root.style.setProperty('--accent', '#FFBE55'); // Morning
-            } else {
-                root.style.setProperty('--primary', '#2A8D9C'); root.style.setProperty('--accent', '#F9A826'); // Afternoon
-            }
-
-            // Parallax effect for hero section (copied from index)
+            // Parallax (if hero exists and is similar to index.html)
             window.addEventListener('scroll', function() {
                 const scrollPosition = window.pageYOffset;
-                const heroImage = document.querySelector('.hero .hero-image img'); // More specific selector
-                if (heroImage) {
-                    heroImage.style.transform = `translateY(${scrollPosition * 0.4}px)`;
+                const heroImageElement = document.querySelector('.hero picture img.hero-image-tag');
+                if (heroImageElement) {
+                    heroImageElement.style.transform = `translateY(${scrollPosition * 0.3}px)`;
                 }
             });
 
-            // Animate stats when they come into view (copied from index)
+            // Animate stats
             const stats = document.querySelectorAll('.stat-number');
-            const animateStats = () => {
-                stats.forEach(stat => {
-                    const rect = stat.getBoundingClientRect();
-                    const isInView = rect.top <= window.innerHeight && rect.bottom >= 0;
-                    
-                    if (isInView && !stat.classList.contains('animated')) { // Animate only once
-                        stat.classList.add('animated');
-                        // Optional: Add counter animation here
-                    }
-                });
-            };
+            const animateStats = () => stats.forEach(stat => {
+                const rect = stat.getBoundingClientRect();
+                if (rect.top <= window.innerHeight && rect.bottom >= 0 && !stat.classList.contains('animated')) {
+                    stat.classList.add('animated', 'fadeInUp'); // Added specific animation class
+                }
+            });
             window.addEventListener('scroll', animateStats);
-            animateStats(); // Initial call
+            animateStats();
         });
     </script>
     <script>
-      function openAppOrFallback(appUrl, fallbackUrl) {
+      function openAppOrFallback(appUrl, fallbackUrl) { /* Keep this global function */
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-        
-        if (!isMobile) {
-          window.location.href = fallbackUrl; // Use href for clarity
-          return;
-        }
-
-        const timeout = setTimeout(() => {
-          window.location.href = fallbackUrl;
-        }, 2500); // Slightly longer timeout
-
-        // Attempt to open the app
-        // Using window.location.href might be more reliable for some app schemes
-        window.location.href = appUrl; 
-
-        window.addEventListener("pagehide", function onPageHide() { // pagehide is more robust than visibilitychange for this
-            clearTimeout(timeout);
-            window.removeEventListener("pagehide", onPageHide);
-        });
-        // For some newer Android versions, focus change might also indicate app switch
-        window.addEventListener("blur", function onBlur() {
-            clearTimeout(timeout);
-            window.removeEventListener("blur", onBlur);
-        });
+        if (!isMobile) { window.location.href = fallbackUrl; return; }
+        const timeout = setTimeout(() => { window.location.href = fallbackUrl; }, 2500);
+        window.location.href = appUrl;
+        function cft() { clearTimeout(timeout); window.removeEventListener("pagehide", cft); window.removeEventListener("blur", cft); }
+        window.addEventListener("pagehide", cft); window.addEventListener("blur", cft);
       }
     </script>
 </body>
