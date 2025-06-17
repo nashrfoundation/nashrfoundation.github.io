@@ -8,12 +8,12 @@
     <meta name="description" content="Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.">
     <link rel="canonical" href="https://nashrfoundation.github.io/">
 
-    <!-- Preload LCP image and fonts. -->
+    <!-- Preload LCP image and optimized fonts. -->
     <link rel="preload" fetchpriority="high" as="image" href="hero_background.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Merriweather:wght@400;700&display=swap" as="style">
     
-    <!-- Asynchronously load the fonts so they don't block rendering -->
+    <!-- Asynchronously load the optimized fonts so they don't block rendering -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Merriweather:wght@400;700&display=swap" media="print" onload="this.media='all'">
 
     <!-- Inlined Critical CSS for instant rendering of above-the-fold content -->
@@ -52,7 +52,7 @@
         @media (max-width:768px){.logo img{height:72px}.mobile-menu-toggle{display:flex}.donate-button{display:none}nav{position:fixed;top:80px;left:0;width:100%;background-color:rgba(44,44,44,.95);max-height:0;overflow:hidden;transition:max-height .5s ease}nav.active{max-height:300px}nav ul{flex-direction:column;padding:1.5rem}nav ul li{margin:0 0 1rem}.hero-content h1{font-size:2.2rem}}
     </style>
     
-    <!-- Asynchronously load the full stylesheet. It's not render-blocking. -->
+    <!-- Asynchronously load the full stylesheet. -->
     <link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="styles.css"></noscript>
 </head>
@@ -147,8 +147,7 @@
         </div>
     </footer>
 
-    <!-- Deferred scripts do not block rendering -->
-    <!-- Pointing to a specific version of AOS avoids redirects -->
+    <!-- Deferred scripts that do not block rendering -->
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
     <script src="leaderboard.js" defer></script>
     <script defer>
