@@ -178,3 +178,52 @@ footer { background-color: var(--bg-medium); color: var(--text-secondary); paddi
 @media (max-width: 768px) { .logo img { height: 72px; } .mobile-menu-toggle { display: flex; } .donate-button { display: none; } .social-icons { display: flex; } nav { position: fixed; top: 80px; left: 0; width: 100%; background-color: rgba(44, 44, 44, 0.95); backdrop-filter: blur(10px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1); padding: 0; max-height: 0; overflow: hidden; transition: max-height 0.5s ease; z-index: 999; } nav.active { max-height: 300px; } nav ul { flex-direction: column; padding: 1.5rem; } nav ul li { margin: 0; margin-bottom: 1rem; } nav ul li:last-child { margin-bottom: 0; } .hero-content h1 { font-size: 2.2rem; } .hero-content p { font-size: 1.1rem; } .impact-stats { grid-template-columns: repeat(2, 1fr); gap: 1rem; } .stat { padding: 1rem; } .stat-number { font-size: 2.5rem; } .stat-label { font-size: 1rem; } .amount-options { grid-template-columns: repeat(2, 1fr); } .btn { padding: 0.65rem 1.2rem; font-size: 0.95rem; } .btn-large { padding: 0.75rem 1.4rem; font-size: 1rem; } }
 @media (max-width: 576px) { section { padding: 2rem 1rem; } .hero { min-height: 520px; padding: 1rem 0; } .hero-content h1 { font-size: 2rem; line-height: 1.3; } .hero-content p { font-size: 1.05rem; line-height: 1.5; } .aims-grid, .involvement-options, .impact-stats { grid-template-columns: 1fr; } .footer-content { grid-template-columns: 1fr; text-align: center; } .footer-social { justify-content: center; gap: 1rem; } .btn { padding: 0.7rem 1.2rem; font-size: 0.95rem; } .btn-large { padding: 0.8rem 1.4rem; font-size: 1rem; } }
 @media (min-width: 1024px) { .logo img { height: 100px; } }
+
+/* =====  MOBILE NAVIGATION FIXES - ADD TO END OF CSS FILE ===== */
+
+/* Override existing mobile styles for better header layout */
+@media (max-width: 768px) {
+    /* Smaller header height */
+    header { padding: 0.25rem 0 !important; }
+    
+    /* Smaller logo */
+    .logo img { height: 60px !important; }
+    
+    /* Better mobile menu toggle positioning */
+    .mobile-menu-toggle {
+        width: 28px !important;
+        height: 20px !important;
+        margin-right: 1rem !important;
+    }
+    
+    /* Social icons alignment fix */
+    .social-icons {
+        margin-left: 1rem !important;
+    }
+    
+    .social-icons img {
+        width: 22px !important;
+        height: 22px !important;
+    }
+    
+    /* Adjust nav and hero for smaller header */
+    nav { top: 70px !important; }
+    .hero { margin-top: 70px !important; }
+}
+
+@media (max-width: 576px) {
+    /* Even more compact for small phones */
+    header { padding: 0.2rem 0 !important; }
+    .logo img { height: 55px !important; }
+    .mobile-menu-toggle {
+        width: 26px !important;
+        height: 18px !important;
+        margin-right: 0.5rem !important;
+    }
+    .social-icons img {
+        width: 20px !important;
+        height: 20px !important;
+    }
+    nav { top: 65px !important; }
+    .hero { margin-top: 65px !important; }
+}
