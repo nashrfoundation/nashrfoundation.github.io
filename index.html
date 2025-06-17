@@ -84,8 +84,7 @@
 
     <section class="hero">
         <div class="hero-image">
-            <!-- The hero_background.webp is preloaded via <link> tag in <head> -->
-            <img src="hero_background.webp" alt="Children joyfully accessing clean water provided by Nashr Foundation"> <!-- Alt text improved -->
+            <img src="hero_background.webp" alt="Children joyfully accessing clean water provided by Nashr Foundation">
         </div>
         <div class="hero-overlay"></div>
         <div class="hero-content">
@@ -154,7 +153,7 @@
                     </thead>
                     <tbody id="leaderboard-data">
                         <tr>
-                            <td colspan="3">Loading donor data...</td>
+                            <td colspan="3">Loading donor data...</td> <!-- This will be replaced by leaderboard.js -->
                         </tr>
                     </tbody>
                 </table>
@@ -178,7 +177,7 @@
                 <div class="involvement-option" data-aos="fade-up" data-aos-delay="100">
                     <h3>Volunteer</h3>
                     <p>Join our team of dedicated volunteers making a difference in communities.</p>
-                    <a href="#" class="btn btn-outline">Coming Soon</a>
+                    <a href="#" class="btn btn-outline">Coming Soon</a> <!-- Using href="#" for non-functional links is standard -->
                 </div>
                 <div class="involvement-option" data-aos="fade-up" data-aos-delay="200">
                     <h3>Spread Awareness</h3>
@@ -187,10 +186,10 @@
                         <a href="javascript:void(0)" onclick="openAppOrFallback('instagram://user?username=nashrfoundation', 'https://www.instagram.com/nashrfoundation')" aria-label="Share on Instagram">
                           <img src="instagram_icon.webp" alt="Instagram" loading="lazy">
                         </a>
-                        <a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/nashrfoundation')" aria-label="Share on Facebook">
+                        <a href="javascript:void(0)" onclick="openAppOrFallback('fb://page/YOUR_PAGE_ID', 'https://www.facebook.com/sharer/sharer.php?u=https%3A%2F%2Fnashrfoundation.github.io%2F')" aria-label="Share on Facebook"> <!-- Updated Facebook to use sharer.php as fallback -->
                           <img src="facebook_icon.webp" alt="Facebook" loading="lazy">
                         </a>
-                        <a href="javascript:void(0)" onclick="openAppOrFallback('twitter://user?screen_name=Nashrfoundation', 'https://x.com/Nashrfoundation')" aria-label="Share on X">
+                        <a href="javascript:void(0)" onclick="openAppOrFallback('twitter://intent/tweet?text=Support%20Nashr%20Foundation&url=https%3A%2F%2Fnashrfoundation.github.io%2F&via=Nashrfoundation', 'https://twitter.com/intent/tweet?text=Support%20Nashr%20Foundation&url=https%3A%2F%2Fnashrfoundation.github.io%2F&via=Nashrfoundation')" aria-label="Share on X"> <!-- Updated X/Twitter to use intent URL as fallback -->
                           <img src="twitter_icon.webp" alt="X" loading="lazy">
                         </a>
                         <a href="javascript:void(0)" onclick="openAppOrFallback('tiktok://user/@nashr756', 'https://www.tiktok.com/@nashr756?_t=ZS-8wvFwBRNt6V&_r=1')" aria-label="Share on TikTok">
@@ -241,7 +240,8 @@
     </footer>
 
     <script src="https://unpkg.com/aos@next/dist/aos.js" defer></script>
-    <script src="leaderboard.js" defer></script>
+    <script src="leaderboard.js" defer></script> <!-- This will handle leaderboard loading -->
+
     <script>
         document.addEventListener('DOMContentLoaded', function( ) {
             // Initialize AOS animation library
@@ -255,7 +255,7 @@
 
             // Mobile menu toggle
             const menuToggle = document.querySelector('.mobile-menu-toggle');
-            const nav = document.querySelector('#main-navigation'); // Target by ID
+            const nav = document.querySelector('#main-navigation');
             
             if (menuToggle && nav) {
                 menuToggle.addEventListener('click', function() {
@@ -265,10 +265,10 @@
                 });
             }
 
-            // Smooth scroll for anchor links (if any internal #links are added later)
+            // Smooth scroll for anchor links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
-                    if (this.hash !== "") { // Check if hash exists and is not just "#"
+                    if (this.hash !== "") {
                         e.preventDefault();
                         const targetElement = document.querySelector(this.hash);
                         if (targetElement) {
@@ -280,25 +280,17 @@
                 });
             });
             
-            // Add animation classes to elements as they scroll into view (AOS handles data-aos attributes)
-            // This custom animation part can be removed if AOS is solely used for these elements
-            // const animateElements = document.querySelectorAll('.aim-item, .involvement-option');
-            // animateElements.forEach((element, index) => {
-            //    element.classList.add('animated'); // This class seems defined with keyframes
-            //    element.style.animationDelay = (index * 0.1) + 's';
-            // });
-            
             // Dynamic color theme based on time of day
             const hour = new Date().getHours();
             const root = document.documentElement;
 
-            if (hour >= 18 || hour < 6) { // Evening/night: 6 PM to 5:59 AM
+            if (hour >= 18 || hour < 6) { 
                 root.style.setProperty('--primary', '#0D5965'); 
                 root.style.setProperty('--accent', '#F9A826');
-            } else if (hour >= 6 && hour < 12) { // Morning: 6 AM to 11:59 AM
+            } else if (hour >= 6 && hour < 12) { 
                 root.style.setProperty('--primary', '#1A6E7C'); 
                 root.style.setProperty('--accent', '#FFBE55');
-            } else { // Afternoon: 12 PM to 5:59 PM
+            } else { 
                 root.style.setProperty('--primary', '#2A8D9C'); 
                 root.style.setProperty('--accent', '#F9A826');
             }
@@ -306,105 +298,44 @@
             // Parallax effect for hero section
             window.addEventListener('scroll', function() {
                 const scrollPosition = window.pageYOffset;
-                // Make selector more specific to hero's image if multiple .hero-image elements could exist
                 const heroImageElement = document.querySelector('.hero .hero-image img'); 
                 if (heroImageElement) {
                     heroImageElement.style.transform = `translateY(${scrollPosition * 0.4}px)`;
                 }
             });
 
-            // Load leaderboard data if the function and element exist
-            if (typeof loadLeaderboardData === 'function' && document.getElementById('leaderboard-data')) {
-                 loadLeaderboardData();
-            }
+            // The 'loadLeaderboardData' function definition and its direct call
+            // have been REMOVED from this inline script.
+            // leaderboard.js (loaded via <script defer src="leaderboard.js"></script>) 
+            // will handle the leaderboard loading.
         });
     </script>
-    <!-- Keep this leaderboard data loading script if leaderboard.js does not handle it -->
-    <script> 
-        // Load leaderboard data from CSV (Ensure leaderboard.js doesn't duplicate this)
-        function loadLeaderboardData() {
-            if (!document.getElementById('leaderboard-data')) return; // Don't run if element isn't there
-            
-            fetch('leaderboard.csv')
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok for leaderboard.csv');
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    const rows = data.trim().split('\n');
-                    if (rows.length <= 1) { // Only headers or empty
-                         document.getElementById('leaderboard-data').innerHTML = '<tr><td colspan="3">No donor data available yet.</td></tr>';
-                         return;
-                    }
-                    // const headers = rows[0].split(','); // Assuming CSV has headers
-                    const tableBody = document.getElementById('leaderboard-data');
-            
-                    tableBody.innerHTML = ''; // Clear existing
-            
-                    for (let i = 1; i < rows.length; i++) { // Start from 1 to skip header row
-                        if (rows[i].trim() === '') continue; 
-                
-                        const cells = rows[i].split(',');
-                        if (cells.length < 3) continue; // Expecting Rank, Name, Amount
 
-                        const row = document.createElement('tr');
-                
-                        // Rank
-                        const rankCell = document.createElement('td');
-                        rankCell.textContent = cells[0];
-                        row.appendChild(rankCell);
-
-                        // Name
-                        const nameCell = document.createElement('td');
-                        nameCell.textContent = cells[1];
-                        row.appendChild(nameCell);
-                        
-                        // Amount
-                        const amountCell = document.createElement('td');
-                        const amountValue = parseFloat(cells[2]);
-                        amountCell.textContent = !isNaN(amountValue) ? '₨ ' + amountValue.toLocaleString() : 'N/A';
-                        row.appendChild(amountCell);
-                    
-                        tableBody.appendChild(row);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading leaderboard data:', error);
-                    if (document.getElementById('leaderboard-data')){
-                       document.getElementById('leaderboard-data').innerHTML = '<tr><td colspan="3">Error loading donor data. Please try again later.</td></tr>';
-                    }
-                });
-        }
-    </script>
+    <!-- The inline leaderboard script has been completely removed. -->
+    <!-- leaderboard.js handles this functionality now. -->
 
 <script>
   function openAppOrFallback(appUrl, fallbackUrl) {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     if (!isMobile) {
-      window.location.href = fallbackUrl; // Use .href for clarity
+      window.location.href = fallbackUrl;
       return;
     }
 
     const timeout = setTimeout(() => {
       window.location.href = fallbackUrl;
-    }, 2500); // 2.5 seconds delay
+    }, 2500); 
 
-    // Try to open app URL
-    window.location.href = appUrl; // Using href might be slightly more robust for some schemes
+    window.location.href = appUrl;
 
-    // Clear timeout if app opens and page becomes hidden/blurred
-    // pagehide is generally more reliable than visibilitychange for this specific use case
-    // of detecting navigation away from the page (e.g., to an app).
     function clearFallbackTimer() {
         clearTimeout(timeout);
         window.removeEventListener("pagehide", clearFallbackTimer);
-        window.removeEventListener("blur", clearFallbackTimer); // Adding blur as another signal
+        window.removeEventListener("blur", clearFallbackTimer);
     }
     window.addEventListener("pagehide", clearFallbackTimer);
-    window.addEventListener("blur", clearFallbackTimer); // For some Android scenarios
+    window.addEventListener("blur", clearFallbackTimer);
   }
 </script>
 
