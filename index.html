@@ -8,7 +8,7 @@
     <meta name="description" content="Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.">
     <link rel="canonical" href="https://nashrfoundation.github.io/">
 
-    <!-- Preload LCP image and fonts. This hints to the browser to fetch these high-priority resources immediately. -->
+    <!-- Preload LCP image and fonts. -->
     <link rel="preload" fetchpriority="high" as="image" href="hero_background.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Merriweather:wght@400;700&display=swap" as="style">
@@ -148,7 +148,8 @@
     </footer>
 
     <!-- Deferred scripts do not block rendering -->
-    <script src="https://unpkg.com/aos@next/dist/aos.js" defer></script>
+    <!-- Pointing to a specific version of AOS avoids redirects -->
+    <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
     <script src="leaderboard.js" defer></script>
     <script defer>
         document.addEventListener('DOMContentLoaded', function() {
