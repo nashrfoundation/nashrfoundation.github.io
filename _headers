@@ -1,8 +1,15 @@
-# Set a strong caching policy for all static assets. This tells browsers
-# to store these files for one year, so repeat visits are much faster.
-/styles.css
-  Cache-Control: public, max-age=31536000, immutable
-/leaderboard.js
+#
+# Caching rules for Nashr Foundation Website on GitHub Pages
+#
+
+# By default, cache HTML for a short time (1 hour).
+# This allows you to push updates and have them appear relatively quickly.
+/*.html
+  Cache-Control: public, max-age=3600
+
+# Cache all other static assets for 1 year. They have unique names or content,
+# so the browser should not check for them again.
+/*.css
   Cache-Control: public, max-age=31536000, immutable
 /*.js
   Cache-Control: public, max-age=31536000, immutable
@@ -16,7 +23,3 @@
   Cache-Control: public, max-age=31536000, immutable
 /*.woff2
   Cache-Control: public, max-age=31536000, immutable
-
-# HTML files should be checked for updates more often. Cache for 1 hour.
-/*.html
-  Cache-Control: public, max-age=3600
