@@ -1,88 +1,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https://*.github.io; font-src 'self' https://fonts.gstatic.com; connect-src 'self' *.github.io; frame-src https://formspree.io;">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate - Nashr Foundation</title>
     
-    <!-- Performance Optimizations: Preload critical assets -->
+    <!-- Preload LCP image and fonts -->
     <link rel="preload" fetchpriority="high" as="image" href="hero_background.webp" type="image/webp">
-    <link rel="preload" href="styles.css" as="style">
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" as="style" onload="this.onload=null;this.rel='stylesheet'">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" as="style">
+    
+    <!-- Asynchronously load the fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap" media="print" onload="this.media='all'">
 
-    <!-- Stylesheets -->
-    <link rel="stylesheet" href="styles.css">
-    <!-- Fallback for browsers with JavaScript disabled -->
-    <noscript>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;700&family=Merriweather:wght@300;400;700&family=Playfair+Display:wght@400;700&display=swap">
-    </noscript>
-
+    <!-- Inlined Critical CSS for instant rendering of above-the-fold content -->
     <style>
-        /* Additional styles specific to donation page */
-        .donation-section { padding: var(--spacing-lg) 0; }
-        .donation-header { text-align: center; max-width: 800px; margin: 0 auto var(--spacing-lg); }
-        .donation-form-container { max-width: 800px; margin: 0 auto; background-color: var(--white); border-radius: var(--border-radius-md); box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1); overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease; }
-        .donation-form-container:hover { transform: translateY(-5px); box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1); }
-        .donation-tabs { display: flex; border-bottom: 1px solid var(--medium-gray); }
-        .donation-tab { flex: 1; padding: var(--spacing-sm); text-align: center; background-color: var(--light-gray); cursor: pointer; transition: background-color var(--transition-fast); }
-        .donation-tab.active { background-color: var(--white); border-bottom: 3px solid var(--primary); font-weight: 500; }
-        .donation-form { padding: var(--spacing-md); }
-        .form-group { margin-bottom: var(--spacing-md); }
-        .form-group label { display: block; margin-bottom: var(--spacing-xs); font-weight: 500; }
-        .form-control { width: 100%; padding: 0.75rem; border: 1px solid var(--medium-gray); border-radius: var(--border-radius-sm); font-family: var(--body-font); font-size: 1rem; transition: border-color var(--transition-fast); }
-        .form-control:focus { outline: none; border-color: var(--primary); box-shadow: 0 0 0 2px rgba(13, 105, 115, 0.2); }
-        .amount-options { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: var(--spacing-sm); margin-bottom: var(--spacing-md); }
-        .amount-option { padding: var(--spacing-sm); text-align: center; border: 2px solid var(--medium-gray); border-radius: var(--border-radius-sm); cursor: pointer; transition: all var(--transition-fast); }
-        .amount-option:hover { border-color: var(--primary-light); transform: translateY(-2px); }
-        .amount-option.active { background-color: var(--primary); border-color: var(--primary); color: var(--white); }
-        .payment-methods { margin-bottom: var(--spacing-md); }
-        .payment-method { display: flex; align-items: center; margin-bottom: var(--spacing-sm); padding: var(--spacing-sm); border: 1px solid var(--medium-gray); border-radius: var(--border-radius-sm); cursor: pointer; transition: border-color var(--transition-fast); }
-        .payment-method:hover { border-color: var(--primary-light); }
-        .payment-method.active { border-color: var(--primary); background-color: rgba(13, 105, 115, 0.05); }
-        .payment-method input { margin-right: var(--spacing-sm); }
-        .payment-details { margin-top: var(--spacing-sm); padding: var(--spacing-sm); background-color: var(--light-gray); border-radius: var(--border-radius-sm); }
-        .checkbox-group { display: flex; align-items: center; margin-bottom: var(--spacing-sm); }
-        .checkbox-group input { margin-right: var(--spacing-xs); }
-        .form-submit { text-align: center; }
-        .form-submit .btn { padding: 1rem 2rem; font-size: 1.1rem; width: 100%; max-width: 300px; }
-        .secure-badge { display: flex; align-items: center; justify-content: center; margin-top: var(--spacing-md); color: var(--dark-gray); font-size: 0.9rem; }
-        .secure-badge svg { width: 16px; height: 16px; margin-right: var(--spacing-xs); }
-        @media (max-width: 768px) { .amount-options { grid-template-columns: repeat(2, 1fr); } }
-        @media (max-width: 480px) { .impact-stats { grid-template-columns: 1fr; gap: 1rem; } .stat { padding: 1rem; } .stat-number { font-size: 1.8rem; } .stat-label { font-size: 0.9rem; } .donation-form { padding: var(--spacing-sm); } }
+        :root{--bg-dark:#1a1a1a;--bg-medium:#2c2c2c;--text-primary:#f0f0f0;--text-secondary:#b0b0b0;--primary:#2A8D9C;--primary-light:#3AA7B8;--accent:#FFB52E;--white:#FFFFFF;--overlay-color:rgba(0,0,0,0.6);--heading-font:'Merriweather',serif;--body-font:'Lora',serif;--spacing-xs:0.5rem;--spacing-sm:1rem;--spacing-md:2rem;--border-radius-sm:4px;--border-radius-md:8px}
+        *,:after,:before{margin:0;padding:0;box-sizing:border-box}
+        html{font-size:16.5px;scroll-behavior:smooth}
+        body{font-family:var(--body-font);line-height:1.9;color:var(--text-primary);background-color:var(--bg-dark);overflow-x:hidden}
+        h1,h2,h3{font-family:var(--heading-font);font-weight:700;line-height:1.3;margin-bottom:var(--spacing-sm);color:var(--primary-light)}
+        h1{font-size:2.5rem;letter-spacing:-.5px}
+        p{margin-bottom:var(--spacing-sm);color:var(--text-secondary)}
+        a{color:var(--accent);text-decoration:none}
+        img{max-width:100%;height:auto}
+        .container{width:100%;max-width:1200px;margin:0 auto;padding:0 var(--spacing-sm)}
+        .btn{display:inline-block;padding:.75rem 1.5rem;background-color:var(--accent);color:var(--bg-dark);border:2px solid var(--accent);border-radius:var(--border-radius-sm);font-weight:600;text-align:center;cursor:pointer;transition:all .3s ease}
+        .btn-large{padding:.85rem 1.75rem;font-size:1.1rem}
+        header{position:fixed;top:0;left:0;width:100%;background-color:rgba(44,44,44,.95);backdrop-filter:blur(10px);z-index:1000;padding:var(--spacing-xs) 0}
+        header .container{display:flex;align-items:center;justify-content:space-between}
+        .logo img{height:88px;max-height:100px;width:auto;border-radius:var(--border-radius-md)}
+        nav ul{display:flex;list-style:none}
+        nav ul li{margin-left:var(--spacing-md)}
+        nav ul li a{font-weight:500;padding:.5rem;position:relative;color:var(--text-primary)}
+        .social-icons{display:flex;align-items:center}
+        .social-icons a{margin-left:var(--spacing-xs)}
+        .social-icons img{width:24px;height:24px;filter:brightness(.8) invert(.9)}
+        .donate-button{margin-left:var(--spacing-md)}
+        .mobile-menu-toggle{display:none;flex-direction:column;justify-content:space-between;width:30px;height:21px;cursor:pointer}
+        .mobile-menu-toggle span{display:block;height:3px;width:100%;background-color:var(--text-primary);border-radius:3px;transition:all .2s ease}
+        .hero{position:relative;height:50vh;min-height:400px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--white);margin-top:80px;overflow:hidden}
+        .hero-image{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-2}
+        .hero-image img{width:100%;height:100%;object-fit:cover}
+        .hero-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:var(--overlay-color);z-index:-1}
+        .hero-content{max-width:800px;padding:var(--spacing-md);z-index:1}
+        .hero-content h1{font-size:3.5rem;margin-bottom:var(--spacing-md);color:var(--white)}
+        .hero-content p{font-size:1.4rem;margin-bottom:var(--spacing-md);color:var(--text-primary)}
+        @media (max-width:768px){.logo img{height:72px}.mobile-menu-toggle{display:flex}.donate-button{display:none}nav{position:fixed;top:80px;left:0;width:100%;background-color:rgba(44,44,.95);max-height:0;overflow:hidden;transition:max-height .5s ease}nav.active{max-height:300px}nav ul{flex-direction:column;padding:1.5rem}nav ul li{margin:0 0 1rem}.hero-content h1{font-size:2.2rem}}
     </style>
+    
+    <!-- Asynchronously load the full stylesheet -->
+    <link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="styles.css"></noscript>
 </head>
 <body>
     <header>
-        <div class="container">
-            <div class="logo">
-                <a href="index.html">
-                    <img src="logo.webp" alt="Nashr Foundation Logo" width="100" height="100" loading="lazy" decoding="async">
-                </a>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="donate.html" class="active">Donate</a></li>
-                </ul>
-            </nav>
-            <div class="social-icons">
-                <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"></a>
-                <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"></a>
-                <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async"></a>
-                <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async"></a>
-                <a href="https://youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"></a>
-            </div>
-            <div class="donate-button">
-                <a href="donate.html" class="btn">Donate Now</a>
-            </div>
-            <div class="mobile-menu-toggle" role="button" tabindex="0">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
+         <div class="container"> <div class="logo"> <a href="index.html"> <img src="logo.webp" alt="Nashr Foundation Logo" width="100" height="100" decoding="async"> </a> </div> <nav> <ul> <li><a href="index.html">Home</a></li> <li><a href="donate.html" class="active">Donate</a></li> </ul> </nav> <div class="social-icons"> <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"></a> <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"></a> <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async"></a> <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async"></a> <a href="https://youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"></a> </div> <div class="donate-button"> <a href="donate.html" class="btn">Donate Now</a> </div> <div class="mobile-menu-toggle" role="button" tabindex="0"> <span></span> <span></span> <span></span> </div> </div>
     </header>
 
     <main>
@@ -113,9 +86,7 @@
                     <div class="donation-form">
                         <form action="https://formspree.io/f/xanjnelw" method="POST" id="donation-form">
                             <div id="donation-type-display" style="text-align: center; margin-bottom: 20px; font-weight: 500;">One-time Donation</div>
-                            
                             <input type="hidden" name="donation_type" id="donation-type-input" value="one-time">
-                            
                             <div class="form-group">
                                 <label>Select Amount</label>
                                 <div class="amount-options">
@@ -126,11 +97,8 @@
                                     <div class="amount-option" data-amount="custom" role="button" tabindex="0">Custom</div>
                                 </div>
                                 <input type="hidden" name="donation_amount" id="donation-amount-input" value="2500">
-                                <div id="custom-amount-container" style="display: none;">
-                                    <input type="number" class="form-control" id="custom-amount" placeholder="Enter amount in PKR">
-                                </div>
+                                <div id="custom-amount-container" style="display: none;"><input type="number" class="form-control" id="custom-amount" placeholder="Enter amount in PKR"></div>
                             </div>
-                            
                             <div class="form-group">
                                 <label>Payment Method</label>
                                 <div class="coming-soon-message">
@@ -139,162 +107,32 @@
                                     <p>In the meantime, you can still submit your donation details below and we'll contact you with payment instructions.</p>
                                 </div>
                             </div>
-                            
+                            <div class="form-group"><label for="donor-name">Your Name</label><input type="text" class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required></div>
+                            <div class="form-group"><label for="donor-email">Email Address</label><input type="email" class="form-control" id="donor-email" name="email" placeholder="Enter your email address" required></div>
                             <div class="form-group">
-                                <label for="donor-name">Your Name</label>
-                                <input type="text" class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required>
+                                <div class="checkbox-group"><input type="checkbox" id="leaderboard-consent" name="leaderboard_consent" value="yes" checked><label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label></div>
+                                <div class="checkbox-group"><input type="checkbox" id="anonymous-donation" name="anonymous_donation" value="yes"><label for="anonymous-donation">Make my donation anonymous</label></div>
                             </div>
-                            
-                            <div class="form-group">
-                                <label for="donor-email">Email Address</label>
-                                <input type="email" class="form-control" id="donor-email" name="email" placeholder="Enter your email address" required>
-                            </div>
-                            
-                            <div class="form-group">
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="leaderboard-consent" name="leaderboard_consent" value="yes" checked>
-                                    <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label>
-                                </div>
-                                
-                                <div class="checkbox-group">
-                                    <input type="checkbox" id="anonymous-donation" name="anonymous_donation" value="yes">
-                                    <label for="anonymous-donation">Make my donation anonymous</label>
-                                </div>
-                            </div>
-                            
-                            <div class="form-submit">
-                                <button type="submit" class="btn">Complete Donation</button>
-                            </div>
-                            
-                            <div class="secure-badge">
-                                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-                                <span>Your financial information is secure and will not be stored</span>
-                            </div>
+                            <div class="form-submit"><button type="submit" class="btn">Complete Donation</button></div>
+                            <div class="secure-badge"><svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 16V12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M12 8H12.01" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg> <span>Your financial information is secure and will not be stored</span></div>
                         </form>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section class="impact" style="padding: var(--spacing-lg ) 0;">
-            <div class="container">
-                <h2>Your Donation's Impact</h2>
-                <div class="impact-stats">
-                    <div class="stat"><div class="stat-number">₨ 1,000</div><div class="stat-label">Provides school supplies for one child</div></div>
-                    <div class="stat"><div class="stat-number">₨ 2,500</div><div class="stat-label">Feeds a family for one week</div></div>
-                    <div class="stat"><div class="stat-number">₨ 5,000</div><div class="stat-label">Provides clean water for a month</div></div>
-                    <div class="stat"><div class="stat-number">₨ 10,000</div><div class="stat-label">Supports a child's education for a term</div></div>
-                </div>
-            </div>
+        <section class="impact" style="padding: var(--spacing-lg) 0;">
+            <div class="container"> <h2>Your Donation's Impact</h2> <div class="impact-stats"> <div class="stat"><div class="stat-number">₨ 1,000</div><div class="stat-label">Provides school supplies for one child</div></div> <div class="stat"><div class="stat-number">₨ 2,500</div><div class="stat-label">Feeds a family for one week</div></div> <div class="stat"><div class="stat-number">₨ 5,000</div><div class="stat-label">Provides clean water for a month</div></div> <div class="stat"><div class="stat-number">₨ 10,000</div><div class="stat-label">Supports a child's education for a term</div></div> </div> </div>
         </section>
     </main>
 
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo">
-                    <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" decoding="async">
-                </div>
-                <div class="footer-info">
-                    <p>Nashr Foundation</p>
-                    <p>Established 2025</p>
-                    <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p>
-                </div>
-                <div class="footer-social">
-                    <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"></a>
-                    <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"></a>
-                    <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async"></a>
-                    <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async"></a>
-                    <a href="https://youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"></a>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>© 2025 Nashr Foundation. All rights reserved.</p>
-            </div>
-        </div>
+         <div class="container"> <div class="footer-content"> <div class="footer-logo"> <img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" decoding="async"> </div> <div class="footer-info"> <p>Nashr Foundation</p> <p>Established 2025</p> <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p> </div> <div class="footer-social"> <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"></a> <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"></a> <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async"></a> <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async"></a> <a href="https://youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"></a> </div> </div> <div class="footer-bottom"> <p>© 2025 Nashr Foundation. All rights reserved.</p> </div> </div>
     </footer>
-
+    
     <script defer>
         document.addEventListener('DOMContentLoaded', function() {
-            // Mobile menu toggle
-            const menuToggle = document.querySelector('.mobile-menu-toggle');
-            const nav = document.querySelector('nav');
-            if (menuToggle && nav) {
-                menuToggle.addEventListener('click', function() {
-                    nav.classList.toggle('active');
-                    menuToggle.setAttribute('aria-expanded', nav.classList.contains('active'));
-                });
-                menuToggle.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); this.click(); } });
-            }
-            
-            // Donation amount selection
-            const amountOptions = document.querySelectorAll('.amount-option');
-            const customAmountContainer = document.getElementById('custom-amount-container');
-            const donationAmountInput = document.getElementById('donation-amount-input');
-            const customAmountField = document.getElementById('custom-amount');
-            
-            amountOptions.forEach(option => {
-                option.addEventListener('click', function() {
-                    amountOptions.forEach(opt => opt.classList.remove('active'));
-                    this.classList.add('active');
-                    
-                    const isCustom = this.dataset.amount === 'custom';
-                    customAmountContainer.style.display = isCustom ? 'block' : 'none';
-                    if (!isCustom) {
-                        donationAmountInput.value = this.dataset.amount;
-                        customAmountField.value = '';
-                    } else {
-                        customAmountField.focus();
-                    }
-                });
-            });
-
-            if (customAmountField) {
-                customAmountField.addEventListener('input', function() {
-                    donationAmountInput.value = this.value;
-                });
-            }
-            
-            // Anonymous donation checkbox
-            const anonymousCheckbox = document.getElementById('anonymous-donation');
-            const leaderboardCheckbox = document.getElementById('leaderboard-consent');
-            if(anonymousCheckbox && leaderboardCheckbox){
-                anonymousCheckbox.addEventListener('change', function() {
-                    leaderboardCheckbox.disabled = this.checked;
-                    if (this.checked) leaderboardCheckbox.checked = false;
-                });
-            }
-            
-            // Donation tabs
-            const donationTabs = document.querySelectorAll('.donation-tab');
-            const donationTypeDisplay = document.getElementById('donation-type-display');
-            const donationTypeInput = document.getElementById('donation-type-input');
-            
-            donationTabs.forEach(tab => {
-                tab.addEventListener('click', function() {
-                    donationTabs.forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    const donationType = this.dataset.tab;
-                    donationTypeDisplay.textContent = `${donationType.charAt(0).toUpperCase() + donationType.slice(1)} Donation`;
-                    donationTypeInput.value = donationType;
-                });
-            });
-            
-            // Form submission validation
-            const donationForm = document.getElementById('donation-form');
-            if(donationForm){
-                donationForm.addEventListener('submit', function(e) {
-                    const activeAmount = document.querySelector('.amount-option.active');
-                    if (activeAmount && activeAmount.dataset.amount === 'custom') {
-                        const customAmount = customAmountField.value;
-                        if (!customAmount || customAmount <= 0) {
-                            e.preventDefault();
-                            alert('Please enter a valid donation amount.');
-                            customAmountField.focus();
-                        }
-                    }
-                });
-            }
+            const menuToggle=document.querySelector('.mobile-menu-toggle'),nav=document.querySelector('nav');menuToggle&&nav&&(menuToggle.addEventListener('click',function(){nav.classList.toggle('active');menuToggle.setAttribute('aria-expanded',nav.classList.contains('active'))}),menuToggle.addEventListener('keydown',e=>{' '===e.key||'Enter'===e.key&&(e.preventDefault(),this.click())}));const amountOptions=document.querySelectorAll('.amount-option'),customAmountContainer=document.getElementById('custom-amount-container'),donationAmountInput=document.getElementById('donation-amount-input'),customAmountField=document.getElementById('custom-amount');amountOptions.forEach(e=>{e.addEventListener('click',function(){amountOptions.forEach(e=>e.classList.remove('active')),this.classList.add('active');const e='custom'===this.dataset.amount;customAmountContainer.style.display=e?'block':'none',e?customAmountField.focus():(donationAmountInput.value=this.dataset.amount,customAmountField.value='')})}),customAmountField&&customAmountField.addEventListener('input',function(){donationAmountInput.value=this.value});const anonymousCheckbox=document.getElementById('anonymous-donation'),leaderboardCheckbox=document.getElementById('leaderboard-consent');anonymousCheckbox&&leaderboardCheckbox&&anonymousCheckbox.addEventListener('change',function(){leaderboardCheckbox.disabled=this.checked,this.checked&&(leaderboardCheckbox.checked=!1)});const donationTabs=document.querySelectorAll('.donation-tab'),donationTypeDisplay=document.getElementById('donation-type-display'),donationTypeInput=document.getElementById('donation-type-input');donationTabs.forEach(t=>{t.addEventListener('click',function(){donationTabs.forEach(e=>e.classList.remove('active')),this.classList.add('active');let e=this.dataset.tab;donationTypeDisplay.textContent="".concat(e.charAt(0).toUpperCase()+e.slice(1)," Donation"),donationTypeInput.value=e})});const donationForm=document.getElementById('donation-form');donationForm&&donationForm.addEventListener('submit',function(e){const t=document.querySelector('.amount-option.active');if(t&&'custom'===t.dataset.amount){let t=customAmountField.value;t&&0<t||(e.preventDefault(),alert('Please enter a valid donation amount.'),customAmountField.focus())}});
         });
     </script>
 </body>
