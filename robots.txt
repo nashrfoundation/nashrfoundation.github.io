@@ -1,96 +1,41 @@
-# Robots.txt for Nashr Foundation Website
-# This file tells search engine crawlers which pages or files they can or can't request from your site.
+# Robots.txt for Nashr Foundation
+# This revised file allows search engines to fully render the page for best ranking results.
+# Last updated: June 18, 2025
 
-# Allow all web crawlers to access all content by default
+# Rule for all web crawlers (Googlebot, Bingbot, DuckDuckBot, etc.)
 User-agent: *
-Allow: /
 
-# Disallow access to optimization scripts and temporary files
-Disallow: /optimize_images.py
-Disallow: /minify_css.py
-Disallow: /minify_enhanced_css.py
+# Disallow crawlers from accessing specific script, backup, and unoptimized files.
+# This is the most important section for blocking unwanted content.
 Disallow: /*.py$
-
-# Disallow access to original unoptimized images (prefer WebP versions)
-Disallow: /hero_background.jpeg
-Disallow: /logo.png
-Disallow: /facebook_icon.png
-Disallow: /instagram_icon.png
-Disallow: /twitter_icon.png
-Disallow: /tik-tok.png
-Disallow: /youtube.png
-
-
-
-# Disallow access to development/backup files
-Disallow: /index_optimized.html
 Disallow: /*.bak$
 Disallow: /*.tmp$
 Disallow: /*.backup$
+Disallow: /optimize_images.py
+Disallow: /minify_css.py
+Disallow: /minify_enhanced_css.py
+Disallow: /index_optimized.html
 
-# Allow access to important files
-Allow: /index.html
-Allow: /donate.html
-Allow: /sitemap.xml
-Allow: /robots.txt
+# By not disallowing CSS, JS, or image files here, you are implicitly
+# allowing Google and other crawlers to see your website exactly as users do.
+# This is critical for good ranking.
 
-# Allow access to optimized images
-Allow: /*.webp$
+# --- Social Media Bots ---
+# These specific rules ensure that rich previews (e.g., cards) are generated
+# correctly when your site is shared on social media. They are allowed to access everything.
 
-# Allow access to minified CSS
-Allow: /*.min.css$
-
-# Allow access to JavaScript files
-Allow: /*.js$
-
-# Allow access to CSV data files
-Allow: /*.csv$
-
-# Specify the location of the sitemap
-Sitemap: https://nashrfoundation.github.io/sitemap.xml
-
-# Crawl delay (optional - be respectful to server resources)
-Crawl-delay: 1
-
-# Specific rules for major search engines
-
-# Google
-User-agent: Googlebot
-Allow: /
-Disallow: /*.py$
-Disallow: /styles.css
-Disallow: /styles_enhanced.css
-
-# Bing
-User-agent: Bingbot
-Allow: /
-Disallow: /*.py$
-Disallow: /styles.css
-Disallow: /styles_enhanced.css
-
-# Yahoo
-User-agent: Slurp
-Allow: /
-Disallow: /*.py$
-
-# DuckDuckGo
-User-agent: DuckDuckBot
-Allow: /
-Disallow: /*.py$
-
-# Facebook (for Open Graph)
 User-agent: facebookexternalhit
 Allow: /
 
-# Twitter (for Twitter Cards)
 User-agent: Twitterbot
 Allow: /
 
-# LinkedIn
 User-agent: LinkedInBot
 Allow: /
 
-# WhatsApp
 User-agent: WhatsApp
 Allow: /
 
+# --- Sitemap ---
+# This tells crawlers where to find a list of all your important pages.
+Sitemap: https://nashrfoundation.github.io/sitemap.xml
