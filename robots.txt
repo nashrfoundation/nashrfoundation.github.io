@@ -1,12 +1,14 @@
-# Robots.txt for Nashr Foundation
-# This revised file allows search engines to fully render the page for best ranking results.
+# Robots.txt for Nashr Foundation Website
+# This file is optimized to ensure search engines can properly crawl and rank the site.
 # Last updated: June 18, 2025
 
-# Rule for all web crawlers (Googlebot, Bingbot, DuckDuckBot, etc.)
+# --- General Rules for All Crawlers ---
+# By default, all crawlers (like Googlebot, Bingbot, etc.) can access everything.
+# Specific files that should NOT be crawled are listed below.
 User-agent: *
 
-# Disallow crawlers from accessing specific script, backup, and unoptimized files.
-# This is the most important section for blocking unwanted content.
+# Do not crawl server-side scripts, temporary backup files, or unoptimized assets.
+# This prevents crawlers from indexing unimportant or duplicate content.
 Disallow: /*.py$
 Disallow: /*.bak$
 Disallow: /*.tmp$
@@ -16,14 +18,9 @@ Disallow: /minify_css.py
 Disallow: /minify_enhanced_css.py
 Disallow: /index_optimized.html
 
-# By not disallowing CSS, JS, or image files here, you are implicitly
-# allowing Google and other crawlers to see your website exactly as users do.
-# This is critical for good ranking.
-
-# --- Social Media Bots ---
-# These specific rules ensure that rich previews (e.g., cards) are generated
-# correctly when your site is shared on social media. They are allowed to access everything.
-
+# --- Rules for Social Media Bots ---
+# These rules ensure that when your website is shared on social platforms,
+# they can generate a proper preview with a title, description, and image.
 User-agent: facebookexternalhit
 Allow: /
 
@@ -36,6 +33,6 @@ Allow: /
 User-agent: WhatsApp
 Allow: /
 
-# --- Sitemap ---
-# This tells crawlers where to find a list of all your important pages.
+# --- Sitemap Location ---
+# This line tells crawlers where to find the sitemap, which lists all important pages.
 Sitemap: https://nashrfoundation.github.io/sitemap.xml
