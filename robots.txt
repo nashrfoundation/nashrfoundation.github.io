@@ -3,12 +3,9 @@
 # Last updated: June 18, 2025
 
 # --- General Rules for All Crawlers ---
-# By default, all crawlers (like Googlebot, Bingbot, etc.) can access everything.
-# Specific files that should NOT be crawled are listed below.
 User-agent: *
 
 # Do not crawl server-side scripts, temporary backup files, or unoptimized assets.
-# This prevents crawlers from indexing unimportant or duplicate content.
 Disallow: /*.py$
 Disallow: /*.bak$
 Disallow: /*.tmp$
@@ -19,8 +16,6 @@ Disallow: /minify_enhanced_css.py
 Disallow: /index_optimized.html
 
 # --- Rules for Social Media Bots ---
-# These rules ensure that when your website is shared on social platforms,
-# they can generate a proper preview with a title, description, and image.
 User-agent: facebookexternalhit
 Allow: /
 
@@ -34,5 +29,5 @@ User-agent: WhatsApp
 Allow: /
 
 # --- Sitemap Location ---
-# This line tells crawlers where to find the sitemap, which lists all important pages.
+# This line tells crawlers where to find the sitemap.
 Sitemap: https://nashrfoundation.github.io/sitemap.xml
