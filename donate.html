@@ -19,13 +19,35 @@
     
     <!-- Custom Styles for New Features -->
     <style>
-        .fund-tracker { padding: 40px 20px; background: #f9f9f9; text-align: center; }
-        .fund-tracker h2 { margin-bottom: 10px; font-family: 'Playfair Display', serif; }
-        .fund-tracker p { margin-bottom: 20px; font-family: 'Lora', serif; }
-        .progress-bar-container { background: #e0e0e0; border-radius: 50px; overflow: hidden; max-width: 800px; margin: 20px auto; border: 1px solid #ccc; }
+        /* --- Styles for Dark Fund Tracker --- */
+        .fund-tracker {
+            padding: 40px 20px;
+            background: #000000; /* Changed background to black */
+            color: #f0f0f0;       /* Changed default text color to light grey */
+            text-align: center;
+        }
+        .fund-tracker h2, .fund-tracker p {
+            color: #ffffff; /* Make headers and text white */
+        }
+        .progress-bar-container {
+            background: #333333;  /* Changed track background to dark grey */
+            border: 1px solid #555555; /* Changed border to a matching dark grey */
+            border-radius: 50px;
+            overflow: hidden;
+            max-width: 800px;
+            margin: 20px auto;
+        }
+        .fund-details {
+            font-size: 1.2em;
+            font-weight: bold;
+            font-family: 'Merriweather', serif;
+            color: #f0f0f0; /* Make this text light grey */
+        }
+        /* --- End of tracker style changes --- */
+
+
         .progress-bar { background: #28a745; height: 35px; width: 0; text-align: center; line-height: 35px; color: white; transition: width 1s ease-in-out; border-radius: 50px; font-weight: bold;}
-        .fund-details { font-size: 1.2em; font-weight: bold; font-family: 'Merriweather', serif; color: #333; }
-        .fund-details span { color: #28a745; }
+        .fund-details span { color: #28a745; } /* Green color will stand out well */
         #qr-code-details img { max-width: 200px; margin: 20px auto; display: block; }
         .payment-option label { cursor: pointer; }
     </style>
@@ -440,12 +462,7 @@
               leaderboardConsent: !document.getElementById("anonymous-donation").checked && document.getElementById("leaderboard-consent").checked,
               createdAt: serverTimestamp()
             });
-            
-            // EMAIL CONFIRMATION:
-            // Sending email directly from the client is not secure. 
-            // The best practice is to use a Firebase Extension like "Trigger Email" or write a Cloud Function.
-            // When a new document is added to the 'donations' collection, a function can trigger
-            // that uses a service (like SendGrid, Mailgun) to send a formatted confirmation email.
+
             
             alert("Donation submitted successfully! Thank you for your support.");
             form.reset();
