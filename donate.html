@@ -105,13 +105,30 @@
                             </div>
                             
                             <div class="form-group">
-                                <label>Payment Method</label>
-                                <div class="coming-soon-message">
-                                    <p><strong>Payment options are coming soon!</strong></p>
-                                    <p>We are currently setting up secure payment accounts. Thank you for your patience.</p>
-                                    <p>In the meantime, you can still submit your donation details below and we'll contact you with payment instructions.</p>
-                                </div>
-                            </div>
+    <label>Payment Method</label>
+    <div class="payment-options">
+        <div class="payment-option" data-method="bank-transfer">
+            <input type="radio" id="bank-transfer" name="payment_method" value="bank-transfer" checked>
+            <label for="bank-transfer">Bank Transfer</label>
+        </div>
+    </div>
+    <div id="bank-transfer-details" class="payment-details-content">
+        <h3>Bank Transfer Details</h3>
+        <p>You can make a direct bank transfer using the details below:</p>
+        <pre>
+Account Title: Talal Nadeem
+Account Number: 0154XXXXXXXXX
+IBAN: PK69ASC0015400123456789
+Bank Name: Askari Bank Limited
+Branch Code: 0154
+Branch Name: Gujranwala Cantt Branch
+SWIFT Code: ASCMPKKA
+Bank Address: AWT Plaza, The Mall, Rawalpindi, Pakistan
+Currency: PKR
+        </pre>
+        <p>For international transfers, please use the SWIFT/BIC code provided.</p>
+    </div>
+</div>
                             
                             <div class="form-group">
                                 <label for="donor-name">Your Name</label>
@@ -388,6 +405,25 @@
                 });
             }
         });
+                    // Payment method selection functionality
+            const paymentOptions = document.querySelectorAll(".payment-option");
+            const paymentDetailsContents = document.querySelectorAll(".payment-details-content");
+
+            paymentOptions.forEach(option => {
+                option.addEventListener("change", function() {
+                    const selectedMethod = this.dataset.method;
+
+                    paymentDetailsContents.forEach(content => {
+                        if (content.id === selectedMethod + "-details") {
+                            content.style.display = "block";
+                        } else {
+                            content.style.display = "none";
+                        }
+                    });
+                });
+            });
     </script>
 </body>
 </html>
+
+
