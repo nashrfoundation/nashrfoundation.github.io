@@ -16,41 +16,6 @@
 
     <!-- Your external CSS file -->
     <link rel="stylesheet" href="styles.css">
-    
-    <!-- Custom Styles for New Features -->
-    <style>
-        /* --- Styles for Dark Fund Tracker --- */
-        .fund-tracker {
-            padding: 40px 20px;
-            background: #000000; /* Changed background to black */
-            color: #f0f0f0;       /* Changed default text color to light grey */
-            text-align: center;
-        }
-        .fund-tracker h2, .fund-tracker p {
-            color: #ffffff; /* Make headers and text white */
-        }
-        .progress-bar-container {
-            background: #333333;  /* Changed track background to dark grey */
-            border: 1px solid #555555; /* Changed border to a matching dark grey */
-            border-radius: 50px;
-            overflow: hidden;
-            max-width: 800px;
-            margin: 20px auto;
-        }
-        .fund-details {
-            font-size: 1.2em;
-            font-weight: bold;
-            font-family: 'Merriweather', serif;
-            color: #f0f0f0; /* Make this text light grey */
-        }
-        /* --- End of tracker style changes --- */
-
-
-        .progress-bar { background: #28a745; height: 35px; width: 0; text-align: center; line-height: 35px; color: white; transition: width 1s ease-in-out; border-radius: 50px; font-weight: bold;}
-        .fund-details span { color: #28a745; } /* Green color will stand out well */
-        #qr-code-details img { max-width: 200px; margin: 20px auto; display: block; }
-        .payment-option label { cursor: pointer; }
-    </style>
 </head>
 <body>
     <header>
@@ -152,38 +117,50 @@
                                 </div>
                             </div>
 
+                            <!-- *** UPDATED PAYMENT OPTIONS HTML *** -->
                             <div class="form-group">
                                 <label>Payment Method</label>
                                 <div class="payment-options">
-                                    <div class="payment-option" data-method="bank-transfer">
-                                        <input checked name="payment_method" type="radio" value="bank-transfer" id="bank-transfer"/>
-                                        <label for="bank-transfer">Bank Transfer</label>
-                                    </div>
-                                    <div class="payment-option" data-method="jazzcash">
-                                        <input name="payment_method" type="radio" value="jazzcash" id="jazzcash"/>
-                                        <label for="jazzcash">JazzCash</label>
-                                    </div>
-                                    <div class="payment-option" data-method="easy-paisa">
-                                        <input name="payment_method" type="radio" value="easy-paisa" id="easy-paisa"/>
-                                        <label for="easy-paisa">Easy Paisa</label>
-                                    </div>
-                                    <div class="payment-option" data-method="qr-code">
-                                        <input name="payment_method" type="radio" value="qr-code" id="qr-code"/>
-                                        <label for="qr-code">QR Code</label>
-                                    </div>
-                                    <div class="payment-option" data-method="paypal">
-                                        <input name="payment_method" type="radio" value="paypal" id="paypal"/>
-                                        <label for="paypal">PayPal</label>
-                                    </div>
-                                    <div class="payment-option" data-method="stripe">
-                                        <input name="payment_method" type="radio" value="stripe" id="stripe"/>
-                                        <label for="stripe">Stripe (Card)</label>
-                                    </div>
+                                    <!-- Bank Transfer -->
+                                    <label for="bank-transfer" class="payment-option">
+                                        <input type="radio" id="bank-transfer" name="payment_method" value="bank-transfer" checked>
+                                        <span>Bank Transfer</span>
+                                    </label>
+                                    
+                                    <!-- JazzCash -->
+                                    <label for="jazzcash" class="payment-option">
+                                        <input type="radio" id="jazzcash" name="payment_method" value="jazzcash">
+                                        <span>JazzCash</span>
+                                    </label>
+
+                                    <!-- Easy Paisa -->
+                                    <label for="easy-paisa" class="payment-option">
+                                        <input type="radio" id="easy-paisa" name="payment_method" value="easy-paisa">
+                                        <span>Easy Paisa</span>
+                                    </label>
+
+                                    <!-- QR Code -->
+                                    <label for="qr-code" class="payment-option">
+                                        <input type="radio" id="qr-code" name="payment_method" value="qr-code">
+                                        <span>QR Code</span>
+                                    </label>
+
+                                    <!-- PayPal -->
+                                    <label for="paypal" class="payment-option">
+                                        <input type="radio" id="paypal" name="payment_method" value="paypal">
+                                        <span>PayPal</span>
+                                    </label>
+
+                                    <!-- Stripe (Card) -->
+                                    <label for="stripe" class="payment-option">
+                                        <input type="radio" id="stripe" name="payment_method" value="stripe">
+                                        <span>Stripe (Card)</span>
+                                    </label>
                                 </div>
                             </div>
                             
                             <!-- Payment Details Sections -->
-                            <div class="payment-details-content" id="bank-transfer-details">
+                            <div class="payment-details-content" id="bank-transfer-details" style="display:none;">
                                 <h3>Bank Transfer Details</h3>
                                 <p>You can make a direct bank transfer using the details below:</p>
                                 <pre>
@@ -206,7 +183,6 @@
                              <div class="payment-details-content" id="qr-code-details" style="display: none;">
                                 <h3>Pay with QR Code</h3>
                                 <p>Scan the QR code below using your mobile payment app.</p>
-                                <!-- IMPORTANT: Replace with your actual QR code image file -->
                                 <img src="qr_code_placeholder.png" alt="QR Code for payment">
                              </div>
                              <div class="payment-details-content" id="paypal-details" style="display: none;">
@@ -218,14 +194,12 @@
                                 <p>Secure card payments powered by Stripe. This is a placeholder as direct integration requires server-side setup.</p>
                             </div>
 
-                            <!-- Unified Screenshot Upload Section -->
-                            <div class="form-group" id="screenshot-upload-section">
+                            <div class="form-group" id="screenshot-upload-section" style="display:none;">
                                 <label for="screenshot">Upload Proof of Payment</label>
                                 <input type="file" class="form-control" id="screenshot" name="screenshot" accept="image/*">
                                 <small>Screenshot is required for Bank Transfer, JazzCash, Easy Paisa, and QR Code payments.</small>
                             </div>
 
-                            <!-- Remaining form fields -->
                             <div class="form-group">
                                 <label for="donor-name">Your Name</label>
                                 <input class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required type="text"/>
@@ -296,91 +270,51 @@
             const percentage = (amountRaised / targetAmount) * 100;
             const progressBar = document.getElementById('fund-progress-bar');
             if(progressBar) {
-              setTimeout(() => { // Timeout to allow smooth animation on load
+              setTimeout(() => {
                 progressBar.style.width = percentage + '%';
                 progressBar.textContent = Math.round(percentage) + '%';
               }, 500);
             }
 
-            const donationTabs = document.querySelectorAll(".donation-tab");
-            const donationTypeInput = document.getElementById("donation-type-input");
-            const donationTypeDisplay = document.getElementById("donation-type-display");
-            donationTabs.forEach(tab => {
-                tab.addEventListener("click", function() {
-                    donationTabs.forEach(t => {t.classList.remove("active"); t.setAttribute("aria-selected", "false"); t.setAttribute("tabindex", "-1");});
-                    this.classList.add("active"); this.setAttribute("aria-selected", "true"); this.setAttribute("tabindex", "0");
-                    const donationType = this.dataset.tab;
-                    donationTypeInput.value = donationType;
-                    donationTypeDisplay.textContent = donationType.charAt(0).toUpperCase() + donationType.slice(1).replace("-", " ") + " Donation";
-                });
-                tab.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); this.click(); }});
-            });
+            // --- Donation Tabs, Amount Selection, etc. ---
+            const donationTabs=document.querySelectorAll(".donation-tab"),donationTypeInput=document.getElementById("donation-type-input"),donationTypeDisplay=document.getElementById("donation-type-display");donationTabs.forEach(t=>{t.addEventListener("click",function(){donationTabs.forEach(t=>{t.classList.remove("active"),t.setAttribute("aria-selected","false"),t.setAttribute("tabindex","-1")}),this.classList.add("active"),this.setAttribute("aria-selected","true"),this.setAttribute("tabindex","0");const e=this.dataset.tab;donationTypeInput.value=e,donationTypeDisplay.textContent=e.charAt(0).toUpperCase()+e.slice(1).replace("-"," ")+" Donation"}),t.addEventListener("keydown",function(t){"Enter"!==t.key&&" "!==t.key||(t.preventDefault(),this.click())})});const amountOptions=document.querySelectorAll(".amount-option"),donationAmountInput=document.getElementById("donation-amount-input"),customAmountContainer=document.getElementById("custom-amount-container"),customAmountInput=document.getElementById("custom-amount");amountOptions.forEach(t=>{t.addEventListener("click",function(){amountOptions.forEach(t=>{t.classList.remove("active")}),this.classList.add("active");const e=this.dataset.amount;"custom"===e?(customAmountContainer.style.display="block",customAmountInput.focus(),donationAmountInput.value=""):(customAmountContainer.style.display="none",donationAmountInput.value=e,customAmountInput.value="")}),t.addEventListener("keydown",function(t){"Enter"!==t.key&&" "!==t.key||(t.preventDefault(),this.click())})}),customAmountInput&&customAmountInput.addEventListener("input",function(){donationAmountInput.value=this.value&&0<this.value?this.value:""});
 
-            const amountOptions = document.querySelectorAll(".amount-option");
-            const donationAmountInput = document.getElementById("donation-amount-input");
-            const customAmountContainer = document.getElementById("custom-amount-container");
-            const customAmountInput = document.getElementById("custom-amount");
-            amountOptions.forEach(option => {
-                option.addEventListener("click", function() {
-                    amountOptions.forEach(opt => {opt.classList.remove("active");});
-                    this.classList.add("active");
-                    const amount = this.dataset.amount;
-                    if (amount === "custom") {
-                        customAmountContainer.style.display = "block"; customAmountInput.focus(); donationAmountInput.value = "";
-                    } else {
-                        customAmountContainer.style.display = "none"; donationAmountInput.value = amount; customAmountInput.value = "";
-                    }
-                });
-                option.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); this.click(); }});
-            });
-
-            if (customAmountInput) {
-                customAmountInput.addEventListener("input", function() { donationAmountInput.value = (this.value && this.value > 0) ? this.value : ""; });
-                customAmountInput.addEventListener("blur", function() {
-                    if (!this.value || this.value <= 0) {
-                        customAmountContainer.style.display = "none";
-                        const defaultOption = document.querySelector('.amount-option[data-amount="2500"]');
-                        if (defaultOption) { amountOptions.forEach(opt => opt.classList.remove("active")); defaultOption.classList.add("active"); donationAmountInput.value = "2500";}
-                    }
-                });
-                customAmountInput.addEventListener("keydown", function(e) { if (e.key === "Escape") { this.blur(); }});
-            }
-
-            const anonymousCheckbox = document.getElementById("anonymous-donation");
-            const leaderboardCheckbox = document.getElementById("leaderboard-consent");
-            if (anonymousCheckbox && leaderboardCheckbox) {
-                anonymousCheckbox.addEventListener("change", function() {
-                    if (this.checked) { leaderboardCheckbox.checked = false; leaderboardCheckbox.disabled = true;} else { leaderboardCheckbox.disabled = false; leaderboardCheckbox.checked = true; }
-                });
-            }
-
-            const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
-            const nav = document.querySelector("nav");
-            if (mobileMenuToggle && nav) {
-                mobileMenuToggle.addEventListener("click", function() { nav.classList.toggle("active"); this.classList.toggle("active"); });
-                const navLinks = nav.querySelectorAll("a");
-                navLinks.forEach(link => { link.addEventListener("click", function() { nav.classList.remove("active"); mobileMenuToggle.classList.remove("active"); }); });
-            }
-
-            // --- Payment Method Selection Logic ---
+            // --- *** UPDATED JAVASCRIPT LOGIC FOR PAYMENT METHODS *** ---
             const paymentMethodRadios = document.querySelectorAll(".payment-option input[type='radio']");
+            const allPaymentOptions = document.querySelectorAll(".payment-option");
             const screenshotSection = document.getElementById('screenshot-upload-section');
             const manualPaymentMethods = ['bank-transfer', 'jazzcash', 'easy-paisa', 'qr-code'];
 
+            const updateActiveState = (selectedInput) => {
+                allPaymentOptions.forEach(opt => opt.classList.remove('active'));
+
+                if (selectedInput && selectedInput.parentElement.classList.contains('payment-option')) {
+                    selectedInput.parentElement.classList.add('active');
+                }
+
+                const selectedMethod = selectedInput.value;
+                document.querySelectorAll('.payment-details-content').forEach(content => { content.style.display = 'none'; });
+                const detailsSection = document.getElementById(`${selectedMethod}-details`);
+                if (detailsSection) { detailsSection.style.display = 'block'; }
+
+                if (manualPaymentMethods.includes(selectedMethod)) {
+                    screenshotSection.style.display = 'block';
+                } else {
+                    screenshotSection.style.display = 'none';
+                }
+            };
+
             paymentMethodRadios.forEach(input => {
-                input.addEventListener("change", function() {
-                    const selectedMethod = this.value;
-                    document.querySelectorAll('.payment-details-content').forEach(content => { content.style.display = 'none'; });
-                    const detailsSection = document.getElementById(`${selectedMethod}-details`);
-                    if (detailsSection) { detailsSection.style.display = 'block'; }
-                    
-                    if (manualPaymentMethods.includes(selectedMethod)) {
-                        screenshotSection.style.display = 'block';
-                    } else {
-                        screenshotSection.style.display = 'none';
-                    }
-                });
+                input.addEventListener("change", () => updateActiveState(input));
             });
+
+            const initiallyChecked = document.querySelector(".payment-option input[type='radio']:checked");
+            if (initiallyChecked) {
+                updateActiveState(initiallyChecked);
+            }
+
+            // --- Anonymous & Mobile Menu Logic ---
+            const anonymousCheckbox = document.getElementById("anonymous-donation"),leaderboardCheckbox=document.getElementById("leaderboard-consent");anonymousCheckbox&&leaderboardCheckbox&&anonymousCheckbox.addEventListener("change",function(){this.checked?(leaderboardCheckbox.checked=!1,leaderboardCheckbox.disabled=!0):(leaderboardCheckbox.disabled=!1,leaderboardCheckbox.checked=!0)});const mobileMenuToggle=document.querySelector(".mobile-menu-toggle"),nav=document.querySelector("nav");mobileMenuToggle&&nav&&(mobileMenuToggle.addEventListener("click",function(){nav.classList.toggle("active"),this.classList.toggle("active")}),nav.querySelectorAll("a").forEach(t=>{t.addEventListener("click",function(){nav.classList.remove("active"),mobileMenuToggle.classList.remove("active")})}));
         });
     </script>
     
@@ -436,7 +370,6 @@
             return;
           }
           
-          // Placeholder for live integrations like Stripe/PayPal
           if (selectedPaymentMethod === 'paypal' || selectedPaymentMethod === 'stripe') {
              alert('Thank you for your intent to donate! Live integration for ' + selectedPaymentMethod + ' is coming soon.');
              submitButton.disabled = false;
@@ -462,13 +395,12 @@
               leaderboardConsent: !document.getElementById("anonymous-donation").checked && document.getElementById("leaderboard-consent").checked,
               createdAt: serverTimestamp()
             });
-
             
             alert("Donation submitted successfully! Thank you for your support.");
             form.reset();
-            // Also reset UI elements to default
-            document.querySelector('.amount-option.active').classList.remove('active');
-            document.querySelector('.amount-option[data-amount="2500"]').classList.add('active');
+            
+            document.querySelector('.amount-option.active')?.classList.remove('active');
+            document.querySelector('.amount-option[data-amount="2500"]')?.classList.add('active');
 
 
           } catch (error) {
