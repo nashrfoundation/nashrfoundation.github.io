@@ -50,6 +50,7 @@
         .fund-details span { color: #28a745; } /* Green color will stand out well */
         #qr-code-details img { max-width: 200px; margin: 20px auto; display: block; }
         .payment-option label { cursor: pointer; }
+        .payment-option { cursor: pointer; } /* Make the whole area clickable */
     </style>
 </head>
 <body>
@@ -97,6 +98,7 @@
     <main>
         <section class="hero">
             <div class="hero-image">
+                <!-- IMPORTANT: Make sure this background image exists in your project -->
                 <img src="hero_background.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async">
             </div>
             <div class="hero-overlay"></div>
@@ -207,7 +209,7 @@
                                 <h3>Pay with QR Code</h3>
                                 <p>Scan the QR code below using your mobile payment app.</p>
                                 <!-- IMPORTANT: Replace with your actual QR code image file -->
-                                <img src="qr_code_placeholder.png" alt="QR Code for payment">
+                                <img src="nashr-qr.png" alt="QR Code for payment">
                              </div>
                              <div class="payment-details-content" id="paypal-details" style="display: none;">
                                 <h3>PayPal Payment</h3>
@@ -217,13 +219,8 @@
                                 <h3>Stripe (Credit/Debit Card)</h3>
                                 <p>Secure card payments powered by Stripe. This is a placeholder as direct integration requires server-side setup.</p>
                             </div>
-
-                            <!-- Unified Screenshot Upload Section -->
-                            <div class="form-group" id="screenshot-upload-section">
-                                <label for="screenshot">Upload Proof of Payment</label>
-                                <input type="file" class="form-control" id="screenshot" name="screenshot" accept="image/*">
-                                <small>Screenshot is required for Bank Transfer, JazzCash, Easy Paisa, and QR Code payments.</small>
-                            </div>
+                            
+                            <!-- SCREENSHOT UPLOAD REMOVED -->
 
                             <!-- Remaining form fields -->
                             <div class="form-group">
@@ -363,32 +360,34 @@
             }
 
             // --- Payment Method Selection Logic ---
-            const paymentMethodRadios = document.querySelectorAll(".payment-option input[type='radio']");
-            const screenshotSection = document.getElementById('screenshot-upload-section');
-            const manualPaymentMethods = ['bank-transfer', 'jazzcash', 'easy-paisa', 'qr-code'];
-
-            paymentMethodRadios.forEach(input => {
+            const paymentMethodInputs = document.querySelectorAll(".payment-option input[type='radio']");
+            paymentMethodInputs.forEach(input => {
                 input.addEventListener("change", function() {
                     const selectedMethod = this.value;
                     document.querySelectorAll('.payment-details-content').forEach(content => { content.style.display = 'none'; });
                     const detailsSection = document.getElementById(`${selectedMethod}-details`);
                     if (detailsSection) { detailsSection.style.display = 'block'; }
-                    
-                    if (manualPaymentMethods.includes(selectedMethod)) {
-                        screenshotSection.style.display = 'block';
-                    } else {
-                        screenshotSection.style.display = 'none';
+                });
+            });
+
+            // Make the whole payment option div clickable
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const radio = option.querySelector('input[type="radio"]');
+                    if (radio && e.target.tagName !== 'INPUT') {
+                        radio.checked = true;
+                        radio.dispatchEvent(new Event('change'));
                     }
                 });
             });
         });
     </script>
     
-    <!-- Firebase and Form Submission Logic -->
+    <!-- UPDATED Firebase and Form Submission Logic -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
       import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
-      import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-storage.js";
+      // We no longer need getStorage
 
       // IMPORTANT: Replace with your actual Firebase configuration
       const firebaseConfig = {
@@ -403,7 +402,7 @@
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
-      const storage = getStorage(app);
+      // We no longer need storage
 
       document.addEventListener("DOMContentLoaded", () => {
         const form = document.getElementById("donation-form");
@@ -414,13 +413,10 @@
           submitButton.disabled = true;
           submitButton.textContent = "Processing...";
 
-          const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-          const screenshotRequired = ['bank-transfer', 'jazzcash', 'easy-paisa', 'qr-code'].includes(selectedPaymentMethod);
-          
           const name = document.getElementById("donor-name").value;
           const email = document.getElementById("donor-email").value;
           const amount = document.getElementById("donation-amount-input").value;
-          const screenshotFile = document.getElementById("screenshot")?.files[0];
+          const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
           
           if (!amount || amount <= 0) {
               alert("Please select or enter a valid donation amount.");
@@ -429,28 +425,15 @@
               return;
           }
           
-          if (screenshotRequired && !screenshotFile) {
-            alert("Please upload a proof of payment screenshot for this method.");
-            submitButton.disabled = false;
-            submitButton.textContent = "Complete Donation";
-            return;
-          }
-          
-          // Placeholder for live integrations like Stripe/PayPal
           if (selectedPaymentMethod === 'paypal' || selectedPaymentMethod === 'stripe') {
-             alert('Thank you for your intent to donate! Live integration for ' + selectedPaymentMethod + ' is coming soon.');
+             alert('Live integration for ' + selectedPaymentMethod + ' is coming soon. Please choose another method.');
              submitButton.disabled = false;
              submitButton.textContent = "Complete Donation";
              return;
           }
 
           try {
-            let fileURL = null;
-            if (screenshotFile) {
-              const fileRef = ref(storage, `screenshots/${Date.now()}-${screenshotFile.name}`);
-              await uploadBytes(fileRef, screenshotFile);
-              fileURL = await getDownloadURL(fileRef);
-            }
+            // The file upload logic is removed.
 
             await addDoc(collection(db, "donations"), {
               name: document.getElementById("anonymous-donation").checked ? "Anonymous" : name,
@@ -458,22 +441,23 @@
               amount: Number(amount),
               donationType: document.getElementById("donation-type-input").value,
               paymentMethod: selectedPaymentMethod,
-              screenshotURL: fileURL,
+              screenshotURL: null, // Set to null as we are not uploading a file
               leaderboardConsent: !document.getElementById("anonymous-donation").checked && document.getElementById("leaderboard-consent").checked,
               createdAt: serverTimestamp()
             });
             
-            // EMAIL CONFIRMATION:
-            // Sending email directly from the client is not secure. 
-            // The best practice is to use a Firebase Extension like "Trigger Email" or write a Cloud Function.
-            // When a new document is added to the 'donations' collection, a function can trigger
-            // that uses a service (like SendGrid, Mailgun) to send a formatted confirmation email.
+            // NEW, more helpful success message:
+            alert("Thank you! Your donation has been recorded.\n\nPlease email your proof of payment screenshot to nashrfoundationpk@gmail.com to finalize the process.");
             
-            alert("Donation submitted successfully! Thank you for your support.");
             form.reset();
-            // Also reset UI elements to default
-            document.querySelector('.amount-option.active').classList.remove('active');
+            // Also reset UI elements to default state
+            document.querySelector('.amount-option.active')?.classList.remove('active');
             document.querySelector('.amount-option[data-amount="2500"]').classList.add('active');
+            document.getElementById('donation-amount-input').value = '2500';
+
+            // Reset the payment method display
+            document.getElementById('bank-transfer').checked = true;
+            document.getElementById('bank-transfer').dispatchEvent(new Event('change'));
 
 
           } catch (error) {
@@ -485,17 +469,6 @@
           }
         });
       });
-        // --- Make Entire Payment Option Clickable ---
-document.querySelectorAll('.payment-option').forEach(option => {
-    option.addEventListener('click', () => {
-        const radio = option.querySelector('input[type="radio"]');
-        if (radio) {
-            radio.checked = true;
-            // Manually trigger a 'change' event to ensure other scripts that listen for it will run
-            radio.dispatchEvent(new Event('change'));
-        }
-    });
-});
     </script>
 </body>
 </html>
