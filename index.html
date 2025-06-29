@@ -89,17 +89,14 @@
     </header>
 
     <main>
-        <section class="hero">
-            <div class="hero-image">
-                <img src="hero_background.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async">
-            </div>
-            <div class="hero-overlay"></div>
-            <div class="hero-content">
-                <h1>Empowering Communities Through Essential Support</h1>
-                <p>Providing education, food, water, and basic necessities to those in need</p>
-                <a href="donate.html" class="btn btn-large">Donate Now</a>
-            </div>
-        </section>
+        <div class="hero-image">
+    <picture>
+        <!-- Use the high-quality image on screens wider than 768px -->
+        <source media="(min-width: 768px)" srcset="hero_background.webp">
+        <!-- Use the low-quality image by default for smaller screens -->
+        <img src="hero_background_mobile.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async" style="width:100%; height:100%; object-fit:cover;">
+    </picture>
+</div>
 
         <section class="aims">
             <div class="container">
