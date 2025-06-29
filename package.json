@@ -1,1 +1,11 @@
+{
+  "name": "my-frontend-website",
+  "version": "1.0.0",
+  "description": "A static HTML/CSS/JS website",
+  "author": "Nashr foundation",
+  "license": "MIT",
+  "private": true,
+  "keywords": ["HTML", "CSS", "JavaScript", "frontend", "website"],
+  "dependencies": {}
+}
 
