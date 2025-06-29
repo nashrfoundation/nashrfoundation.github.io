@@ -485,6 +485,17 @@
           }
         });
       });
+        // --- Make Entire Payment Option Clickable ---
+document.querySelectorAll('.payment-option').forEach(option => {
+    option.addEventListener('click', () => {
+        const radio = option.querySelector('input[type="radio"]');
+        if (radio) {
+            radio.checked = true;
+            // Manually trigger a 'change' event to ensure other scripts that listen for it will run
+            radio.dispatchEvent(new Event('change'));
+        }
+    });
+});
     </script>
 </body>
 </html>
