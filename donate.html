@@ -4,16 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate - Nashr Foundation</title>
-    
+
     <!-- Preload LCP image and optimized fonts -->
     <link rel="preload" fetchpriority="high" as="image" href="hero_background.webp" type="image/webp">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preload" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" as="style">
-    
+
     <!-- Load fonts -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:wght@400;700&family=Merriweather:wght@400;700&family=Playfair+Display:wght@400;700&display=swap"></noscript>
-    
+
     <!-- Your external CSS file -->
     <link rel="stylesheet" href="styles.css">
 </head>
@@ -70,135 +70,135 @@
                 <p>Your donation helps provide education, food, water, and basic necessities to those in need</p>
             </div>
         </section>
-
         <section class="donation-section">
             <div class="container">
                 <div class="donation-header">
                     <h2>Your Support Changes Lives</h2>
                     <p>Every contribution, no matter the size, helps us provide essential services to communities in need. Choose your preferred donation method below.</p>
                 </div>
-                
+
                 <div class="donation-form-container">
                     <div class="donation-tabs" role="tablist">
                         <div class="donation-tab active" data-tab="one-time" role="tab" aria-selected="true" tabindex="0">One-time Donation</div>
                         <div class="donation-tab" data-tab="monthly" role="tab" aria-selected="false" tabindex="-1">Monthly Donation</div>
                     </div>
-                    
+
                     <div class="donation-form">
                         <form action="https://formspree.io/f/xanjnelw" id="donation-form" method="POST">
-  <div id="donation-type-display">One-time Donation</div>
-  <input id="donation-type-input" name="donation_type" type="hidden" value="one-time"/>
-  <div class="form-group">
-    <label>Select Amount</label>
-    <div class="amount-options">
-      <div class="amount-option" data-amount="1000" role="button" tabindex="0">₨ 1,000</div>
-      <div class="amount-option active" data-amount="2500" role="button" tabindex="0">₨ 2,500</div>
-      <div class="amount-option" data-amount="5000" role="button" tabindex="0">₨ 5,000</div>
-      <div class="amount-option" data-amount="10000" role="button" tabindex="0">₨ 10,000</div>
-      <div class="amount-option" data-amount="custom" role="button" tabindex="0">Custom</div>
-    </div>
-    <input id="donation-amount-input" name="donation_amount" type="hidden" value="2500"/>
-    <div id="custom-amount-container" style="display: none;">
-      <input class="form-control" id="custom-amount" min="1" placeholder="Enter amount in PKR" type="number"/>
-    </div>
-  </div>
-  <div class="form-group">
-    <label>Payment Method</label>
-    <div class="payment-options">
-      <div class="payment-option" data-method="bank-transfer">
-        <input checked="" id="bank-transfer" name="payment_method" type="radio" value="bank-transfer"/>
-        <label for="bank-transfer">Bank Transfer</label>
-      </div>
-      <div class="payment-option" data-method="jazzcash">
-        <input id="jazzcash" name="payment_method" type="radio" value="jazzcash"/>
-        <label for="jazzcash">JazzCash</label>
-      </div>
-      <div class="payment-option" data-method="easy-paisa">
-        <input id="easy-paisa" name="payment_method" type="radio" value="easy-paisa"/>
-        <label for="easy-paisa">Easy Paisa</label>
-      </div>
-    </div>
-  </div>
+                            <div id="donation-type-display">One-time Donation</div>
+                            <input id="donation-type-input" name="donation_type" type="hidden" value="one-time"/>
+                            <div class="form-group">
+                                <label>Select Amount</label>
+                                <div class="amount-options">
+                                    <div class="amount-option" data-amount="1000" role="button" tabindex="0">₨ 1,000</div>
+                                    <div class="amount-option active" data-amount="2500" role="button" tabindex="0">₨ 2,500</div>
+                                    <div class="amount-option" data-amount="5000" role="button" tabindex="0">₨ 5,000</div>
+                                    <div class="amount-option" data-amount="10000" role="button" tabindex="0">₨ 10,000</div>
+                                    <div class="amount-option" data-amount="custom" role="button" tabindex="0">Custom</div>
+                                </div>
+                                <input id="donation-amount-input" name="donation_amount" type="hidden" value="2500"/>
+                                <div id="custom-amount-container" style="display: none;">
+                                    <input class="form-control" id="custom-amount" min="1" placeholder="Enter amount in PKR" type="number"/>
+                                </div>
+                            </div>
 
-  <!-- Bank Transfer Details Section -->
-  <div class="payment-details-content" id="bank-transfer-details">
-    <h3>Bank Transfer Details</h3>
-    <p>You can make a direct bank transfer using the details below:</p>
-    <pre>
-      Account Title: Talal Nadeem
-      Account Number: 0154XXXXXXXXX
-      IBAN: PK69ASC0015400123456789
-      Bank Name: Askari Bank Limited
-      Branch Code: 0154
-      Branch Name: Gujranwala Cantt Branch
-      SWIFT Code: ASCMPKKA
-      Bank Address: AWT Plaza, The Mall, Rawalpindi, Pakistan
-      Currency: PKR
-    </pre>
-    <p>For international transfers, please use the SWIFT/BIC code provided.</p>
-    <div class="form-group">
-      <label for="bank-transfer-screenshot">Upload Screenshot (Bank Transfer)</label>
-      <input type="file" id="bank-transfer-screenshot" name="bank_transfer_screenshot" accept="image/*" required>
-    </div>
-  </div>
+                            <div class="form-group">
+                                <label>Payment Method</label>
+                                <div class="payment-options">
+                                    <div class="payment-option" data-method="bank-transfer">
+                                        <input checked="" id="bank-transfer" name="payment_method" type="radio" value="bank-transfer"/>
+                                        <label for="bank-transfer">Bank Transfer</label>
+                                    </div>
+                                    <div class="payment-option" data-method="jazzcash">
+                                        <input id="jazzcash" name="payment_method" type="radio" value="jazzcash"/>
+                                        <label for="jazzcash">JazzCash</label>
+                                    </div>
+                                    <div class="payment-option" data-method="easy-paisa">
+                                        <input id="easy-paisa" name="payment_method" type="radio" value="easy-paisa"/>
+                                        <label for="easy-paisa">Easy Paisa</label>
+                                    </div>
+                                </div>
+                            </div>
 
-  <!-- JazzCash Details Section -->
-  <div class="payment-details-content" id="jazzcash-details" style="display: none;">
-    <h3>JazzCash Payment Details</h3>
-    <p>Details for JazzCash payments will be provided here.</p>
-    <div class="form-group">
-      <label for="jazzcash-screenshot">Upload Screenshot (JazzCash)</label>
-      <input type="file" id="jazzcash-screenshot" name="jazzcash_screenshot" accept="image/*" required>
-    </div>
-  </div>
+                            <!-- Payment method details sections with screenshot upload fields -->
+                            <!-- Bank Transfer Details Section -->
+                            <div class="payment-details-content" id="bank-transfer-details">
+                                <h3>Bank Transfer Details</h3>
+                                <p>You can make a direct bank transfer using the details below:</p>
+                                <pre>
+                                    Account Title: Talal Nadeem
+                                    Account Number: 0154XXXXXXXXX
+                                    IBAN: PK69ASC0015400123456789
+                                    Bank Name: Askari Bank Limited
+                                    Branch Code: 0154
+                                    Branch Name: Gujranwala Cantt Branch
+                                    SWIFT Code: ASCMPKKA
+                                    Bank Address: AWT Plaza, The Mall, Rawalpindi, Pakistan
+                                    Currency: PKR
+                                </pre>
+                                <p>For international transfers, please use the SWIFT/BIC code provided.</p>
+                                <div class="form-group">
+                                    <label for="bank-transfer-screenshot">Upload Screenshot (Bank Transfer)</label>
+                                    <input type="file" id="bank-transfer-screenshot" name="bank_transfer_screenshot" accept="image/*" required>
+                                </div>
+                            </div>
 
-  <!-- Easy Paisa Details Section -->
-  <div class="payment-details-content" id="easy-paisa-details" style="display: none;">
-    <h3>Easy Paisa Payment Details</h3>
-    <p>Details for Easy Paisa payments will be provided here.</p>
-    <div class="form-group">
-      <label for="easy-paisa-screenshot">Upload Screenshot (Easy Paisa)</label>
-      <input type="file" id="easy-paisa-screenshot" name="easy_paisa_screenshot" accept="image/*" required>
-    </div>
-  </div>
+                            <!-- JazzCash Details Section -->
+                            <div class="payment-details-content" id="jazzcash-details" style="display: none;">
+                                <h3>JazzCash Payment Details</h3>
+                                <p>Details for JazzCash payments will be provided here.</p>
+                                <div class="form-group">
+                                    <label for="jazzcash-screenshot">Upload Screenshot (JazzCash)</label>
+                                    <input type="file" id="jazzcash-screenshot" name="jazzcash_screenshot" accept="image/*" required>
+                                </div>
+                            </div>
 
-  <div class="form-group">
-    <label for="donor-name">Your Name</label>
-    <input class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required="" type="text"/>
-  </div>
-  <div class="form-group">
-    <label for="donor-email">Email Address</label>
-    <input class="form-control" id="donor-email" name="email" placeholder="Enter your email address" required="" type="email"/>
-  </div>
-  <div class="form-group">
-    <div class="checkbox-group">
-      <input checked="" id="leaderboard-consent" name="leaderboard_consent" type="checkbox" value="yes"/>
-      <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label>
-    </div>
-    <div class="checkbox-group">
-      <input id="anonymous-donation" name="anonymous_donation" type="checkbox" value="yes"/>
-      <label for="anonymous-donation">Make my donation anonymous</label>
-    </div>
-  </div>
-  <div class="form-submit">
-    <button class="btn btn-large" type="submit">Complete Donation</button>
-  </div>
-  <div class="secure-badge">
-    <!-- SVG for security badge -->
-    <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-      <path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-      <path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
-    </svg>
-    <span>Your financial information is secure and will not be stored</span>
-  </div>
-</form>
+                            <!-- Easy Paisa Details Section -->
+                            <div class="payment-details-content" id="easy-paisa-details" style="display: none;">
+                                <h3>Easy Paisa Payment Details</h3>
+                                <p>Details for Easy Paisa payments will be provided here.</p>
+                                <div class="form-group">
+                                    <label for="easy-paisa-screenshot">Upload Screenshot (Easy Paisa)</label>
+                                    <input type="file" id="easy-paisa-screenshot" name="easy_paisa_screenshot" accept="image/*" required>
+                                </div>
+                            </div>
 
+                            <!-- Remaining form fields (donor name, email, etc.) -->
+                            <div class="form-group">
+                                <label for="donor-name">Your Name</label>
+                                <input class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required="" type="text"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="donor-email">Email Address</label>
+                                <input class="form-control" id="donor-email" name="email" placeholder="Enter your email address" required="" type="email"/>
+                            </div>
+                            <div class="form-group">
+                                <div class="checkbox-group">
+                                    <input checked="" id="leaderboard-consent" name="leaderboard_consent" type="checkbox" value="yes"/>
+                                    <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label>
+                                </div>
+                                <div class="checkbox-group">
+                                    <input id="anonymous-donation" name="anonymous_donation" type="checkbox" value="yes"/>
+                                    <label for="anonymous-donation">Make my donation anonymous</label>
+                                </div>
+                            </div>
+                            <div class="form-submit">
+                                <button class="btn btn-large" type="submit">Complete Donation</button>
+                            </div>
+                            <div class="secure-badge">
+                                <!-- SVG for security badge -->
+                                <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                    <path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                    <path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path>
+                                </svg>
+                                <span>Your financial information is secure and will not be stored</span>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
         </section>
-
         <section class="impact">
             <div class="container">
                 <h2>Your Donation's Impact</h2>
@@ -223,7 +223,6 @@
             </div>
         </section>
     </main>
-
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -258,14 +257,12 @@
             </div>
         </div>
     </footer>
-
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Donation tabs functionality
             const donationTabs = document.querySelectorAll(".donation-tab");
             const donationTypeInput = document.getElementById("donation-type-input");
             const donationTypeDisplay = document.getElementById("donation-type-display");
-
             donationTabs.forEach(tab => {
                 tab.addEventListener("click", function() {
                     // Remove active class from all tabs
@@ -274,18 +271,16 @@
                         t.setAttribute("aria-selected", "false");
                         t.setAttribute("tabindex", "-1");
                     });
-                    
+
                     // Add active class to clicked tab
                     this.classList.add("active");
                     this.setAttribute("aria-selected", "true");
                     this.setAttribute("tabindex", "0");
-
                     // Update hidden input and display text
                     const donationType = this.dataset.tab;
                     donationTypeInput.value = donationType;
                     donationTypeDisplay.textContent = donationType.charAt(0).toUpperCase() + donationType.slice(1).replace("-", " ") + " Donation";
                 });
-
                 // Keyboard support for tabs
                 tab.addEventListener("keydown", function(e) {
                     if (e.key === "Enter" || e.key === " ") {
@@ -307,12 +302,11 @@
                     amountOptions.forEach(opt => {
                         opt.classList.remove("active");
                     });
-                    
+
                     // Add active class to clicked option
                     this.classList.add("active");
-
                     const amount = this.dataset.amount;
-                    
+
                     if (amount === "custom") {
                         // Show custom amount input
                         customAmountContainer.style.display = "block";
@@ -370,7 +364,6 @@
             // Anonymous donation checkbox functionality
             const anonymousCheckbox = document.getElementById("anonymous-donation");
             const leaderboardCheckbox = document.getElementById("leaderboard-consent");
-
             if (anonymousCheckbox && leaderboardCheckbox) {
                 anonymousCheckbox.addEventListener("change", function() {
                     if (this.checked) {
@@ -399,13 +392,12 @@
                         alert("Please select a donation amount.");
                         return false;
                     }
-
                     // Add loading state to submit button
                     const submitButton = this.querySelector('button[type="submit"]');
                     if (submitButton) {
                         submitButton.disabled = true;
                         submitButton.textContent = "Processing...";
-                        
+
                         // Reset button after delay in case of errors
                         setTimeout(() => {
                             submitButton.disabled = false;
@@ -418,7 +410,6 @@
             // Mobile menu toggle
             const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
             const nav = document.querySelector("nav");
-
             if (mobileMenuToggle && nav) {
                 mobileMenuToggle.addEventListener("click", function() {
                     nav.classList.toggle("active");
@@ -434,26 +425,25 @@
                     });
                 });
             }
-        });
-                    // Payment method selection functionality
-            const paymentOptions = document.querySelectorAll(".payment-option");
-            const paymentDetailsContents = document.querySelectorAll(".payment-details-content");
 
-            paymentOptions.forEach(option => {
-                option.addEventListener("change", function() {
-                    const selectedMethod = this.dataset.method;
-
-                    paymentDetailsContents.forEach(content => {
-                        if (content.id === selectedMethod + "-details") {
-                            content.style.display = "block";
-                        } else {
-                            content.style.display = "none";
-                        }
+            // Payment method selection functionality
+            document.querySelectorAll(".payment-option input[type='radio']").forEach(input => {
+                input.addEventListener("change", function() {
+                    const selectedMethod = this.value; // Use the radio input's value
+                    document.querySelectorAll('.payment-details-content').forEach(content => {
+                        // Hide all payment detail sections first
+                        content.style.display = 'none';
                     });
+
+                    // Display the relevant payment details section
+                    const detailsSection = document.getElementById(`${selectedMethod}-details`);
+                    if (detailsSection) {
+                        detailsSection.style.display = 'block';
+                    }
                 });
             });
+        });
     </script>
 </body>
 </html>
-
 
