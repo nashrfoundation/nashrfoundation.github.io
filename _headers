@@ -23,3 +23,9 @@
   Cache-Control: public, max-age=31536000, immutable
 /*.woff2
   Cache-Control: public, max-age=31536000, immutable
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' www.google-analytics.com; style-src 'self' 'unsafe-inline'
+  X-Frame-Options: SAMEORIGIN
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
