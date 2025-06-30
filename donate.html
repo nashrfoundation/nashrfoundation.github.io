@@ -67,6 +67,23 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         #qr-code-details img { max-width: 200px; margin: 20px auto; display: block; }
         .payment-option label { cursor: pointer; }
         .payment-option { cursor: pointer; } /* Make the whole area clickable */
+        
+        /* --- Styles for Phone Input --- */
+        .phone-input {
+            display: flex;
+            align-items: center;
+        }
+        .phone-input select {
+            padding: 10px 8px; /* Match form-control padding */
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            margin-right: 10px;
+            background-color: #fff;
+            font-size: 1rem;
+        }
+        .phone-input input {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
@@ -251,7 +268,19 @@ SWIFT Code: ASCMPKKAXXX
                             </div>
                             <div class="form-group">
                                 <label for="donor-email">Email Address</label>
-                                <input class="form-control" id="donor-email" name="email" placeholder="Enter your email address" required type="email"/>
+                                <input class="form-control" id="donor-email" name="email" placeholder="Enter your email address" type="email"/>
+                            </div>
+                            <div class="form-group">
+                                <label for="donor-phone">Phone Number</label>
+                                <div class="phone-input">
+                                    <select id="country-code" name="country_code">
+                                        <option value="+92" selected>+92 (Pakistan)</option>
+                                        <option value="+1">+1 (USA)</option>
+                                        <option value="+44">+44 (UK)</option>
+                                        <!-- Add more country codes as needed -->
+                                    </select>
+                                    <input class="form-control" id="donor-phone" name="phone" placeholder="Enter your phone number" type="tel" />
+                                </div>
                             </div>
                             <div class="form-group">
                                 <div class="checkbox-group">
@@ -437,8 +466,18 @@ SWIFT Code: ASCMPKKAXXX
 
           const name = document.getElementById("donor-name").value;
           const email = document.getElementById("donor-email").value;
+          const phone = document.getElementById("donor-phone").value;
+          const countryCode = document.getElementById("country-code").value;
           const amount = document.getElementById("donation-amount-input").value;
           const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+
+          // ** NEW VALIDATION: Ensure at least email or phone is provided **
+          if (!email && !phone) {
+              alert("Please provide either an email address or a phone number.");
+              submitButton.disabled = false;
+              submitButton.textContent = "Complete Donation";
+              return;
+          }
           
           if (!amount || amount <= 0) {
               alert("Please select or enter a valid donation amount.");
@@ -457,16 +496,23 @@ SWIFT Code: ASCMPKKAXXX
           try {
             // The file upload logic is removed.
 
-            await addDoc(collection(db, "donations"), {
+            // ** Prepare data for Firestore, including phone number **
+            const donationData = {
               name: document.getElementById("anonymous-donation").checked ? "Anonymous" : name,
-              email: email,
+              email: email || null, // Store null if empty
               amount: Number(amount),
               donationType: document.getElementById("donation-type-input").value,
               paymentMethod: selectedPaymentMethod,
               screenshotURL: null, // Set to null as we are not uploading a file
               leaderboardConsent: !document.getElementById("anonymous-donation").checked && document.getElementById("leaderboard-consent").checked,
               createdAt: serverTimestamp()
-            });
+            };
+            
+            if (phone) {
+                donationData.phone = countryCode + phone;
+            }
+
+            await addDoc(collection(db, "donations"), donationData);
             
             // NEW, more helpful success message:
             alert("Thank you! Your donation has been recorded.\n\nPlease email your proof of payment screenshot to nashrfoundationpk@gmail.com to finalize the process.");
@@ -480,6 +526,9 @@ SWIFT Code: ASCMPKKAXXX
             // Reset the payment method display
             document.getElementById('bank-transfer').checked = true;
             document.getElementById('bank-transfer').dispatchEvent(new Event('change'));
+
+            // Reset anonymous checkbox
+            document.getElementById("leaderboard-consent").disabled = false;
 
 
           } catch (error) {
