@@ -246,6 +246,7 @@ SWIFT Code: ASCMPKKAXXX
                              <div class="payment-details-content" id="qr-code-details" style="display: none;">
                                 <h3>Pay with QR Code</h3>
                                 <p>Scan the QR code below using your mobile payment app.</p>
+                                <!-- Make sure you upload a file named 'nashr-qr.png' to your GitHub repo -->
                                 <img src="nashr-qr.png" alt="QR Code for payment">
                              </div>
                              <div class="payment-details-content" id="paypal-details" style="display: none;">
@@ -287,7 +288,6 @@ SWIFT Code: ASCMPKKAXXX
                                 </div>
                             </div>
                             <div class="form-submit">
-                                <!-- ROBUST FIX PART 1: Changed the button back to type="submit" -->
                                 <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button>
                             </div>
                             <div class="secure-badge">
@@ -334,7 +334,7 @@ SWIFT Code: ASCMPKKAXXX
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // This is all the UI logic, no changes needed here.
+            // No changes needed in this UI script
             const amountRaised = 60000;
             const targetAmount = 200000;
             const percentage = (amountRaised / targetAmount) * 100;
@@ -421,11 +421,12 @@ SWIFT Code: ASCMPKKAXXX
         });
     </script>
     
-    <!-- ROBUST FIX PART 2: The updated Firebase script block -->
+    <!-- ======== THE FULLY CORRECTED FIREBASE SCRIPT ======== -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-      import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
-      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+      // CORRECTED: All versions now match (e.g., 11.11.0)
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.11.0/firebase-app.js";
+      import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.11.0/firebase-firestore.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.11.0/firebase-analytics.js";
 
       const firebaseConfig = {
         apiKey: "AIzaSyBw9khGmocvn0bqGDOgumWDwUhQk1JuOMM",
@@ -439,14 +440,15 @@ SWIFT Code: ASCMPKKAXXX
 
       const app = initializeApp(firebaseConfig);
       const db = getFirestore(app);
-      const analytics = getAnalytics(app);
+      // This line no longer crashes, so the rest of the script will run
+      const analytics = getAnalytics(app); 
 
       const form = document.getElementById("donation-form");
       const submitButton = document.getElementById("submit-donation-btn");
 
-      // We now listen for the form's "submit" event, which catches everything.
+      // This event listener will now be attached correctly
       form.addEventListener("submit", async (e) => {
-          // The most important line: prevents the page from reloading.
+          // This line prevents the page from reloading
           e.preventDefault(); 
           
           submitButton.disabled = true;
@@ -498,7 +500,6 @@ SWIFT Code: ASCMPKKAXXX
             await addDoc(collection(db, "donations"), donationData);
             alert("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
             form.reset();
-            // Manually trigger resets for custom UI components
             document.getElementById("custom-amount-container").style.display = 'none';
             document.getElementById("donation-amount-input").value = "2500";
             document.querySelector('.amount-option.active')?.classList.remove("active");
