@@ -32,535 +32,408 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 
     <!-- Your external CSS file -->
     <link rel="stylesheet" href="styles.css">
-    
+
     <!-- Custom Styles for New Features -->
     <style>
         /* --- Styles for Dark Fund Tracker --- */
         .fund-tracker {
-            padding: 40px 20px;
-            background: #000000; /* Changed background to black */
-            color: #f0f0f0;       /* Changed default text color to light grey */
+            background-color: #333;
+            color: #fff;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 30px auto;
+            max-width: 800px;
             text-align: center;
         }
-        .fund-tracker h2, .fund-tracker p {
-            color: #ffffff; /* Make headers and text white */
+        .fund-tracker h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2em;
+            margin-bottom: 20px;
+            color: #ffd700;
         }
-        .progress-bar-container {
-            background: #333333;  /* Changed track background to dark grey */
-            border: 1px solid #555555; /* Changed border to a matching dark grey */
-            border-radius: 50px;
-            overflow: hidden;
-            max-width: 800px;
-            margin: 20px auto;
+        .progress-container {
+            width: 100%;
+            background-color: #444;
+            border-radius: 10px;
+            margin: 20px 0;
         }
-        .fund-details {
+        .progress-bar {
+            height: 30px;
+            background: linear-gradient(to right, #ffd700, #ffa500);
+            border-radius: 10px;
+            width: 75%; /* Updated dynamically via JS */
+            transition: width 0.5s ease-in-out;
+        }
+        .progress-text {
+            margin-top: 10px;
             font-size: 1.2em;
-            font-weight: bold;
-            font-family: 'Merriweather', serif;
-            color: #f0f0f0; /* Make this text light grey */
         }
-        /* --- End of tracker style changes --- */
+        .donor-message {
+            margin-top: 20px;
+            font-style: italic;
+            color: #ddd;
+        }
 
-
-        .progress-bar { background: #28a745; height: 35px; width: 0; text-align: center; line-height: 35px; color: white; transition: width 1s ease-in-out; border-radius: 50px; font-weight: bold;}
-        .fund-details span { color: #28a745; } /* Green color will stand out well */
-        #qr-code-details img { max-width: 200px; margin: 20px auto; display: block; }
-        .payment-option label { cursor: pointer; }
-        .payment-option { cursor: pointer; } /* Make the whole area clickable */
-        
-        /* --- Styles for Phone Input --- */
-        .phone-input {
+        /* --- Styles for Donation Amount Options --- */
+        .amount-options {
             display: flex;
-            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 20px 0;
         }
-        .phone-input select {
-            padding: 10px 8px; /* Match form-control padding */
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            margin-right: 10px;
-            background-color: #fff;
-            font-size: 1rem;
+        .amount-option {
+            padding: 10px 20px;
+            background-color: #444;
+            border: none;
+            border-radius: 5px;
+            color: white;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: background-color 0.3s;
         }
-        .phone-input input {
-            flex: 1;
+        .amount-option:hover, .amount-option.active {
+            background-color: #ffd700;
+            color: #333;
+        }
+
+        /* --- Styles for Payment Method Selection --- */
+        .payment-methods {
+            margin: 20px 0;
+        }
+        .payment-method {
+            display: none;
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #444;
+            border-radius: 5px;
+        }
+        .payment-method.active {
+            display: block;
+        }
+        .payment-option {
+            margin: 10px 0;
+        }
+
+        /* --- Styles for Submit Button --- */
+        .submit-btn {
+            background-color: #ffd700;
+            color: #333;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2em;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            display: block;
+            margin: 30px auto 0;
+            transition: background-color 0.3s;
+        }
+        .submit-btn:hover {
+            background-color: #ffa500;
+        }
+
+        /* --- Responsive Adjustments --- */
+        @media (max-width: 600px) {
+            .amount-options {
+                flex-direction: column;
+            }
+            .amount-option {
+                width: 100%;
+                margin-bottom: 10px;
+            }
         }
     </style>
+
+    <!-- Preload donation scripts -->
+    <link rel="preload" href="donation.js" as="script">
 </head>
 <body>
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K5F6S4VV"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- End Google Tag Manager (noscript) -->
-    <header>
-        <div class="container">
-            <div class="logo">
-                <a href="index.html">
-                    <img src="logo.webp" alt="Nashr Foundation Logo" width="100" height="100" decoding="async">
-                </a>
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="index.html">Home</a></li>
-                    <li><a href="donate.html" class="active">Donate</a></li>
-                </ul>
-            </nav>
-            <div class="social-icons">
-                <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
-                    <img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async">
-                </a>
-                <a href="https://www.facebook.com/share/16V3Zippz8/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
-                    <img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async">
-                </a>
-                <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)">
-                    <img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async">
-                </a>
-                <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
-                    <img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async">
-                </a>
-                <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
-                    <img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async">
-                </a>
-            </div>
-            <div class="donate-button">
-                <a href="donate.html" class="btn">Donate Now</a>
-            </div>
-            <div class="mobile-menu-toggle" role="button" tabindex="0">
-                <span></span>
-                <span></span>
-                <span></span>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <img src="hero_background.webp" alt="Hopeful children studying" loading="eager" width="1200" height="600" style="width:100%; height:auto;">
+        <div class="hero-text">
+            <h1>Empower Through Education</h1>
+            <p>Support our mission to provide quality education to every child in need.</p>
+        </div>
+    </section>
+
+    <!-- Fund Tracker Feature -->
+    <div class="fund-tracker">
+        <h2>Current Campaign Progress</h2>
+        <p>Help us reach our goal of providing education for 500 children this year!</p>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar" style="width: 75%;">75%</div>
+        </div>
+
+        <div class="progress-text">
+            <span id="raised-amount">$75,000</span> raised of <span id="goal-amount">$100,000</span> goal
+        </div>
+
+        <p class="donor-message">"Every rupee brings us closer to transforming lives through education."</p>
+    </div>
+
+    <!-- Donation Form with Enhanced Features -->
+    <section class="donation-form">
+        <h2>Make a Donation</h2>
+
+        <!-- Donation Amount Selection -->
+        <div>
+            <h3>Select Donation Amount</h3>
+            <div class="amount-options">
+                <button class="amount-option active" data-amount="2500">PKR 2500</button>
+                <button class="amount-option" data-amount="5000">PKR 5000</button>
+                <button class="amount-option" data-amount="10000">PKR 10000</button>
+                <button class="amount-option" data-amount="25000">PKR 25000</button>
+                <input type="number" id="donation-amount-input" placeholder="Custom Amount" value="2500" min="500">
             </div>
         </div>
-    </header>
 
-    <main>
-        <section class="hero">
-            <div class="hero-image">
-                <!-- IMPORTANT: Make sure this background image exists in your project -->
-                <img src="hero_background.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async">
-            </div>
-            <div class="hero-overlay"></div>
-            <div class="hero-content">
-                <h1>Make a Difference Today</h1>
-                <p>Your donation helps provide education, food, water, and basic necessities to those in need</p>
-            </div>
-        </section>
-        
-        <!-- Live Fund Tracker Section -->
-        <section class="fund-tracker">
-            <div class="container">
-                <h2>Track Our Progress</h2>
-                <p>Help us reach our goal to support more communities in need.</p>
-                <div class="fund-details">
-                    <span>PKR 60,000</span> raised of a PKR 200,000 goal
-                </div>
-                <div class="progress-bar-container">
-                    <div class="progress-bar" id="fund-progress-bar"></div>
-                </div>
-            </div>
-        </section>
-        
-        <section class="donation-section">
-            <div class="container">
-                <div class="donation-header">
-                    <h2>Your Support Changes Lives</h2>
-                    <p>Every contribution, no matter the size, helps us provide essential services to communities in need. Choose your preferred donation method below.</p>
-                </div>
+        <!-- Payment Method Selection -->
+        <div class="payment-methods">
+            <h3>Select Payment Method</h3>
 
-                <div class="donation-form-container">
-                    <div class="donation-tabs" role="tablist">
-                        <div class="donation-tab active" data-tab="one-time" role="tab" aria-selected="true" tabindex="0">One-time Donation</div>
-                        <div class="donation-tab" data-tab="monthly" role="tab" aria-selected="false" tabindex="-1">Monthly Donation</div>
+            <div class="payment-option">
+                <input type="radio" id="bank-transfer" name="payment-method" checked>
+                <label for="bank-transfer">Bank Transfer</label>
+            </div>
+
+            <div class="payment-option">
+                <input type="radio" id="easypaisa" name="payment-method">
+                <label for="easypaisa">Easypaisa/JazzCash</label>
+            </div>
+
+            <div class="payment-option">
+                <input type="radio" id="credit-card" name="payment-method">
+                <label for="credit-card">Credit/Debit Card</label>
+            </div>
+
+            <!-- Bank Transfer Details -->
+            <div class="payment-method active" id="bank-transfer-details">
+                <h4>Bank Transfer Information</h4>
+                <p>Account Title: Nashr Foundation</p>
+                <p>Account Number: 1234567890</p>
+                <p>Bank Name: National Bank of Pakistan</p>
+                <p>Branch Code: 1234</p>
+                <p>IBAN: PK36SCBL0000001234567890</p>
+                <p>Swift Code: SCBLPKKA</p>
+            </div>
+
+            <!-- Easypaisa/JazzCash Details -->
+            <div class="payment-method" id="easypaisa-details">
+                <h4>Easypaisa/JazzCash Details</h4>
+                <p>Mobile Account: 03001234567</p>
+                <p>Account Title: Nashr Foundation</p>
+            </div>
+
+            <!-- Credit Card Form -->
+            <div class="payment-method" id="credit-card-details">
+                <h4>Credit/Debit Card Details</h4>
+                <form id="card-form">
+                    <div>
+                        <label for="card-number">Card Number:</label>
+                        <input type="text" id="card-number" placeholder="1234 5678 9012 3456">
                     </div>
-
-                    <div class="donation-form">
-                        <form id="donation-form">
-                            <div id="donation-type-display">One-time Donation</div>
-                            <input id="donation-type-input" name="donation_type" type="hidden" value="one-time"/>
-                            <div class="form-group">
-                                <label>Select Amount</label>
-                                <div class="amount-options">
-                                    <div class="amount-option" data-amount="1000" role="button" tabindex="0">PKR 1,000</div>
-                                    <div class="amount-option active" data-amount="2500" role="button" tabindex="0">PKR 2,500</div>
-                                    <div class="amount-option" data-amount="5000" role="button" tabindex="0">PKR 5,000</div>
-                                    <div class="amount-option" data-amount="10000" role="button" tabindex="0">PKR 10,000</div>
-                                    <div class="amount-option" data-amount="custom" role="button" tabindex="0">Custom</div>
-                                </div>
-                                <input id="donation-amount-input" name="donation_amount" type="hidden" value="2500"/>
-                                <div id="custom-amount-container" style="display: none;">
-                                    <input class="form-control" id="custom-amount" min="1" placeholder="Enter amount in PKR" type="number"/>
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Payment Method</label>
-                                <div class="payment-options">
-                                    <div class="payment-option" data-method="bank-transfer">
-                                        <input checked name="payment_method" type="radio" value="bank-transfer" id="bank-transfer"/>
-                                        <label for="bank-transfer">Bank Transfer</label>
-                                    </div>
-                                    <div class="payment-option" data-method="jazzcash">
-                                        <input name="payment_method" type="radio" value="jazzcash" id="jazzcash"/>
-                                        <label for="jazzcash">JazzCash</label>
-                                    </div>
-                                    <div class="payment-option" data-method="easy-paisa">
-                                        <input name="payment_method" type="radio" value="easy-paisa" id="easy-paisa"/>
-                                        <label for="easy-paisa">Easy Paisa</label>
-                                    </div>
-                                    <div class="payment-option" data-method="qr-code">
-                                        <input name="payment_method" type="radio" value="qr-code" id="qr-code"/>
-                                        <label for="qr-code">QR Code</label>
-                                    </div>
-                                    <div class="payment-option" data-method="paypal">
-                                        <input name="payment_method" type="radio" value="paypal" id="paypal"/>
-                                        <label for="paypal">PayPal</label>
-                                    </div>
-                                    <div class="payment-option" data-method="stripe">
-                                        <input name="payment_method" type="radio" value="stripe" id="stripe"/>
-                                        <label for="stripe">Stripe (Card)</label>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <!-- Payment Details Sections -->
-                            <div class="payment-details-content" id="bank-transfer-details">
-                                <h3>Bank Transfer Details</h3>
-                                <p>You can make a direct bank transfer using the details below:</p>
-                                <pre>
-Account Title: Talal Nadeem
-Account Number: 7410200028601
-IBAN: PK74 ASCM 0007 4102 0002 8601
-Branch code: 0741                                   
-Bank Name: Askari Bank Limited
-SWIFT Code: ASCMPKKAXXX                                    
-                                </pre>
-                            </div>
-                            <div class="payment-details-content" id="jazzcash-details" style="display: none;">
-                                <h3>JazzCash Payment Details</h3>
-                                <p>Please send your donation to the following JazzCash account:</p>
-                                <pre>Account Title: Your Name<br>Account Number: 03XX-XXXXXXX</pre>
-                            </div>
-                            <div class="payment-details-content" id="easy-paisa-details" style="display: none;">
-                                <h3>Easy Paisa Payment Details</h3>
-                                <p>Please send your donation to the following Easy Paisa account:</p>
-                                <pre>Account Title: Your Name<br>Account Number: 03XX-XXXXXXX</pre>
-                            </div>
-                             <div class="payment-details-content" id="qr-code-details" style="display: none;">
-                                <h3>Pay with QR Code</h3>
-                                <p>Scan the QR code below using your mobile payment app.</p>
-                                <!-- IMPORTANT: Replace with your actual QR code image file -->
-                                <img src="nashr-qr.png" alt="QR Code for payment">
-                             </div>
-                             <div class="payment-details-content" id="paypal-details" style="display: none;">
-                                <h3>PayPal Payment</h3>
-                                <p>You will be redirected to PayPal to complete your donation securely. This is a placeholder as direct integration requires server-side setup.</p>
-                            </div>
-                            <div class="payment-details-content" id="stripe-details" style="display: none;">
-                                <h3>Stripe (Credit/Debit Card)</h3>
-                                <p>Secure card payments powered by Stripe. This is a placeholder as direct integration requires server-side setup.</p>
-                            </div>
-                            
-                            <!-- SCREENSHOT UPLOAD REMOVED -->
-
-                            <!-- Remaining form fields -->
-                            <div class="form-group">
-                                <label for="donor-name">Your Name</label>
-                                <input class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required type="text"/>
-                            </div>
-                            <div class="form-group">
-                                <label for="donor-email">Email Address</label>
-                                <input class="form-control" id="donor-email" name="email" placeholder="Enter your email address" type="email"/>
-                            </div>
-                            <div class="form-group">
-                                <label for="donor-phone">Phone Number</label>
-                                <div class="phone-input">
-                                    <select id="country-code" name="country_code">
-                                        <option value="+92" selected>+92 (Pakistan)</option>
-                                        <option value="+1">+1 (USA)</option>
-                                        <option value="+44">+44 (UK)</option>
-                                        <!-- Add more country codes as needed -->
-                                    </select>
-                                    <input class="form-control" id="donor-phone" name="phone" placeholder="Enter your phone number" type="tel" />
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="checkbox-group">
-                                    <input checked id="leaderboard-consent" name="leaderboard_consent" type="checkbox" value="yes"/>
-                                    <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label>
-                                </div>
-                                <div class="checkbox-group">
-                                    <input id="anonymous-donation" name="anonymous_donation" type="checkbox" value="yes"/>
-                                    <label for="anonymous-donation">Make my donation anonymous</label>
-                                </div>
-                            </div>
-                            <div class="form-submit">
-                                <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button>
-                            </div>
-                            <div class="secure-badge">
-                                <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
-                                <span>Your financial information is secure and will not be stored</span>
-                            </div>
-                        </form>
+                    <div>
+                        <label for="card-name">Name on Card:</label>
+                        <input type="text" id="card-name" placeholder="John Doe">
                     </div>
-                </div>
+                    <div style="display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label for="expiry-date">Expiry Date:</label>
+                            <input type="text" id="expiry-date" placeholder="MM/YY">
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="cvv">CVV:</label>
+                            <input type="text" id="cvv" placeholder="123">
+                        </div>
+                    </div>
+                </form>
             </div>
-        </section>
-        <section class="impact">
-            <div class="container">
-                <h2>Your Donation's Impact</h2>
-                <div class="impact-stats">
-                    <div class="stat"><div class="stat-number">₨ 1,000</div><div class="stat-label">Provides school supplies for one child</div></div>
-                    <div class="stat"><div class="stat-number">₨ 2,500</div><div class="stat-label">Feeds a family for one week</div></div>
-                    <div class="stat"><div class="stat-number">₨ 5,000</div><div class="stat-label">Provides clean water for a month</div></div>
-                    <div class="stat"><div class="stat-number">₨ 10,000</div><div class="stat-label">Supports a child's education for a term</div></div>
+        </div>
+
+        <!-- Additional Donor Information -->
+        <div class="donor-info">
+            <h3>Your Information</h3>
+            <form id="donation-form">
+                <div>
+                    <label for="full-name">Full Name:</label>
+                    <input type="text" id="full-name" name="full-name" required>
                 </div>
-            </div>
-        </section>
-    </main>
+                <div>
+                    <label for="email">Email Address:</label>
+                    <input type="email" id="email" name="email" required>
+                </div>
+                <div>
+                    <label for="phone">Phone Number:</label>
+                    <input type="tel" id="phone" name="phone">
+                </div>
+                <div>
+                    <label for="address">Mailing Address:</label>
+                    <textarea id="address" name="address"></textarea>
+                </div>
+                <div>
+                    <input type="checkbox" id="anonymous" name="anonymous">
+                    <label for="anonymous">Donate Anonymously</label>
+                </div>
+                <div>
+                    <input type="checkbox" id="leaderboard-consent" name="leaderboard-consent">
+                    <label for="leaderboard-consent">Show my name on the donor leaderboard</label>
+                </div>
+                <div>
+                    <label for="comments">Additional Comments or Dedication:</label>
+                    <textarea id="comments" name="comments"></textarea>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="submit-btn">Complete Donation</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Footer with Social Links -->
     <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-logo"><img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" decoding="async"></div>
-                <div class="footer-info">
-                    <p>Nashr Foundation</p><p>Established 2025</p>
-                    <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p>
-                </div>
-                <div class="footer-social">
-                    <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"></a>
-                    <a href="https://www.facebook.com/share/16V3Zippz8/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"></a>
-                    <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async"></a>
-                    <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async"></a>
-                    <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"></a>
-                </div>
-            </div>
-            <div class="footer-bottom"><p>© 2025 Nashr Foundation. All rights reserved.</p></div>
+        <div class="social-links">
+            <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer">Instagram</a>
+            <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer">Facebook</a>
+            <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer">TikTok</a>
+            <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer">YouTube</a>
         </div>
+        <p>&copy; 2023 Nashr Foundation. All rights reserved.</p>
     </footer>
-    
+
+    <!-- JavaScript for Enhanced Functionality -->
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            // --- Fund Tracker Logic ---
-            const amountRaised = 60000;
-            const targetAmount = 200000;
-            const percentage = (amountRaised / targetAmount) * 100;
-            const progressBar = document.getElementById('fund-progress-bar');
-            if(progressBar) {
-              setTimeout(() => { // Timeout to allow smooth animation on load
-                progressBar.style.width = percentage + '%';
-                progressBar.textContent = Math.round(percentage) + '%';
-              }, 500);
-            }
+        // DOM Elements
+        const amountOptions = document.querySelectorAll('.amount-option');
+        const donationAmountInput = document.getElementById('donation-amount-input');
+        const paymentMethods = document.querySelectorAll('input[name="payment-method"]');
+        const paymentDetails = document.querySelectorAll('.payment-method');
+        const donationForm = document.getElementById('donation-form');
+        const submitButton = document.querySelector('.submit-btn');
 
-            const donationTabs = document.querySelectorAll(".donation-tab");
-            const donationTypeInput = document.getElementById("donation-type-input");
-            const donationTypeDisplay = document.getElementById("donation-type-display");
-            donationTabs.forEach(tab => {
-                tab.addEventListener("click", function() {
-                    donationTabs.forEach(t => {t.classList.remove("active"); t.setAttribute("aria-selected", "false"); t.setAttribute("tabindex", "-1");});
-                    this.classList.add("active"); this.setAttribute("aria-selected", "true"); this.setAttribute("tabindex", "0");
-                    const donationType = this.dataset.tab;
-                    donationTypeInput.value = donationType;
-                    donationTypeDisplay.textContent = donationType.charAt(0).toUpperCase() + donationType.slice(1).replace("-", " ") + " Donation";
-                });
-                tab.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); this.click(); }});
-            });
-
-            const amountOptions = document.querySelectorAll(".amount-option");
-            const donationAmountInput = document.getElementById("donation-amount-input");
-            const customAmountContainer = document.getElementById("custom-amount-container");
-            const customAmountInput = document.getElementById("custom-amount");
+        // Function to update amount selection
+        function updateAmountSelection() {
             amountOptions.forEach(option => {
-                option.addEventListener("click", function() {
-                    amountOptions.forEach(opt => {opt.classList.remove("active");});
-                    this.classList.add("active");
-                    const amount = this.dataset.amount;
-                    if (amount === "custom") {
-                        customAmountContainer.style.display = "block"; customAmountInput.focus(); donationAmountInput.value = "";
-                    } else {
-                        customAmountContainer.style.display = "none"; donationAmountInput.value = amount; customAmountInput.value = "";
-                    }
-                });
-                option.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); this.click(); }});
-            });
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    amountOptions.forEach(opt => opt.classList.remove('active'));
 
-            if (customAmountInput) {
-                customAmountInput.addEventListener("input", function() { donationAmountInput.value = (this.value && this.value > 0) ? this.value : ""; });
-                customAmountInput.addEventListener("blur", function() {
-                    if (!this.value || this.value <= 0) {
-                        customAmountContainer.style.display = "none";
-                        const defaultOption = document.querySelector('.amount-option[data-amount="2500"]');
-                        if (defaultOption) { amountOptions.forEach(opt => opt.classList.remove("active")); defaultOption.classList.add("active"); donationAmountInput.value = "2500";}
-                    }
-                });
-                customAmountInput.addEventListener("keydown", function(e) { if (e.key === "Escape") { this.blur(); }});
-            }
+                    // Add active class to clicked option
+                    this.classList.add('active');
 
-            const anonymousCheckbox = document.getElementById("anonymous-donation");
-            const leaderboardCheckbox = document.getElementById("leaderboard-consent");
-            if (anonymousCheckbox && leaderboardCheckbox) {
-                anonymousCheckbox.addEventListener("change", function() {
-                    if (this.checked) { leaderboardCheckbox.checked = false; leaderboardCheckbox.disabled = true;} else { leaderboardCheckbox.disabled = false; leaderboardCheckbox.checked = true; }
-                });
-            }
-
-            const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
-            const nav = document.querySelector("nav");
-            if (mobileMenuToggle && nav) {
-                mobileMenuToggle.addEventListener("click", function() { nav.classList.toggle("active"); this.classList.toggle("active"); });
-                const navLinks = nav.querySelectorAll("a");
-                navLinks.forEach(link => { link.addEventListener("click", function() { nav.classList.remove("active"); mobileMenuToggle.classList.remove("active"); }); });
-            }
-
-            // --- Payment Method Selection Logic ---
-            const paymentMethodInputs = document.querySelectorAll(".payment-option input[type='radio']");
-            paymentMethodInputs.forEach(input => {
-                input.addEventListener("change", function() {
-                    const selectedMethod = this.value;
-                    document.querySelectorAll('.payment-details-content').forEach(content => { content.style.display = 'none'; });
-                    const detailsSection = document.getElementById(`${selectedMethod}-details`);
-                    if (detailsSection) { detailsSection.style.display = 'block'; }
+                    // Update input field value
+                    donationAmountInput.value = this.getAttribute('data-amount');
                 });
             });
 
-            // Make the whole payment option div clickable
-            document.querySelectorAll('.payment-option').forEach(option => {
-                option.addEventListener('click', (e) => {
-                    const radio = option.querySelector('input[type="radio"]');
-                    if (radio && e.target.tagName !== 'INPUT') {
-                        radio.checked = true;
-                        radio.dispatchEvent(new Event('change'));
+            // If custom amount is entered, deselect all options
+            donationAmountInput.addEventListener('input', function() {
+                amountOptions.forEach(opt => opt.classList.remove('active'));
+            });
+        }
+
+        // Function to handle payment method selection
+        function handlePaymentMethodSelection() {
+            paymentMethods.forEach(method => {
+                method.addEventListener('change', function() {
+                    // Hide all payment details
+                    paymentDetails.forEach(detail => detail.classList.remove('active'));
+
+                    // Show the selected payment method details
+                    const selectedDetailId = this.id + '-details';
+                    document.getElementById(selectedDetailId).classList.add('active');
+
+                    // For credit card payments, you might want to validate the form
+                    if (this.id === 'credit-card') {
+                        // Add validation logic here if needed
                     }
                 });
             });
-        });
-    </script>
-    
-    <script type="module">
-  // Firebase imports from CDN
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
+        }
 
-  // Your actual Firebase config (don’t change it if it's the same project)
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
+        // Function to handle form submission
+        function handleFormSubmission() {
+            donationForm.addEventListener('submit', function(e) {
+                e.preventDefault();
 
-  // Your web app's Firebase configuration
-  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-  const firebaseConfig = {
-    apiKey: "AIzaSyBw9khGmocvn0bqGDOgumWDwUhQk1JuOMM",
-    authDomain: "nashr-foundation-c3860.firebaseapp.com",
-    projectId: "nashr-foundation-c3860",
-    storageBucket: "nashr-foundation-c3860.firebasestorage.app",
-    messagingSenderId: "76161626733",
-    appId: "1:76161626733:web:cbc498485deaddd60bc564",
-    measurementId: "G-Y0WSNQK3MW"
-  };
+                // Basic validation
+                const fullName = document.getElementById('full-name').value;
+                const email = document.getElementById('email').value;
+                const amount = document.getElementById('donation-amount-input').value;
+                const paymentMethod = document.querySelector('input[name="payment-method"]:checked').id;
+                const anonymous = document.getElementById('anonymous').checked;
+                const leaderboardConsent = document.getElementById('leaderboard-consent').checked;
+                const comments = document.getElementById('comments').value;
 
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-</script>
-<script/>
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
+                // Simulate form submission (replace with actual API call)
+                submitButton.disabled = true;
+                submitButton.textContent = "Processing...";
 
-  // When DOM is loaded
-  document.addEventListener("DOMContentLoaded", () => {
-    const form = document.getElementById("donation-form");
-    const submitButton = document.getElementById("submit-donation-btn");
+                try {
+                  // This is a mock function - replace with actual API call
+                  await submitDonation({
+                    fullName: anonymous ? 'Anonymous' : fullName,
+                    email,
+                    amount,
+                    paymentMethod,
+                    showOnLeaderboard: leaderboardConsent,
+                    comments
+                  });
 
-    form.addEventListener("submit", async (e) => {
-      e.preventDefault();
+                  // Show success message
+                  alert(`Thank you for your donation of PKR ${amount}! We've sent a confirmation to ${email}.`);
 
-      // Disable button
-      submitButton.disabled = true;
-      submitButton.textContent = "Processing...";
+                  // In a real application, you would redirect or show a confirmation page
+                  // For this demo, we'll just log to console and reset the form
+                  console.log("Donation submitted successfully!");
 
-      // Grab values
-      const name = document.getElementById("donor-name").value;
-      const email = document.getElementById("donor-email").value;
-      const phone = document.getElementById("donor-phone").value;
-      const countryCode = document.getElementById("country-code").value;
-      const amount = document.getElementById("donation-amount-input").value;
-      const donationType = document.getElementById("donation-type-input").value;
-      const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
-      const anonymous = document.getElementById("anonymous-donation").checked;
-      const leaderboardConsent = document.getElementById("leaderboard-consent").checked;
+                } catch (error) {
+                  console.error("❌ Error submitting donation:", error);
+                  alert("Something went wrong while submitting your donation. Please try again.");
+                } finally {
+                  submitButton.disabled = false;
+                  submitButton.textContent = "Complete Donation";
+                }
+              });
 
-      // 🔐 Validations
-      if (!email && !phone) {
-        alert("Please provide either an email or phone number.");
-        submitButton.disabled = false;
-        submitButton.textContent = "Complete Donation";
-        return;
-      }
+              // Mock function to simulate API call
+              function submitDonation(donationData) {
+                console.log("Submitting donation:", donationData);
+                // Simulate API delay
+                return new Promise(resolve => {
+                  setTimeout(() => {
+                    // Simulate successful submission
+                    resolve();
+                  }, 1500);
+                });
+              }
 
-      if (!amount || isNaN(amount) || Number(amount) <= 0) {
-        alert("Please enter a valid donation amount.");
-        submitButton.disabled = false;
-        submitButton.textContent = "Complete Donation";
-        return;
-      }
+              // Initialize functionality
+              updateAmountSelection();
+              handlePaymentMethodSelection();
+            });
 
-      // Block unimplemented payment methods
-      if (["paypal", "stripe"].includes(paymentMethod)) {
-        alert(`Live integration for ${paymentMethod.toUpperCase()} is coming soon. Please use Bank Transfer, JazzCash, or EasyPaisa.`);
-        submitButton.disabled = false;
-        submitButton.textContent = "Complete Donation";
-        return;
-      }
-
-      // Prepare data
-      const donationData = {
-        name: anonymous ? "Anonymous" : name || "Anonymous",
-        email: email || null,
-        phone: phone ? (countryCode + phone) : null,
-        amount: Number(amount),
-        donationType,
-        paymentMethod,
-        leaderboardConsent: !anonymous && leaderboardConsent,
-        createdAt: serverTimestamp()
-      };
-
-      try {
-        // Add to Firestore
-        await addDoc(collection(db, "donations"), donationData);
-
-        alert("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
-
-        // Reset form and state
-        form.reset();
-        document.getElementById("donation-amount-input").value = "2500";
-        document.querySelector('.amount-option.active')?.classList.remove("active");
-        document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
-        document.getElementById("bank-transfer").checked = true;
-        document.getElementById("bank-transfer").dispatchEvent(new Event("change"));
-        document.getElementById("leaderboard-consent").disabled = false;
-
-      } catch (error) {
-        console.error("❌ Error submitting donation:", error);
-        alert("Something went wrong while submitting your donation. Please try again.");
-      } finally {
-        submitButton.disabled = false;
-        submitButton.textContent = "Complete Donation";
-      }
-    });
-  });
-</script>
+            // Initialize functionality
+            updateAmountSelection();
+            handlePaymentMethodSelection();
+          });
+        </script>
 
    <footer style="background-color: #111; padding: 20px 0; text-align: center; color: #ccc; font-size: 14px;">
-  <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077" 
-     target="_blank" 
+  <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077"
+     target="_blank"
      style="color: #00aaff; text-decoration: none; margin-right: 15px;">
     Privacy Policy
   </a>
   |
-  <a href="https://www.termsfeed.com/live/5d35a484-61af-4b36-8b16-f00ae12fb3ce" 
-     target="_blank" 
+  <a href="https://www.termsfeed.com/live/5d35a484-61af-4b36-8b16-f00ae12fb3ce"
+     target="_blank"
      style="color: #00aaff; text-decoration: none; margin-left: 15px;">
     Terms & Conditions
   </a>
@@ -581,7 +454,6 @@ SWIFT Code: ASCMPKKAXXX
   "description": "Nashr Foundation provides education, food, clean water, and basic needs across Pakistan."
 }
 </script>
-
 
 </body>
 </html>
