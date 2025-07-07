@@ -440,15 +440,29 @@ SWIFT Code: ASCMPKKAXXX
   import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
   // Your actual Firebase config (don’t change it if it's the same project)
+<script type="module">
+  // Import the functions you need from the SDKs you need
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
+
+  // Your web app's Firebase configuration
+  // For Firebase JS SDK v7.20.0 and later, measurementId is optional
   const firebaseConfig = {
-    apiKey: "AIzaSyDDXYYtRBlguNu9Sq7jJDwGXOLpnFTxxc",
-    authDomain: "nashr-foundation.firebaseapp.com",
-    projectId: "nashr-foundation",
-    storageBucket: "nashr-foundation.appspot.com",
-    messagingSenderId: "992430100834",
-    appId: "1:992430100834:web:c0c7a54070bf9ec9ac9c3b",
-    measurementId: "G-078CXSNP38"
+    apiKey: "AIzaSyBw9khGmocvn0bqGDOgumWDwUhQk1JuOMM",
+    authDomain: "nashr-foundation-c3860.firebaseapp.com",
+    projectId: "nashr-foundation-c3860",
+    storageBucket: "nashr-foundation-c3860.firebasestorage.app",
+    messagingSenderId: "76161626733",
+    appId: "1:76161626733:web:cbc498485deaddd60bc564",
+    measurementId: "G-Y0WSNQK3MW"
   };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+</script>
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
