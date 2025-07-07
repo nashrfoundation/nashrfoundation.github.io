@@ -434,113 +434,110 @@ SWIFT Code: ASCMPKKAXXX
         });
     </script>
     
-    <!-- UPDATED Firebase and Form Submission Logic -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
-      import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
-      // We no longer need getStorage
+  // Firebase imports from CDN
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+  import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
 
-      // IMPORTANT: Replace with your actual Firebase configuration
-      const firebaseConfig = {
-        apiKey: "AIzaSyDDXYYtRBlguNu9Sq7jJDwGXOLpnFTxxc",
-        authDomain: "nashr-foundation.firebaseapp.com",
-        projectId: "nashr-foundation",
-        storageBucket: "nashr-foundation.appspot.com",
-        messagingSenderId: "992430100834",
-        appId: "1:992430100834:web:c0c7a54070bf9ec9ac9c3b",
-        measurementId: "G-078CXSNP38"
+  // Your actual Firebase config (don’t change it if it's the same project)
+  const firebaseConfig = {
+    apiKey: "AIzaSyDDXYYtRBlguNu9Sq7jJDwGXOLpnFTxxc",
+    authDomain: "nashr-foundation.firebaseapp.com",
+    projectId: "nashr-foundation",
+    storageBucket: "nashr-foundation.appspot.com",
+    messagingSenderId: "992430100834",
+    appId: "1:992430100834:web:c0c7a54070bf9ec9ac9c3b",
+    measurementId: "G-078CXSNP38"
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // When DOM is loaded
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("donation-form");
+    const submitButton = document.getElementById("submit-donation-btn");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Disable button
+      submitButton.disabled = true;
+      submitButton.textContent = "Processing...";
+
+      // Grab values
+      const name = document.getElementById("donor-name").value;
+      const email = document.getElementById("donor-email").value;
+      const phone = document.getElementById("donor-phone").value;
+      const countryCode = document.getElementById("country-code").value;
+      const amount = document.getElementById("donation-amount-input").value;
+      const donationType = document.getElementById("donation-type-input").value;
+      const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+      const anonymous = document.getElementById("anonymous-donation").checked;
+      const leaderboardConsent = document.getElementById("leaderboard-consent").checked;
+
+      // 🔐 Validations
+      if (!email && !phone) {
+        alert("Please provide either an email or phone number.");
+        submitButton.disabled = false;
+        submitButton.textContent = "Complete Donation";
+        return;
+      }
+
+      if (!amount || isNaN(amount) || Number(amount) <= 0) {
+        alert("Please enter a valid donation amount.");
+        submitButton.disabled = false;
+        submitButton.textContent = "Complete Donation";
+        return;
+      }
+
+      // Block unimplemented payment methods
+      if (["paypal", "stripe"].includes(paymentMethod)) {
+        alert(`Live integration for ${paymentMethod.toUpperCase()} is coming soon. Please use Bank Transfer, JazzCash, or EasyPaisa.`);
+        submitButton.disabled = false;
+        submitButton.textContent = "Complete Donation";
+        return;
+      }
+
+      // Prepare data
+      const donationData = {
+        name: anonymous ? "Anonymous" : name || "Anonymous",
+        email: email || null,
+        phone: phone ? (countryCode + phone) : null,
+        amount: Number(amount),
+        donationType,
+        paymentMethod,
+        leaderboardConsent: !anonymous && leaderboardConsent,
+        createdAt: serverTimestamp()
       };
 
-      const app = initializeApp(firebaseConfig);
-      const db = getFirestore(app);
-      // We no longer need storage
+      try {
+        // Add to Firestore
+        await addDoc(collection(db, "donations"), donationData);
 
-      document.addEventListener("DOMContentLoaded", () => {
-        const form = document.getElementById("donation-form");
-        const submitButton = document.getElementById("submit-donation-btn");
+        alert("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
 
-        form.addEventListener("submit", async (e) => {
-          e.preventDefault();
-          submitButton.disabled = true;
-          submitButton.textContent = "Processing...";
+        // Reset form and state
+        form.reset();
+        document.getElementById("donation-amount-input").value = "2500";
+        document.querySelector('.amount-option.active')?.classList.remove("active");
+        document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
+        document.getElementById("bank-transfer").checked = true;
+        document.getElementById("bank-transfer").dispatchEvent(new Event("change"));
+        document.getElementById("leaderboard-consent").disabled = false;
 
-          const name = document.getElementById("donor-name").value;
-          const email = document.getElementById("donor-email").value;
-          const phone = document.getElementById("donor-phone").value;
-          const countryCode = document.getElementById("country-code").value;
-          const amount = document.getElementById("donation-amount-input").value;
-          const selectedPaymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+      } catch (error) {
+        console.error("❌ Error submitting donation:", error);
+        alert("Something went wrong while submitting your donation. Please try again.");
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Complete Donation";
+      }
+    });
+  });
+</script>
 
-          // ** NEW VALIDATION: Ensure at least email or phone is provided **
-          if (!email && !phone) {
-              alert("Please provide either an email address or a phone number.");
-              submitButton.disabled = false;
-              submitButton.textContent = "Complete Donation";
-              return;
-          }
-          
-          if (!amount || amount <= 0) {
-              alert("Please select or enter a valid donation amount.");
-              submitButton.disabled = false;
-              submitButton.textContent = "Complete Donation";
-              return;
-          }
-          
-          if (selectedPaymentMethod === 'paypal' || selectedPaymentMethod === 'stripe') {
-             alert('Live integration for ' + selectedPaymentMethod + ' is coming soon. Please choose another method.');
-             submitButton.disabled = false;
-             submitButton.textContent = "Complete Donation";
-             return;
-          }
-
-          try {
-            // The file upload logic is removed.
-
-            // ** Prepare data for Firestore, including phone number **
-            const donationData = {
-              name: document.getElementById("anonymous-donation").checked ? "Anonymous" : name,
-              email: email || null, // Store null if empty
-              amount: Number(amount),
-              donationType: document.getElementById("donation-type-input").value,
-              paymentMethod: selectedPaymentMethod,
-              screenshotURL: null, // Set to null as we are not uploading a file
-              leaderboardConsent: !document.getElementById("anonymous-donation").checked && document.getElementById("leaderboard-consent").checked,
-              createdAt: serverTimestamp()
-            };
-            
-            if (phone) {
-                donationData.phone = countryCode + phone;
-            }
-
-            await addDoc(collection(db, "donations"), donationData);
-            
-            // NEW, more helpful success message:
-            alert("Thank you! Your donation has been recorded.\n\nPlease email your proof of payment screenshot to nashrfoundationpk@gmail.com to finalize the process.");
-            
-            form.reset();
-            // Also reset UI elements to default state
-            document.querySelector('.amount-option.active')?.classList.remove('active');
-            document.querySelector('.amount-option[data-amount="2500"]').classList.add('active');
-            document.getElementById('donation-amount-input').value = '2500';
-
-            // Reset the payment method display
-            document.getElementById('bank-transfer').checked = true;
-            document.getElementById('bank-transfer').dispatchEvent(new Event('change'));
-
-            // Reset anonymous checkbox
-            document.getElementById("leaderboard-consent").disabled = false;
-
-
-          } catch (error) {
-            console.error("Error submitting donation:", error);
-            alert("An error occurred while submitting your donation. Please try again later.");
-          } finally {
-            submitButton.disabled = false;
-            submitButton.textContent = "Complete Donation";
-          }
-        });
-      });
-    </script>
    <footer style="background-color: #111; padding: 20px 0; text-align: center; color: #ccc; font-size: 14px;">
   <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077" 
      target="_blank" 
