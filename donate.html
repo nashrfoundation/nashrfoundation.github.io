@@ -17,7 +17,7 @@
     'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
     })(window,document,'script','dataLayer','GTM-K5F6S4VV');</script>
     <!-- End Google Tag Manager -->
-    
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate - Nashr Foundation</title>
@@ -60,10 +60,11 @@
             font-family: 'Merriweather', serif;
             color: #f0f0f0; /* Make this text light grey */
         }
-        .fund-details span { color: #28a745; } /* Green color will stand out well */
         /* --- End of tracker style changes --- */
 
+
         .progress-bar { background: #28a745; height: 35px; width: 0; text-align: center; line-height: 35px; color: white; transition: width 1s ease-in-out; border-radius: 50px; font-weight: bold;}
+        .fund-details span { color: #28a745; } /* Green color will stand out well */
         #qr-code-details img { max-width: 200px; margin: 20px auto; display: block; }
         .payment-option label { cursor: pointer; }
         .payment-option { cursor: pointer; } /* Make the whole area clickable */
@@ -106,11 +107,21 @@
                 </ul>
             </nav>
             <div class="social-icons">
-                <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"></a>
-                <a href="https://www.facebook.com/share/16V3Zippz8/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"></a>
-                <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async"></a>
-                <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async"></a>
-                <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"></a>
+                <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
+                    <img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async">
+                </a>
+                <a href="https://www.facebook.com/share/16V3Zippz8/" target="_blank" rel="noopener noreferrer" aria-label="Facebook">
+                    <img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async">
+                </a>
+                <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)">
+                    <img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async">
+                </a>
+                <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok">
+                    <img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async">
+                </a>
+                <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube">
+                    <img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async">
+                </a>
             </div>
             <div class="donate-button">
                 <a href="donate.html" class="btn">Donate Now</a>
@@ -126,6 +137,7 @@
     <main>
         <section class="hero">
             <div class="hero-image">
+                <!-- IMPORTANT: Make sure this background image exists in your project -->
                 <img src="hero_background.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async">
             </div>
             <div class="hero-overlay"></div>
@@ -135,6 +147,7 @@
             </div>
         </section>
         
+        <!-- Live Fund Tracker Section -->
         <section class="fund-tracker">
             <div class="container">
                 <h2>Track Our Progress</h2>
@@ -162,10 +175,9 @@
                     </div>
 
                     <div class="donation-form">
-                        <form id="donation-form" onsubmit="return false;"> <!-- Added onsubmit to prevent default form submission -->
+                        <form id="donation-form">
                             <div id="donation-type-display">One-time Donation</div>
                             <input id="donation-type-input" name="donation_type" type="hidden" value="one-time"/>
-                            
                             <div class="form-group">
                                 <label>Select Amount</label>
                                 <div class="amount-options">
@@ -237,6 +249,7 @@ SWIFT Code: ASCMPKKAXXX
                              <div class="payment-details-content" id="qr-code-details" style="display: none;">
                                 <h3>Pay with QR Code</h3>
                                 <p>Scan the QR code below using your mobile payment app.</p>
+                                <!-- IMPORTANT: Replace with your actual QR code image file -->
                                 <img src="nashr-qr.png" alt="QR Code for payment">
                              </div>
                              <div class="payment-details-content" id="paypal-details" style="display: none;">
@@ -247,8 +260,10 @@ SWIFT Code: ASCMPKKAXXX
                                 <h3>Stripe (Credit/Debit Card)</h3>
                                 <p>Secure card payments powered by Stripe. This is a placeholder as direct integration requires server-side setup.</p>
                             </div>
+                            
+                            <!-- SCREENSHOT UPLOAD REMOVED -->
 
-                            <!-- Personal Details -->
+                            <!-- Remaining form fields -->
                             <div class="form-group">
                                 <label for="donor-name">Your Name</label>
                                 <input class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required type="text"/>
@@ -283,7 +298,7 @@ SWIFT Code: ASCMPKKAXXX
                                 <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button>
                             </div>
                             <div class="secure-badge">
-                                <svg aria-hidden="true" fill="none" focusable="false" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
+                                <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
                                 <span>Your financial information is secure and will not be stored</span>
                             </div>
                         </form>
@@ -291,7 +306,6 @@ SWIFT Code: ASCMPKKAXXX
                 </div>
             </div>
         </section>
-        
         <section class="impact">
             <div class="container">
                 <h2>Your Donation's Impact</h2>
@@ -325,13 +339,7 @@ SWIFT Code: ASCMPKKAXXX
         </div>
     </footer>
     
-    <div style="background-color: #111; padding: 20px 0; text-align: center; color: #ccc; font-size: 14px;">
-        <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077" target="_blank" style="color: #00aaff; text-decoration: none; margin-right: 15px;">Privacy Policy</a>
-        |
-        <a href="https://www.termsfeed.com/live/5d35a484-61af-4b36-8b16-f00ae12fb3ce" target="_blank" style="color: #00aaff; text-decoration: none; margin-left: 15px;">Terms & Conditions</a>
-    </div>
-
-    <!-- UI Interaction & DOM Manipulation Script -->
+    <!-- This is the original first script block -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // --- Fund Tracker Logic ---
@@ -346,120 +354,96 @@ SWIFT Code: ASCMPKKAXXX
               }, 500);
             }
 
-            // --- Donation Tabs ---
             const donationTabs = document.querySelectorAll(".donation-tab");
             const donationTypeInput = document.getElementById("donation-type-input");
             const donationTypeDisplay = document.getElementById("donation-type-display");
             donationTabs.forEach(tab => {
-                const handler = () => {
+                tab.addEventListener("click", function() {
                     donationTabs.forEach(t => {t.classList.remove("active"); t.setAttribute("aria-selected", "false"); t.setAttribute("tabindex", "-1");});
-                    tab.classList.add("active"); tab.setAttribute("aria-selected", "true"); tab.setAttribute("tabindex", "0");
-                    const donationType = tab.dataset.tab;
+                    this.classList.add("active"); this.setAttribute("aria-selected", "true"); this.setAttribute("tabindex", "0");
+                    const donationType = this.dataset.tab;
                     donationTypeInput.value = donationType;
                     donationTypeDisplay.textContent = donationType.charAt(0).toUpperCase() + donationType.slice(1).replace("-", " ") + " Donation";
-                };
-                tab.addEventListener("click", handler);
-                tab.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handler(); }});
+                });
+                tab.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); this.click(); }});
             });
 
-            // --- Amount Options ---
             const amountOptions = document.querySelectorAll(".amount-option");
             const donationAmountInput = document.getElementById("donation-amount-input");
             const customAmountContainer = document.getElementById("custom-amount-container");
             const customAmountInput = document.getElementById("custom-amount");
             amountOptions.forEach(option => {
-                const handler = () => {
-                    amountOptions.forEach(opt => opt.classList.remove("active"));
-                    option.classList.add("active");
-                    const amount = option.dataset.amount;
+                option.addEventListener("click", function() {
+                    amountOptions.forEach(opt => {opt.classList.remove("active");});
+                    this.classList.add("active");
+                    const amount = this.dataset.amount;
                     if (amount === "custom") {
-                        customAmountContainer.style.display = "block"; 
-                        customAmountInput.focus(); 
-                        donationAmountInput.value = "";
+                        customAmountContainer.style.display = "block"; customAmountInput.focus(); donationAmountInput.value = "";
                     } else {
-                        customAmountContainer.style.display = "none"; 
-                        donationAmountInput.value = amount; 
-                        customAmountInput.value = "";
-                    }
-                };
-                option.addEventListener("click", handler);
-                option.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); handler(); }});
-            });
-            if (customAmountInput) {
-                customAmountInput.addEventListener("input", () => { donationAmountInput.value = (customAmountInput.value && customAmountInput.value > 0) ? customAmountInput.value : ""; });
-                customAmountInput.addEventListener("blur", () => {
-                    if (!customAmountInput.value || customAmountInput.value <= 0) {
-                        customAmountContainer.style.display = "none";
-                        const defaultOption = document.querySelector('.amount-option[data-amount="2500"]');
-                        if (defaultOption) { 
-                            amountOptions.forEach(opt => opt.classList.remove("active")); 
-                            defaultOption.classList.add("active"); 
-                            donationAmountInput.value = "2500";
-                        }
+                        customAmountContainer.style.display = "none"; donationAmountInput.value = amount; customAmountInput.value = "";
                     }
                 });
+                option.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); this.click(); }});
+            });
+
+            if (customAmountInput) {
+                customAmountInput.addEventListener("input", function() { donationAmountInput.value = (this.value && this.value > 0) ? this.value : ""; });
+                customAmountInput.addEventListener("blur", function() {
+                    if (!this.value || this.value <= 0) {
+                        customAmountContainer.style.display = "none";
+                        const defaultOption = document.querySelector('.amount-option[data-amount="2500"]');
+                        if (defaultOption) { amountOptions.forEach(opt => opt.classList.remove("active")); defaultOption.classList.add("active"); donationAmountInput.value = "2500";}
+                    }
+                });
+                customAmountInput.addEventListener("keydown", function(e) { if (e.key === "Escape") { this.blur(); }});
             }
 
-            // --- Checkbox Logic ---
             const anonymousCheckbox = document.getElementById("anonymous-donation");
             const leaderboardCheckbox = document.getElementById("leaderboard-consent");
             if (anonymousCheckbox && leaderboardCheckbox) {
-                anonymousCheckbox.addEventListener("change", () => {
-                    if (anonymousCheckbox.checked) { 
-                        leaderboardCheckbox.checked = false; 
-                        leaderboardCheckbox.disabled = true;
-                    } else { 
-                        leaderboardCheckbox.disabled = false; 
-                        leaderboardCheckbox.checked = true; 
-                    }
+                anonymousCheckbox.addEventListener("change", function() {
+                    if (this.checked) { leaderboardCheckbox.checked = false; leaderboardCheckbox.disabled = true;} else { leaderboardCheckbox.disabled = false; leaderboardCheckbox.checked = true; }
                 });
             }
 
-            // --- Mobile Menu ---
             const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
             const nav = document.querySelector("nav");
             if (mobileMenuToggle && nav) {
-                mobileMenuToggle.addEventListener("click", () => { 
-                    nav.classList.toggle("active"); 
-                    mobileMenuToggle.classList.toggle("active"); 
-                });
+                mobileMenuToggle.addEventListener("click", function() { nav.classList.toggle("active"); this.classList.toggle("active"); });
+                const navLinks = nav.querySelectorAll("a");
+                navLinks.forEach(link => { link.addEventListener("click", function() { nav.classList.remove("active"); mobileMenuToggle.classList.remove("active"); }); });
             }
 
-            // --- Payment Method Selection ---
-            document.querySelectorAll('.payment-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    const radio = option.querySelector('input[type="radio"]');
-                    if (radio && !radio.checked) {
-                        radio.checked = true;
-                        // Dispatch change event to trigger other listeners
-                        const event = new Event('change', { bubbles: true });
-                        radio.dispatchEvent(event);
-                    }
+            // --- Payment Method Selection Logic ---
+            const paymentMethodInputs = document.querySelectorAll(".payment-option input[type='radio']");
+            paymentMethodInputs.forEach(input => {
+                input.addEventListener("change", function() {
+                    const selectedMethod = this.value;
+                    document.querySelectorAll('.payment-details-content').forEach(content => { content.style.display = 'none'; });
+                    const detailsSection = document.getElementById(`${selectedMethod}-details`);
+                    if (detailsSection) { detailsSection.style.display = 'block'; }
                 });
             });
 
-            document.querySelectorAll(".payment-option input[type='radio']").forEach(input => {
-                input.addEventListener("change", (e) => {
-                    if (e.currentTarget.checked) {
-                        const selectedMethod = e.currentTarget.value;
-                        document.querySelectorAll('.payment-details-content').forEach(content => content.style.display = 'none');
-                        const detailsSection = document.getElementById(`${selectedMethod}-details`);
-                        if (detailsSection) { 
-                            detailsSection.style.display = 'block'; 
-                        }
+            // Make the whole payment option div clickable
+            document.querySelectorAll('.payment-option').forEach(option => {
+                option.addEventListener('click', (e) => {
+                    const radio = option.querySelector('input[type="radio"]');
+                    if (radio && e.target.tagName !== 'INPUT') {
+                        radio.checked = true;
+                        radio.dispatchEvent(new Event('change'));
                     }
                 });
             });
         });
     </script>
     
-    <!-- Firebase Logic -->
+    <!-- This is the original second script block, handling Firebase -->
     <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-app.js";
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
+      import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
       import { getAnalytics } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-analytics.js";
-      import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.10.0/firebase-firestore.js";
 
-      // Your web app's Firebase configuration
       const firebaseConfig = {
         apiKey: "AIzaSyBw9khGmocvn0bqGDOgumWDwUhQk1JuOMM",
         authDomain: "nashr-foundation-c3860.firebaseapp.com",
@@ -470,18 +454,15 @@ SWIFT Code: ASCMPKKAXXX
         measurementId: "G-Y0WSNQK3MW"
       };
 
-      // Initialize Firebase
       const app = initializeApp(firebaseConfig);
-      const analytics = getAnalytics(app);
       const db = getFirestore(app);
+      const analytics = getAnalytics(app);
 
-      // Form Submission Logic
       const form = document.getElementById("donation-form");
       const submitButton = document.getElementById("submit-donation-btn");
 
       form.addEventListener("submit", async (e) => {
           e.preventDefault();
-
           submitButton.disabled = true;
           submitButton.textContent = "Processing...";
 
@@ -496,57 +477,65 @@ SWIFT Code: ASCMPKKAXXX
           const leaderboardConsent = document.getElementById("leaderboard-consent").checked;
 
           if (!email && !phone) {
-              alert("Please provide either an email or phone number.");
-              submitButton.disabled = false;
-              submitButton.textContent = "Complete Donation";
-              return;
+            alert("Please provide either an email or phone number.");
+            submitButton.disabled = false;
+            submitButton.textContent = "Complete Donation";
+            return;
           }
+
           if (!amount || isNaN(amount) || Number(amount) <= 0) {
-              alert("Please enter a valid donation amount.");
-              submitButton.disabled = false;
-              submitButton.textContent = "Complete Donation";
-              return;
+            alert("Please enter a valid donation amount.");
+            submitButton.disabled = false;
+            submitButton.textContent = "Complete Donation";
+            return;
           }
+          
           if (["paypal", "stripe"].includes(paymentMethod)) {
-              alert(`Live integration for ${paymentMethod.toUpperCase()} is coming soon. Please use Bank Transfer, JazzCash, or EasyPaisa.`);
-              submitButton.disabled = false;
-              submitButton.textContent = "Complete Donation";
-              return;
+            alert(`Live integration for ${paymentMethod.toUpperCase()} is coming soon. Please use Bank Transfer, JazzCash, or EasyPaisa.`);
+            submitButton.disabled = false;
+            submitButton.textContent = "Complete Donation";
+            return;
           }
 
           const donationData = {
-              name: anonymous ? "Anonymous" : name || "Anonymous",
-              email: email || null,
-              phone: phone ? (countryCode + phone) : null,
-              amount: Number(amount),
-              donationType,
-              paymentMethod,
-              leaderboardConsent: !anonymous && leaderboardConsent,
-              createdAt: serverTimestamp()
+            name: anonymous ? "Anonymous" : name || "Anonymous",
+            email: email || null,
+            phone: phone ? (countryCode + phone) : null,
+            amount: Number(amount),
+            donationType,
+            paymentMethod,
+            leaderboardConsent: !anonymous && leaderboardConsent,
+            createdAt: serverTimestamp()
           };
 
           try {
-              await addDoc(collection(db, "donations"), donationData);
-              alert("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
-              form.reset();
-              // Manually reset UI elements not covered by form.reset()
-              document.getElementById("donation-amount-input").value = "2500";
-              document.querySelector('.amount-option.active')?.classList.remove("active");
-              document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
-              document.getElementById("bank-transfer").checked = true;
-              document.getElementById("bank-transfer").dispatchEvent(new Event("change", { bubbles: true }));
-              document.getElementById("leaderboard-consent").disabled = false;
+            await addDoc(collection(db, "donations"), donationData);
+            alert("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
+            form.reset();
+            // Manually trigger resets for custom components
+            document.getElementById("donation-amount-input").value = "2500";
+            document.querySelector('.amount-option.active')?.classList.remove("active");
+            document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
+            document.getElementById("bank-transfer").checked = true;
+            document.getElementById("bank-transfer").dispatchEvent(new Event("change"));
+            document.getElementById("leaderboard-consent").disabled = false;
           } catch (error) {
-              console.error("❌ Error submitting donation:", error);
-              alert("Something went wrong while submitting your donation. Please try again.");
+            console.error("❌ Error submitting donation:", error);
+            alert("Something went wrong while submitting your donation. Please try again.");
           } finally {
-              submitButton.disabled = false;
-              submitButton.textContent = "Complete Donation";
+            submitButton.disabled = false;
+            submitButton.textContent = "Complete Donation";
           }
       });
     </script>
+   
+    <!-- The second footer with Privacy Policy, etc. -->
+    <footer style="background-color: #111; padding: 20px 0; text-align: center; color: #ccc; font-size: 14px;">
+      <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077" target="_blank" style="color: #00aaff; text-decoration: none; margin-right: 15px;">Privacy Policy</a> |
+      <a href="https://www.termsfeed.com/live/5d35a484-61af-4b36-8b16-f00ae12fb3ce" target="_blank" style="color: #00aaff; text-decoration: none; margin-left: 15px;">Terms & Conditions</a>
+    </footer>
 
-    <!-- Schema.org JSON-LD -->
+    <!-- This is the schema script at the end -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -556,13 +545,13 @@ SWIFT Code: ASCMPKKAXXX
       "logo": "https://nashrfoundation.github.io/logo.webp",
       "sameAs": [
         "https://www.instagram.com/nashrfoundation",
-        "https://www.facebook.com/share/16V3Zippz8/",
-        "https://x.com/nashrfoundation",
+        "https://www.facebook.com/nashrfoundation",
         "https://www.tiktok.com/@nashr756",
         "https://www.youtube.com/@nashrfoundation"
       ],
-      "description": "Nashr Foundation is a non-profit organization dedicated to providing education, food, clean water, and basic necessities to underprivileged communities across Pakistan."
+      "description": "Nashr Foundation provides education, food, clean water, and basic needs across Pakistan."
     }
     </script>
+
 </body>
 </html>
