@@ -295,7 +295,8 @@ SWIFT Code: ASCMPKKAXXX
                                 </div>
                             </div>
                             <div class="form-submit">
-                                <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button>
+                                <!-- ========== FIX #1: Changed type="submit" to type="button" ========== -->
+                                <button class="btn btn-large" id="submit-donation-btn" type="button">Complete Donation</button>
                             </div>
                             <div class="secure-badge">
                                 <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
@@ -339,7 +340,7 @@ SWIFT Code: ASCMPKKAXXX
         </div>
     </footer>
     
-    <!-- This is the original first script block -->
+    <!-- This script block handles general page interactivity and needs no changes -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // --- Fund Tracker Logic ---
@@ -438,7 +439,7 @@ SWIFT Code: ASCMPKKAXXX
         });
     </script>
     
-    <!-- This is the original second script block, handling Firebase -->
+    <!-- ========== FIX #2: The entire Firebase script block is replaced with this corrected version ========== -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
       import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
@@ -461,8 +462,15 @@ SWIFT Code: ASCMPKKAXXX
       const form = document.getElementById("donation-form");
       const submitButton = document.getElementById("submit-donation-btn");
 
-      form.addEventListener("submit", async (e) => {
-          e.preventDefault();
+      // We now listen for a CLICK on the button, not a SUBMIT on the form.
+      submitButton.addEventListener("click", async () => {
+          
+          // First, check if the form is valid (e.g., checks the 'required' attribute on name)
+          if (!form.checkValidity()) {
+              form.reportValidity(); // This shows the browser's default validation pop-up
+              return; // Stop the function if the form is not valid
+          }
+          
           submitButton.disabled = true;
           submitButton.textContent = "Processing...";
 
@@ -513,6 +521,7 @@ SWIFT Code: ASCMPKKAXXX
             alert("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
             form.reset();
             // Manually trigger resets for custom components
+            document.getElementById("custom-amount-container").style.display = 'none'; // Hide custom amount field
             document.getElementById("donation-amount-input").value = "2500";
             document.querySelector('.amount-option.active')?.classList.remove("active");
             document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
