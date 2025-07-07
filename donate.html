@@ -137,7 +137,6 @@
     <main>
         <section class="hero">
             <div class="hero-image">
-                <!-- IMPORTANT: Make sure this background image exists in your project -->
                 <img src="hero_background.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async">
             </div>
             <div class="hero-overlay"></div>
@@ -147,7 +146,6 @@
             </div>
         </section>
         
-        <!-- Live Fund Tracker Section -->
         <section class="fund-tracker">
             <div class="container">
                 <h2>Track Our Progress</h2>
@@ -223,7 +221,6 @@
                                 </div>
                             </div>
                             
-                            <!-- Payment Details Sections -->
                             <div class="payment-details-content" id="bank-transfer-details">
                                 <h3>Bank Transfer Details</h3>
                                 <p>You can make a direct bank transfer using the details below:</p>
@@ -249,7 +246,6 @@ SWIFT Code: ASCMPKKAXXX
                              <div class="payment-details-content" id="qr-code-details" style="display: none;">
                                 <h3>Pay with QR Code</h3>
                                 <p>Scan the QR code below using your mobile payment app.</p>
-                                <!-- IMPORTANT: Replace with your actual QR code image file -->
                                 <img src="nashr-qr.png" alt="QR Code for payment">
                              </div>
                              <div class="payment-details-content" id="paypal-details" style="display: none;">
@@ -261,9 +257,6 @@ SWIFT Code: ASCMPKKAXXX
                                 <p>Secure card payments powered by Stripe. This is a placeholder as direct integration requires server-side setup.</p>
                             </div>
                             
-                            <!-- SCREENSHOT UPLOAD REMOVED -->
-
-                            <!-- Remaining form fields -->
                             <div class="form-group">
                                 <label for="donor-name">Your Name</label>
                                 <input class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required type="text"/>
@@ -279,7 +272,6 @@ SWIFT Code: ASCMPKKAXXX
                                         <option value="+92" selected>+92 (Pakistan)</option>
                                         <option value="+1">+1 (USA)</option>
                                         <option value="+44">+44 (UK)</option>
-                                        <!-- Add more country codes as needed -->
                                     </select>
                                     <input class="form-control" id="donor-phone" name="phone" placeholder="Enter your phone number" type="tel" />
                                 </div>
@@ -295,8 +287,8 @@ SWIFT Code: ASCMPKKAXXX
                                 </div>
                             </div>
                             <div class="form-submit">
-                                <!-- ========== FIX #1: Changed type="submit" to type="button" ========== -->
-                                <button class="btn btn-large" id="submit-donation-btn" type="button">Complete Donation</button>
+                                <!-- ROBUST FIX PART 1: Changed the button back to type="submit" -->
+                                <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button>
                             </div>
                             <div class="secure-badge">
                                 <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg>
@@ -340,21 +332,19 @@ SWIFT Code: ASCMPKKAXXX
         </div>
     </footer>
     
-    <!-- This script block handles general page interactivity and needs no changes -->
     <script>
         document.addEventListener("DOMContentLoaded", function() {
-            // --- Fund Tracker Logic ---
+            // This is all the UI logic, no changes needed here.
             const amountRaised = 60000;
             const targetAmount = 200000;
             const percentage = (amountRaised / targetAmount) * 100;
             const progressBar = document.getElementById('fund-progress-bar');
             if(progressBar) {
-              setTimeout(() => { // Timeout to allow smooth animation on load
+              setTimeout(() => {
                 progressBar.style.width = percentage + '%';
                 progressBar.textContent = Math.round(percentage) + '%';
               }, 500);
             }
-
             const donationTabs = document.querySelectorAll(".donation-tab");
             const donationTypeInput = document.getElementById("donation-type-input");
             const donationTypeDisplay = document.getElementById("donation-type-display");
@@ -368,7 +358,6 @@ SWIFT Code: ASCMPKKAXXX
                 });
                 tab.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); this.click(); }});
             });
-
             const amountOptions = document.querySelectorAll(".amount-option");
             const donationAmountInput = document.getElementById("donation-amount-input");
             const customAmountContainer = document.getElementById("custom-amount-container");
@@ -386,7 +375,6 @@ SWIFT Code: ASCMPKKAXXX
                 });
                 option.addEventListener("keydown", function(e) { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); this.click(); }});
             });
-
             if (customAmountInput) {
                 customAmountInput.addEventListener("input", function() { donationAmountInput.value = (this.value && this.value > 0) ? this.value : ""; });
                 customAmountInput.addEventListener("blur", function() {
@@ -398,7 +386,6 @@ SWIFT Code: ASCMPKKAXXX
                 });
                 customAmountInput.addEventListener("keydown", function(e) { if (e.key === "Escape") { this.blur(); }});
             }
-
             const anonymousCheckbox = document.getElementById("anonymous-donation");
             const leaderboardCheckbox = document.getElementById("leaderboard-consent");
             if (anonymousCheckbox && leaderboardCheckbox) {
@@ -406,7 +393,6 @@ SWIFT Code: ASCMPKKAXXX
                     if (this.checked) { leaderboardCheckbox.checked = false; leaderboardCheckbox.disabled = true;} else { leaderboardCheckbox.disabled = false; leaderboardCheckbox.checked = true; }
                 });
             }
-
             const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
             const nav = document.querySelector("nav");
             if (mobileMenuToggle && nav) {
@@ -414,8 +400,6 @@ SWIFT Code: ASCMPKKAXXX
                 const navLinks = nav.querySelectorAll("a");
                 navLinks.forEach(link => { link.addEventListener("click", function() { nav.classList.remove("active"); mobileMenuToggle.classList.remove("active"); }); });
             }
-
-            // --- Payment Method Selection Logic ---
             const paymentMethodInputs = document.querySelectorAll(".payment-option input[type='radio']");
             paymentMethodInputs.forEach(input => {
                 input.addEventListener("change", function() {
@@ -425,8 +409,6 @@ SWIFT Code: ASCMPKKAXXX
                     if (detailsSection) { detailsSection.style.display = 'block'; }
                 });
             });
-
-            // Make the whole payment option div clickable
             document.querySelectorAll('.payment-option').forEach(option => {
                 option.addEventListener('click', (e) => {
                     const radio = option.querySelector('input[type="radio"]');
@@ -439,7 +421,7 @@ SWIFT Code: ASCMPKKAXXX
         });
     </script>
     
-    <!-- ========== FIX #2: The entire Firebase script block is replaced with this corrected version ========== -->
+    <!-- ROBUST FIX PART 2: The updated Firebase script block -->
     <script type="module">
       import { initializeApp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-app.js";
       import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.9.1/firebase-firestore.js";
@@ -462,14 +444,10 @@ SWIFT Code: ASCMPKKAXXX
       const form = document.getElementById("donation-form");
       const submitButton = document.getElementById("submit-donation-btn");
 
-      // We now listen for a CLICK on the button, not a SUBMIT on the form.
-      submitButton.addEventListener("click", async () => {
-          
-          // First, check if the form is valid (e.g., checks the 'required' attribute on name)
-          if (!form.checkValidity()) {
-              form.reportValidity(); // This shows the browser's default validation pop-up
-              return; // Stop the function if the form is not valid
-          }
+      // We now listen for the form's "submit" event, which catches everything.
+      form.addEventListener("submit", async (e) => {
+          // The most important line: prevents the page from reloading.
+          e.preventDefault(); 
           
           submitButton.disabled = true;
           submitButton.textContent = "Processing...";
@@ -520,8 +498,8 @@ SWIFT Code: ASCMPKKAXXX
             await addDoc(collection(db, "donations"), donationData);
             alert("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
             form.reset();
-            // Manually trigger resets for custom components
-            document.getElementById("custom-amount-container").style.display = 'none'; // Hide custom amount field
+            // Manually trigger resets for custom UI components
+            document.getElementById("custom-amount-container").style.display = 'none';
             document.getElementById("donation-amount-input").value = "2500";
             document.querySelector('.amount-option.active')?.classList.remove("active");
             document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
@@ -538,13 +516,11 @@ SWIFT Code: ASCMPKKAXXX
       });
     </script>
    
-    <!-- The second footer with Privacy Policy, etc. -->
     <footer style="background-color: #111; padding: 20px 0; text-align: center; color: #ccc; font-size: 14px;">
       <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077" target="_blank" style="color: #00aaff; text-decoration: none; margin-right: 15px;">Privacy Policy</a> |
       <a href="https://www.termsfeed.com/live/5d35a484-61af-4b36-8b16-f00ae12fb3ce" target="_blank" style="color: #00aaff; text-decoration: none; margin-left: 15px;">Terms & Conditions</a>
     </footer>
 
-    <!-- This is the schema script at the end -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -561,6 +537,5 @@ SWIFT Code: ASCMPKKAXXX
       "description": "Nashr Foundation provides education, food, clean water, and basic needs across Pakistan."
     }
     </script>
-
 </body>
 </html>
