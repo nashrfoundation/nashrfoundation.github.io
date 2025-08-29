@@ -274,6 +274,8 @@ nav ul li a.active::after {
     width: 30px;
     height: 21px;
     cursor: pointer;
+    background: transparent;
+    border: none;
     z-index: 1000;
 }
 

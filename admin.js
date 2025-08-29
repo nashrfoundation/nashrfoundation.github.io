@@ -80,51 +80,9 @@ function setupEventListeners() {
         logoutBtn.addEventListener('click', handleLogout);
     }
     
-    // Forms
-    const goalForm = document.getElementById('goal-form');
-    if (goalForm) {
-        goalForm.addEventListener('submit', handleGoalUpdate);
-    }
+    // Forms (settings and donations removed)
     
-    const websiteSettingsForm = document.getElementById('website-settings-form');
-    if (websiteSettingsForm) {
-        websiteSettingsForm.addEventListener('submit', handleWebsiteSettings);
-    }
-    
-    const passwordChangeForm = document.getElementById('password-change-form');
-    if (passwordChangeForm) {
-        passwordChangeForm.addEventListener('submit', handlePasswordChange);
-    }
-    
-    const leaderboardForm = document.getElementById('leaderboard-form');
-    if (leaderboardForm) {
-        leaderboardForm.addEventListener('submit', handleLeaderboardEntry);
-    }
-    
-    // Search and filters
-    const donationSearch = document.getElementById('donation-search');
-    if (donationSearch) {
-        donationSearch.addEventListener('input', handleDonationSearch);
-    }
-    
-    const donationFilter = document.getElementById('donation-filter');
-    if (donationFilter) {
-        donationFilter.addEventListener('change', handleDonationFilter);
-    }
-    
-    // Pagination
-    const prevPageBtn = document.getElementById('prev-page');
-    if (prevPageBtn) {
-        prevPageBtn.addEventListener('click', () => changePage(-1));
-    }
-    
-    const nextPageBtn = document.getElementById('next-page');
-    if (nextPageBtn) {
-        nextPageBtn.addEventListener('click', () => changePage(1));
-    }
-    
-    // Date range picker
-    setupDateRangePicker();
+    // Removed donations and analytics listeners
 }
 
 // Authentication Functions
@@ -137,11 +95,21 @@ async function handleLogin(e) {
     
     const email = document.getElementById('admin-email').value;
     const password = document.getElementById('admin-password').value;
+    const submitBtn = document.getElementById('login-submit');
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Signing in...';
+    }
     
     try {
         await (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js')).signInWithEmailAndPassword(auth, email, password);
     } catch (err) {
         showLoginError('Login failed. Check your email and password.');
+    } finally {
+        if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign in';
+        }
     }
 }
 
@@ -198,14 +166,10 @@ function handleNavigation(e) {
 async function loadDashboardData() {
     try {
         await Promise.all([
-            loadOverviewData(),
-            loadDonationsData(),
-            loadLeaderboardData(),
-            loadAnalyticsData()
+            loadLeaderboardData()
         ]);
         
         updateLastUpdatedTime();
-        startRealtimeUpdates();
     } catch (error) {
         console.error('Failed to load dashboard data:', error);
         showError('Failed to load dashboard data. Please refresh the page.');
@@ -214,20 +178,9 @@ async function loadDashboardData() {
 
 async function loadSectionData(section) {
     switch (section) {
-        case 'overview':
-            await loadOverviewData();
-            break;
-        case 'donations':
-            await loadDonationsData();
-            break;
         case 'leaderboard':
+        default:
             await loadLeaderboardData();
-            break;
-        case 'analytics':
-            await loadAnalyticsData();
-            break;
-        case 'settings':
-            loadSettingsData();
             break;
     }
 }
@@ -365,7 +318,7 @@ function displayDonationsTable(donations) {
         nameCell.textContent = donation.name || 'Anonymous';
         
         const amountCell = document.createElement('td');
-        amountCell.textContent = `₨${donation.amount?.toLocaleString()}`;
+        amountCell.textContent = `₨${(donation.amount != null ? donation.amount.toLocaleString() : '0')}`;
         
         const methodCell = document.createElement('td');
         methodCell.textContent = donation.paymentMethod || 'Unknown';
@@ -404,11 +357,25 @@ function displayDonationsTable(donations) {
 // Leaderboard Section
 async function loadLeaderboardData() {
     try {
-        const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-        const snapshot = await fs.getDocs(fs.collection(db, 'leaderboard'));
-        const leaderboardData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-            .sort((a,b) => (a.rank||9999) - (b.rank||9999));
-        displayLeaderboardTable(leaderboardData);
+        const response = await fetch('leaderboard.csv', { cache: 'no-store' });
+        const text = await response.text();
+        const rows = text.trim().split('\n');
+        const data = [];
+        for (let i = 1; i < rows.length; i++) {
+            const line = rows[i];
+            if (!line) continue;
+            const firstComma = line.indexOf(',');
+            const secondComma = line.indexOf(',', firstComma + 1);
+            if (firstComma === -1 || secondComma === -1) continue;
+            const rankStr = line.slice(0, firstComma).trim();
+            const name = line.slice(firstComma + 1, secondComma).trim();
+            const amountStr = line.slice(secondComma + 1).trim();
+            const rank = parseInt(rankStr, 10);
+            const amount = parseInt(amountStr.replace(/,/g, ''), 10);
+            if (!isNaN(rank) && !isNaN(amount)) data.push({ rank, name, amount });
+        }
+        data.sort((a,b) => a.rank - b.rank);
+        displayLeaderboardTable(data);
     } catch (error) {
         console.error('Failed to load leaderboard data:', error);
         displayLeaderboardTable([]);
@@ -430,25 +397,10 @@ function displayLeaderboardTable(leaderboardData) {
         
         const amountCell = document.createElement('td');
         amountCell.textContent = `₨${entry.amount.toLocaleString()}`;
-        
-        const actionsCell = document.createElement('td');
-        const editBtn = document.createElement('button');
-        editBtn.className = 'btn btn-outline btn-sm';
-        editBtn.textContent = 'Edit';
-        editBtn.onclick = () => editLeaderboardEntry(entry);
-        
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn btn-danger btn-sm';
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.onclick = () => deleteLeaderboardEntry(entry.rank);
-        
-        actionsCell.appendChild(editBtn);
-        actionsCell.appendChild(deleteBtn);
-        
+        // No actions in CSV-driven mode
         row.appendChild(rankCell);
         row.appendChild(nameCell);
         row.appendChild(amountCell);
-        row.appendChild(actionsCell);
         
         tableBody.appendChild(row);
     });

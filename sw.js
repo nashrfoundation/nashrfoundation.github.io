@@ -34,16 +34,16 @@ self.addEventListener('install', event => {
 
 // Fetch event - serve from cache when offline
 self.addEventListener('fetch', event => {
+  const url = new URL(event.request.url);
+  // Bypass analytics and third-party tracking URLs
+  const bypass = url.hostname.includes('google-analytics.com') || url.hostname.includes('googletagmanager.com');
+  if (bypass) {
+    return; // Let the request pass through without interception
+  }
   event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Return cached version or fetch from network
-        if (response) {
-          return response;
-        }
-        return fetch(event.request);
-      }
-    )
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
 

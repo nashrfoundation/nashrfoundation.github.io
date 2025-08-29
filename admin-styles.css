@@ -193,6 +193,20 @@ p {
     text-align: center;
 }
 
+.modal-brand {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    justify-content: center;
+    margin-bottom: var(--spacing-sm);
+}
+
+.modal-subtitle {
+    text-align: center;
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-lg);
+}
+
 /* Form Styles */
 .form-group {
     margin-bottom: var(--spacing-md);
