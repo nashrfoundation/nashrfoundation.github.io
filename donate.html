@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-078CXSNP38"></script>
+    <!-- Consent Mode defaults (deny until user consents) -->
     <script>
       window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-078CXSNP38');
+      function gtag(){dataLayer.push(arguments);} 
+      gtag('consent', 'default', {
+        'ad_storage': 'denied',
+        'analytics_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied'
+      });
     </script>
     
     <!-- Google Tag Manager -->
@@ -30,9 +33,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nashrfoundation.github.io/donate.html">
     <meta property="og:image" content="https://nashrfoundation.github.io/logo.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Donate - Nashr Foundation">
     <meta name="twitter:description" content="Make a difference today by donating to Nashr Foundation.">
+    <meta name="twitter:image" content="https://nashrfoundation.github.io/logo.webp">
+    <link rel="icon" href="/logo.webp" sizes="any" type="image/webp">
+    <link rel="apple-touch-icon" href="/logo.webp">
 
     <!-- Preload LCP image and optimized fonts -->
     <link rel="preload" fetchpriority="high" as="image" href="hero_background.webp" type="image/webp">
@@ -114,13 +122,13 @@
                 <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"> <img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"> </a>
             </div>
             <div class="donate-button"> <a href="donate.html" class="btn">Donate Now</a> </div>
-            <div class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" role="button" tabindex="0" aria-controls="mobile-nav"> <span></span> <span></span> <span></span> </div>
+            <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-nav"> <span></span> <span></span> <span></span> </button>
         </div>
     </header>
 
     <main id="main-content">
         <section class="hero">
-            <div class="hero-image"> <img src="hero_background.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async"> </div>
+            <div class="hero-image"> <img src="hero_background.webp" srcset="hero_background_mobile.webp 640w, hero_background.webp 1200w" sizes="(max-width: 768px) 100vw, 100vw" alt="Children accessing clean water" fetchpriority="high" decoding="async"> </div>
             <div class="hero-overlay"></div>
             <div class="hero-content"> <h1>Make a Difference Today</h1> <p>Your donation helps provide education, food, water, and basic necessities to those in need</p> </div>
         </section>
@@ -213,6 +221,54 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
         </div>
     </footer>
     
+    <!-- Consent Banner -->
+    <div id="consent-banner" style="position:fixed;left:0;right:0;bottom:0;z-index:10000;background:rgba(26,26,26,0.98);color:#fff;padding:12px 16px;display:none;border-top:1px solid #444;">
+        <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div style="flex:1;min-width:0;">
+                <strong style="display:block;margin-bottom:4px;">We use cookies for analytics</strong>
+                <span style="color:#ccc;font-size:0.95rem;">Help us improve the site experience. You can accept or decline analytics.</span>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0;">
+                <button id="consent-decline" class="btn btn-outline" style="min-width:96px;">Decline</button>
+                <button id="consent-accept" class="btn" style="min-width:96px;">Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      (function(){
+        try {
+          var decided = localStorage.getItem('consentDecision');
+          var banner = document.getElementById('consent-banner');
+          if (!decided && banner) {
+            banner.style.display = 'block';
+          }
+          function updateConsent(granted){
+            if (typeof gtag === 'function') {
+              gtag('consent', 'update', {
+                'analytics_storage': granted ? 'granted' : 'denied',
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied'
+              });
+            }
+          }
+          var acceptBtn = document.getElementById('consent-accept');
+          var declineBtn = document.getElementById('consent-decline');
+          if (acceptBtn) acceptBtn.addEventListener('click', function(){
+            localStorage.setItem('consentDecision', 'accepted');
+            updateConsent(true);
+            banner.style.display = 'none';
+          });
+          if (declineBtn) declineBtn.addEventListener('click', function(){
+            localStorage.setItem('consentDecision', 'declined');
+            updateConsent(false);
+            banner.style.display = 'none';
+          });
+          if (decided === 'accepted') updateConsent(true);
+        } catch (e) {}
+      })();
+    </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
             // Enhanced validation and user feedback functions

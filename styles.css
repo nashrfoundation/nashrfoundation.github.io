@@ -196,7 +196,7 @@ header .container {
 }
 
 .logo img {
-    height: 96px;
+    height: 100px;
     max-height: 100px;
     width: auto;
     border-radius: var(--border-radius-md);
@@ -937,7 +937,7 @@ footer {
 
 @media (max-width: 768px) {
     .logo img {
-        height: 78px;
+        height: 100px;
     }
 
     .mobile-menu-toggle {
@@ -954,7 +954,7 @@ footer {
 
     nav {
         position: fixed;
-        top: 64px;
+        top: 60px;
         left: 0;
         width: 100%;
         background-color: rgba(44, 44, 44, 0.95);
@@ -1045,7 +1045,7 @@ footer {
     .hero {
         min-height: 520px;
         padding: 1rem 0;
-        margin-top: 64px;
+        margin-top: 60px;
     }
 
     .hero-content h1 {
@@ -1185,6 +1185,12 @@ footer {
 .payment-option:focus {
     outline: 2px solid var(--accent);
     outline-offset: 2px;
+}
+
+/* Reduce focus ring for mouse users, keep for keyboard */
+:focus:not(:focus-visible) {
+    outline: none;
+    box-shadow: none;
 }
 
 /* QR Code Placeholder */

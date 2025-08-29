@@ -201,10 +201,35 @@ p {
     margin-bottom: var(--spacing-sm);
 }
 
+.modal-content .admin-logo {
+    width: 72px;
+    height: 72px;
+}
+
 .modal-subtitle {
     text-align: center;
     color: var(--text-secondary);
     margin-bottom: var(--spacing-lg);
+}
+
+/* Modern input styling for login */
+.login-form .input-lg {
+    padding: 0.9rem 1rem;
+    font-size: 1rem;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background-color: var(--bg-secondary);
+}
+
+.login-form .input-lg:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.2rem rgba(42, 141, 156, 0.25);
+    background-color: var(--bg-primary);
+}
+
+.password-field .toggle-password {
+    border-radius: 8px;
 }
 
 /* Form Styles */

@@ -35,14 +35,33 @@ self.addEventListener('install', event => {
 // Fetch event - serve from cache when offline
 self.addEventListener('fetch', event => {
   const url = new URL(event.request.url);
+
   // Bypass analytics and third-party tracking URLs
   const bypass = url.hostname.includes('google-analytics.com') || url.hostname.includes('googletagmanager.com');
-  if (bypass) {
-    return; // Let the request pass through without interception
+  if (bypass) return;
+
+  // Network-first for navigation (HTML) to reduce staleness, with offline fallback
+  if (event.request.mode === 'navigate') {
+    event.respondWith(
+      fetch(event.request)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
   }
+
+  // Stale-while-revalidate for other requests
   event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+    caches.match(event.request).then(cached => {
+      const networkFetch = fetch(event.request).then(networkResponse => {
+        caches.open(CACHE_NAME).then(cache => cache.put(event.request, networkResponse.clone()));
+        return networkResponse;
+      });
+      return cached || networkFetch;
     })
   );
 });

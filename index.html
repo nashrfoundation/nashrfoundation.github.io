@@ -1,14 +1,16 @@
 <!DOCTYPE html> 
 <html lang="en">
 <head>
-    <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-078CXSNP38"></script>
+    <!-- Consent Mode defaults (deny until user consents) -->
 <script>
   window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'G-078CXSNP38');
+  function gtag(){dataLayer.push(arguments);} 
+  gtag('consent', 'default', {
+    'ad_storage': 'denied',
+    'analytics_storage': 'denied',
+    'ad_user_data': 'denied',
+    'ad_personalization': 'denied'
+  });
 </script>
     <!-- Google Tag Manager -->
 <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
@@ -30,9 +32,14 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nashrfoundation.github.io/">
     <meta property="og:image" content="https://nashrfoundation.github.io/logo.webp">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Nashr Foundation - Empowering Communities">
     <meta name="twitter:description" content="Providing essential support to vulnerable communities across Pakistan.">
+    <meta name="twitter:image" content="https://nashrfoundation.github.io/logo.webp">
+    <link rel="icon" href="/logo.webp" sizes="any" type="image/webp">
+    <link rel="apple-touch-icon" href="/logo.webp">
     <link rel="canonical" href="https://nashrfoundation.github.io/">
 
     <!-- Preload LCP image and optimized fonts. -->
@@ -125,7 +132,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <main id="main-content">
         <section class="hero">
             <div class="hero-image">
-                <img src="hero_background.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async">
+                <img 
+                  src="hero_background.webp"
+                  srcset="hero_background_mobile.webp 640w, hero_background.webp 1200w"
+                  sizes="(max-width: 768px) 100vw, 100vw"
+                  alt="Children accessing clean water" fetchpriority="high" decoding="async">
             </div>
             <div class="hero-overlay"></div>
             <div class="hero-content">
@@ -152,7 +163,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <section class="get-involved">
-            <div class="container"> <h2>Get Involved</h2> <div class="involvement-options"> <div class="involvement-option" data-aos="fade-up"> <h3>Donate</h3> <p>Your financial support helps us provide essential services to those in need.</p> <a href="donate.html" class="btn btn-outline">Donate Now</a> </div> <div class="involvement-option" data-aos="fade-up" data-aos-delay="100"> <h3>Volunteer</h3> <p>Join our team of dedicated volunteers making a difference in communities.</p> <a href="#" class="btn btn-outline">Coming Soon</a> </div> <div class="involvement-option" data-aos="fade-up" data-aos-delay="200"> <h3>Spread Awareness</h3> <p>Share our mission with your network and help us reach more people.</p> <div class="social-share"> <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://www.facebook.com/share/16V3Zippz8/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" width="24" height="24" loading="lazy" decoding="async"></a> </div> </div> </div> </div>
+            <div class="container"> <h2>Get Involved</h2> <div class="involvement-options"> <div class="involvement-option" data-aos="fade-up"> <h3>Donate</h3> <p>Your financial support helps us provide essential services to those in need.</p> <a href="donate.html" class="btn btn-outline">Donate Now</a> </div> <div class="involvement-option" data-aos="fade-up" data-aos-delay="100"> <h3>Volunteer</h3> <p>Join our team of dedicated volunteers making a difference in communities.</p> <button class="btn btn-outline" aria-disabled="true" disabled>Coming Soon</button> </div> <div class="involvement-option" data-aos="fade-up" data-aos-delay="200"> <h3>Spread Awareness</h3> <p>Share our mission with your network and help us reach more people.</p> <div class="social-share"> <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" width="24" height="24" loading="lazy" decoding="async"></a> </div> </div> </div> </div>
         </section>
     </main>
 
@@ -186,10 +197,60 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </footer>
 
+    <!-- Consent Banner -->
+    <div id="consent-banner" style="position:fixed;left:0;right:0;bottom:0;z-index:10000;background:rgba(26,26,26,0.98);color:#fff;padding:12px 16px;display:none;border-top:1px solid #444;">
+        <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div style="flex:1;min-width:0;">
+                <strong style="display:block;margin-bottom:4px;">We use cookies for analytics</strong>
+                <span style="color:#ccc;font-size:0.95rem;">Help us improve the site experience. You can accept or decline analytics.</span>
+            </div>
+            <div style="display:flex;gap:8px;flex-shrink:0;">
+                <button id="consent-decline" class="btn btn-outline" style="min-width:96px;">Decline</button>
+                <button id="consent-accept" class="btn" style="min-width:96px;">Accept</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+      (function(){
+        try {
+          var decided = localStorage.getItem('consentDecision');
+          var banner = document.getElementById('consent-banner');
+          if (!decided && banner) {
+            banner.style.display = 'block';
+          }
+          function updateConsent(granted){
+            if (typeof gtag === 'function') {
+              gtag('consent', 'update', {
+                'analytics_storage': granted ? 'granted' : 'denied',
+                'ad_storage': 'denied',
+                'ad_user_data': 'denied',
+                'ad_personalization': 'denied'
+              });
+            }
+          }
+          var acceptBtn = document.getElementById('consent-accept');
+          var declineBtn = document.getElementById('consent-decline');
+          if (acceptBtn) acceptBtn.addEventListener('click', function(){
+            localStorage.setItem('consentDecision', 'accepted');
+            updateConsent(true);
+            banner.style.display = 'none';
+          });
+          if (declineBtn) declineBtn.addEventListener('click', function(){
+            localStorage.setItem('consentDecision', 'declined');
+            updateConsent(false);
+            banner.style.display = 'none';
+          });
+          // If previously accepted, ensure consent is granted on load
+          if (decided === 'accepted') updateConsent(true);
+        } catch (e) {}
+      })();
+    </script>
+
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json">
     
-    <!-- Deferred scripts that do not block rendering -->
+    <!-- Deferred scripts that do not block rendering (GTM only; GA code removed) -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js" defer></script>
     <script src="leaderboard.js" defer></script>
     <script defer>
@@ -233,7 +294,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "NonProfit",
+  "@type": "NonprofitOrganization",
   "name": "Nashr Foundation",
   "url": "https://nashrfoundation.github.io",
   "logo": "https://nashrfoundation.github.io/logo.webp",
