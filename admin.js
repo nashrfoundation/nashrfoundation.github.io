@@ -366,6 +366,37 @@ async function loadLeaderboardData() {
         window._leaderboardData = data;
     } catch (error) {
         console.error('Failed to load leaderboard data:', error);
+        // Fallback to CSV so admins can at least view data when Firestore rules block reads
+        await fallbackLeaderboardCsv();
+    }
+}
+
+async function fallbackLeaderboardCsv() {
+    try {
+        const res = await fetch('leaderboard.csv', { cache: 'no-store' });
+        if (!res.ok) throw new Error('CSV fetch failed');
+        const text = await res.text();
+        const rows = text.trim().split('\n');
+        const data = [];
+        for (let i = 1; i < rows.length; i++) {
+            const line = rows[i];
+            if (!line) continue;
+            const firstComma = line.indexOf(',');
+            const secondComma = line.indexOf(',', firstComma + 1);
+            if (firstComma === -1 || secondComma === -1) continue;
+            const rankStr = line.slice(0, firstComma).trim();
+            const name = line.slice(firstComma + 1, secondComma).trim();
+            const amountStr = line.slice(secondComma + 1).trim();
+            const rank = parseInt(rankStr, 10);
+            const amount = parseInt(amountStr.replace(/,/g, ''), 10);
+            if (!isNaN(rank) && !isNaN(amount)) data.push({ rank, name, amount });
+        }
+        data.sort((a,b) => a.rank - b.rank);
+        displayLeaderboardTable(data);
+        window._leaderboardData = data;
+        showError('Realtime data is unavailable due to Firestore rules. Showing CSV fallback.');
+    } catch (e) {
+        console.error('CSV fallback failed:', e);
         displayLeaderboardTable([]);
     }
 }
@@ -742,7 +773,12 @@ async function handleLeaderboardEntry(e) {
         document.getElementById('edit-entry-id').value = '';
         hideEntryForm();
     } catch (error) {
-        showError('Failed to save leaderboard entry. Please try again.');
+        console.error('Failed to save entry:', error);
+        if (String(error).includes('Missing or insufficient permissions')) {
+            showError('Write blocked by Firestore rules. Please sign in or update rules.');
+        } else {
+            showError('Failed to save leaderboard entry. Please try again.');
+        }
     }
 }
 
@@ -782,7 +818,8 @@ function deleteLeaderboardEntry(rank) {
                 await loadLeaderboardData();
             })();
         } catch (error) {
-            showError('Failed to delete entry. Please try again.');
+            console.error('Failed to delete entry:', error);
+            showError('Failed to delete entry. Check Firestore permissions.');
         }
     }
 }
