@@ -240,8 +240,12 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
         try {
           var decided = localStorage.getItem('consentDecision');
           var banner = document.getElementById('consent-banner');
+          var lockInterval = null;
+          var mo = null;
           if (!decided && banner) {
             banner.style.display = 'block';
+          } else if (banner) {
+            banner.style.setProperty('display','none','important');
           }
           function updateConsent(granted){
             if (typeof gtag === 'function') {
@@ -255,15 +259,21 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
           }
           var acceptBtn = document.getElementById('consent-accept');
           var declineBtn = document.getElementById('consent-decline');
+          function stopLocking(){
+            try { if (lockInterval) { clearInterval(lockInterval); lockInterval = null; } } catch(e) {}
+            try { if (mo) { mo.disconnect(); mo = null; } } catch(e) {}
+          }
           if (acceptBtn) acceptBtn.addEventListener('click', function(){
             localStorage.setItem('consentDecision', 'accepted');
             updateConsent(true);
-            banner.style.display = 'none';
+            stopLocking();
+            if (banner) banner.style.setProperty('display','none','important');
           });
           if (declineBtn) declineBtn.addEventListener('click', function(){
             localStorage.setItem('consentDecision', 'declined');
             updateConsent(false);
-            banner.style.display = 'none';
+            stopLocking();
+            if (banner) banner.style.setProperty('display','none','important');
           });
           if (decided === 'accepted') updateConsent(true);
           // Hard-lock banner to viewport in case any styles mutate later
@@ -273,6 +283,11 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
               document.body.appendChild(banner);
             }
             function lockBanner(){
+              var decidedNow = localStorage.getItem('consentDecision');
+              if (decidedNow) {
+                banner.style.setProperty('display','none','important');
+                return;
+              }
               banner.style.setProperty('position','fixed','important');
               banner.style.setProperty('top','auto','important');
               banner.style.setProperty('left','12px','important');
@@ -288,9 +303,9 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
             lockBanner();
             window.addEventListener('scroll', lockBanner, { passive: true });
             window.addEventListener('resize', lockBanner);
-            const mo = new MutationObserver(lockBanner);
+            mo = new MutationObserver(lockBanner);
             mo.observe(banner, { attributes: true, childList: false, subtree: false });
-            setInterval(lockBanner, 500);
+            lockInterval = setInterval(lockBanner, 500);
             document.addEventListener('visibilitychange', lockBanner);
           }
         } catch (e) {}

@@ -1337,12 +1337,12 @@ footer {
 
     /* Smaller mobile header height */
     header {
-        padding: 0.6rem 0 !important;
+        padding: 0.9rem 0 !important;
     }
 
     /* Smaller logo */
     .logo img {
-        height: 60px !important;
+        height: 120px !important;
     }
 
     /* Better mobile menu toggle positioning */
@@ -1364,11 +1364,11 @@ footer {
 
     /* Adjust nav and hero for smaller header */
     nav {
-        top: 80px !important;
+        top: 110px !important;
     }
 
     .hero {
-        margin-top: 80px !important;
+        margin-top: 110px !important;
     }
 }
 
@@ -1376,12 +1376,12 @@ footer {
 
     /* Smaller header on very small screens */
     header {
-        padding: 0.5rem 0 !important;
+        padding: 0.8rem 0 !important;
     }
 
     .logo img {
-        height: 55px !important;
-        transform: scale(1.06);
+        height: 110px !important;
+        transform: scale(1.0);
     }
 
     .mobile-menu-toggle {
@@ -1396,11 +1396,11 @@ footer {
     }
 
     nav {
-        top: 75px !important;
+        top: 105px !important;
     }
 
     .hero {
-        margin-top: 75px !important;
+        margin-top: 105px !important;
     }
 }
 
