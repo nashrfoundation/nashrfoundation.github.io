@@ -1,27 +1,19 @@
 // Admin Dashboard JavaScript for Nashr Foundation
 
-// Firebase Configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyBw9khGmocvn0bqGDOgumWDwUhQk1JuOMM",
-    authDomain: "nashr-foundation-c3860.firebaseapp.com",
-    projectId: "nashr-foundation-c3860",
-    storageBucket: "nashr-foundation-c3860.firebasestorage.app",
-    messagingSenderId: "76161626733",
-    appId: "1:76161626733:web:cbc498485deaddd60bc564",
-    measurementId: "G-Y0WSNQK3MW"
+// Supabase Configuration
+const supabaseConfig = {
+    url: 'https://jtuhnndwhotxjjolwcuz.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
 };
 
-// Initialize Firebase
-let app, db, auth;
+// Initialize Supabase
+let supabase;
 let currentUser = null;
 let charts = {};
 let realtimeData = {};
-let leaderboardUnsub = null;
-const PROJECT_ID = firebaseConfig.projectId;
-const API_KEY = firebaseConfig.apiKey;
-let leaderboardRestTimer = null;
+let leaderboardSubscription = null;
 
-// Using Firebase Auth (email/password). Create admins in Firebase Console.
+// Using Supabase Auth (email/password). Create admins in Supabase Console.
 
 // DOM Elements
 const loginModal = document.getElementById('login-modal');
@@ -31,38 +23,44 @@ const loginError = document.getElementById('login-error');
 
 // Initialize the application
 document.addEventListener('DOMContentLoaded', function() {
-    initializeFirebase();
+    initializeSupabase();
     setupEventListeners();
     checkAuthState();
 });
 
-// Firebase Initialization
-async function initializeFirebase() {
+// Supabase Initialization
+async function initializeSupabase() {
     try {
-        const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-        const { getFirestore, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-        const { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+        const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
         
-        app = initializeApp(firebaseConfig);
-        db = getFirestore(app);
-        auth = getAuth(app);
+        supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
         
-        // Auth state gate
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = { email: user.email, uid: user.uid };
+        // Auth state listener
+        supabase.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN' && session) {
+                currentUser = { email: session.user.email, uid: session.user.id };
                 showDashboard();
                 loadDashboardData();
-            } else {
+            } else if (event === 'SIGNED_OUT') {
                 currentUser = null;
                 showLogin();
             }
         });
         
-        console.log('Firebase initialized successfully');
+        // Check current session
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+            currentUser = { email: session.user.email, uid: session.user.id };
+            showDashboard();
+            loadDashboardData();
+        } else {
+            showLogin();
+        }
+        
+        console.log('Supabase initialized successfully');
     } catch (error) {
-        console.error('Firebase initialization failed:', error);
-        showError('Failed to initialize Firebase. Please refresh the page.');
+        console.error('Supabase initialization failed:', error);
+        showError('Failed to initialize Supabase. Please refresh the page.');
     }
 }
 
@@ -112,7 +110,18 @@ async function handleLogin(e) {
     }
     
     try {
-        await (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js')).signInWithEmailAndPassword(auth, email, password);
+        const { data, error } = await supabase.auth.signInWithPassword({
+            email: email,
+            password: password
+        });
+        
+        if (error) {
+            throw error;
+        }
+        
+        currentUser = { email: data.user.email, uid: data.user.id };
+        showSuccess('Login successful!');
+        
     } catch (err) {
         showLoginError('Login failed. Check your email and password.');
     } finally {
@@ -125,7 +134,9 @@ async function handleLogin(e) {
 
 async function handleLogout() {
     try {
-        await (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js')).signOut(auth);
+        const { error } = await supabase.auth.signOut();
+        if (error) throw error;
+        showSuccess('Logged out successfully!');
     } catch (err) {
         showError('Failed to logout. Please try again.');
     }
@@ -367,29 +378,50 @@ function displayDonationsTable(donations) {
 // Leaderboard Section
 async function loadLeaderboardData() {
     try {
-        // Prefer REST polling to avoid onSnapshot permission issues
-        if (leaderboardUnsub) {
-            try { leaderboardUnsub(); } catch(_) {}
-            leaderboardUnsub = null;
+        // Clear any existing subscription
+        if (leaderboardSubscription) {
+            leaderboardSubscription.unsubscribe();
+            leaderboardSubscription = null;
         }
-        if (leaderboardRestTimer) {
-            clearInterval(leaderboardRestTimer);
-            leaderboardRestTimer = null;
-        }
+        
         // Initial fetch
-        const ok = await fallbackLeaderboardRest();
-        if (!ok) await fallbackLeaderboardCsv();
-        // Poll every 10s for near-realtime updates
-        leaderboardRestTimer = setInterval(async () => {
-            const ok2 = await fallbackLeaderboardRest();
-            if (!ok2) {
-                // keep previous data; optionally fall back to CSV once
-            }
-        }, 10000);
+        await fetchLeaderboardData();
+        
+        // Set up real-time subscription
+        leaderboardSubscription = supabase
+            .channel('leaderboard-changes')
+            .on('postgres_changes', 
+                { event: '*', schema: 'public', table: 'leaderboard' },
+                (payload) => {
+                    console.log('Leaderboard change detected:', payload);
+                    fetchLeaderboardData(); // Refresh data when changes occur
+                }
+            )
+            .subscribe();
+            
     } catch (error) {
         console.error('Failed to load leaderboard data:', error);
-        const restOk = await fallbackLeaderboardRest();
-        if (!restOk) await fallbackLeaderboardCsv();
+        showError('Failed to load leaderboard data. Please refresh the page.');
+    }
+}
+
+async function fetchLeaderboardData() {
+    try {
+        const { data, error } = await supabase
+            .from('leaderboard')
+            .select('*')
+            .order('rank', { ascending: true });
+            
+        if (error) {
+            throw error;
+        }
+        
+        window._leaderboardData = data || [];
+        displayLeaderboardTable(data || []);
+        
+    } catch (error) {
+        console.error('Failed to fetch leaderboard data:', error);
+        displayLeaderboardTable([]);
     }
 }
 
@@ -840,98 +872,47 @@ async function handleLeaderboardSubmit(e) {
     
     // Debug: Check authentication state
     console.log('Current user:', currentUser);
-    console.log('Auth state:', auth.currentUser);
     
-    if (!auth.currentUser) {
+    if (!currentUser) {
         showError('You must be logged in to add entries.');
         return;
     }
     
     try {
-        // Try Firestore first, fallback to REST API
         let success = false;
         
-        try {
-            const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-            
-            if (editId) {
-                // Edit existing entry
-                const rankId = String(editId).padStart(2, '0');
-                const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
-                await fs.setDoc(docRef, {
-                    rank: parseInt(editId, 10),
+        if (editId) {
+            // Edit existing entry
+            const { data, error } = await supabase
+                .from('leaderboard')
+                .update({
                     name: name,
                     amount: amount,
-                    updatedAt: fs.serverTimestamp()
-                });
-                success = true;
-            } else {
-                // Add new entry - find next available rank
-                const currentData = window._leaderboardData || [];
-                const nextRank = currentData.length > 0 ? Math.max(...currentData.map(d => d.rank)) + 1 : 1;
-                const rankId = String(nextRank).padStart(2, '0');
-                const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
-                await fs.setDoc(docRef, {
+                    updated_at: new Date().toISOString()
+                })
+                .eq('rank', parseInt(editId, 10));
+                
+            if (error) {
+                throw error;
+            }
+            success = true;
+        } else {
+            // Add new entry - find next available rank
+            const currentData = window._leaderboardData || [];
+            const nextRank = currentData.length > 0 ? Math.max(...currentData.map(d => d.rank)) + 1 : 1;
+            
+            const { data, error } = await supabase
+                .from('leaderboard')
+                .insert({
                     rank: nextRank,
                     name: name,
-                    amount: amount,
-                    createdAt: fs.serverTimestamp()
-                });
-                success = true;
-            }
-        } catch (firestoreError) {
-            console.log('Firestore write failed, trying REST API:', firestoreError);
-            
-            // Fallback to REST API
-            if (editId) {
-                // Edit existing entry via REST
-                const rankId = String(editId).padStart(2, '0');
-                const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/leaderboard/${rankId}?key=${API_KEY}`;
-                const response = await fetch(url, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        fields: {
-                            rank: { integerValue: parseInt(editId, 10) },
-                            name: { stringValue: name },
-                            amount: { integerValue: amount },
-                            updatedAt: { timestampValue: new Date().toISOString() }
-                        }
-                    })
+                    amount: amount
                 });
                 
-                if (!response.ok) {
-                    throw new Error(`REST API failed: ${response.status}`);
-                }
-                success = true;
-            } else {
-                // Add new entry via REST
-                const currentData = window._leaderboardData || [];
-                const nextRank = currentData.length > 0 ? Math.max(...currentData.map(d => d.rank)) + 1 : 1;
-                const rankId = String(nextRank).padStart(2, '0');
-                const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/leaderboard?documentId=${rankId}&key=${API_KEY}`;
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        fields: {
-                            rank: { integerValue: nextRank },
-                            name: { stringValue: name },
-                            amount: { integerValue: amount },
-                            createdAt: { timestampValue: new Date().toISOString() }
-                        }
-                    })
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`REST API failed: ${response.status}`);
-                }
-                success = true;
+            if (error) {
+                throw error;
             }
+            success = true;
         }
         
         if (success) {
@@ -939,7 +920,7 @@ async function handleLeaderboardSubmit(e) {
             hideEntryForm();
             // Refresh data after a short delay
             setTimeout(() => {
-                loadLeaderboardData();
+                fetchLeaderboardData();
             }, 1000);
         }
         
@@ -976,38 +957,20 @@ function hideEntryForm() {
 async function deleteLeaderboardEntry(rank) {
     if (confirm(`Are you sure you want to delete the entry with rank ${rank}?`)) {
         try {
-            let success = false;
-            
-            try {
-                // Try Firestore first
-                const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-                const rankId = String(rank).padStart(2, '0');
-                const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
-                await fs.deleteDoc(docRef);
-                success = true;
-            } catch (firestoreError) {
-                console.log('Firestore delete failed, trying REST API:', firestoreError);
+            const { data, error } = await supabase
+                .from('leaderboard')
+                .delete()
+                .eq('rank', rank);
                 
-                // Fallback to REST API
-                const rankId = String(rank).padStart(2, '0');
-                const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/leaderboard/${rankId}?key=${API_KEY}`;
-                const response = await fetch(url, {
-                    method: 'DELETE'
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`REST API failed: ${response.status}`);
-                }
-                success = true;
+            if (error) {
+                throw error;
             }
             
-            if (success) {
-                showSuccess('Leaderboard entry deleted.');
-                // Refresh data after a short delay
-                setTimeout(() => {
-                    loadLeaderboardData();
-                }, 1000);
-            }
+            showSuccess('Leaderboard entry deleted.');
+            // Refresh data after a short delay
+            setTimeout(() => {
+                fetchLeaderboardData();
+            }, 1000);
             
         } catch (error) {
             console.error('Failed to delete entry:', error);

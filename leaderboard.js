@@ -54,47 +54,67 @@ document.addEventListener('DOMContentLoaded', function() {
     async function setupRealtimeLeaderboard() {
         try {
             // Dynamic imports for better performance
-            const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-            const { getFirestore, collection, onSnapshot, query, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
 
-            const firebaseConfig = {
-                apiKey: "AIzaSyBw9khGmocvn0bqGDOgumWDwUhQk1JuOMM",
-                authDomain: "nashr-foundation-c3860.firebaseapp.com",
-                projectId: "nashr-foundation-c3860",
-                storageBucket: "nashr-foundation-c3860.firebasestorage.app",
-                messagingSenderId: "76161626733",
-                appId: "1:76161626733:web:cbc498485deaddd60bc564",
-                measurementId: "G-Y0WSNQK3MW"
+            const supabaseConfig = {
+                url: 'https://jtuhnndwhotxjjolwcuz.supabase.co',
+                anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
             };
 
-            const app = initializeApp(firebaseConfig);
-            const db = getFirestore(app);
+            const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
 
-            // Optimized query with ordering and limiting
-            const leaderboardQuery = query(
-                collection(db, 'leaderboard'),
-                orderBy('rank', 'asc'),
-                limit(50)
-            );
+            // Initial fetch
+            const { data, error } = await supabase
+                .from('leaderboard')
+                .select('*')
+                .order('rank', { ascending: true })
+                .limit(50);
 
-            onSnapshot(leaderboardQuery, (snapshot) => {
-                const data = snapshot.docs
-                    .map(d => d.data())
-                    .filter(Boolean)
-                    .sort((a, b) => (a.rank || 9999) - (b.rank || 9999));
-                
-                // Use requestIdleCallback for non-critical updates
-                requestIdleCallback(() => {
-                    updateTable(data);
-                });
-                
-                isInitialized = true;
-            }, async (err) => {
-                console.error('Realtime leaderboard error:', err);
-                if (!isInitialized) {
-                    await fallbackToCsv();
-                }
+            if (error) {
+                throw error;
+            }
+
+            // Update table with initial data
+            requestIdleCallback(() => {
+                updateTable(data || []);
             });
+            
+            isInitialized = true;
+
+            // Set up real-time subscription
+            const subscription = supabase
+                .channel('leaderboard-changes')
+                .on('postgres_changes', 
+                    { event: '*', schema: 'public', table: 'leaderboard' },
+                    (payload) => {
+                        console.log('Leaderboard change detected:', payload);
+                        // Refresh data when changes occur
+                        fetchAndUpdateData();
+                    }
+                )
+                .subscribe();
+
+            // Function to fetch and update data
+            async function fetchAndUpdateData() {
+                try {
+                    const { data: newData, error } = await supabase
+                        .from('leaderboard')
+                        .select('*')
+                        .order('rank', { ascending: true })
+                        .limit(50);
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    requestIdleCallback(() => {
+                        updateTable(newData || []);
+                    });
+                } catch (err) {
+                    console.error('Failed to fetch updated data:', err);
+                }
+            }
+
         } catch (e) {
             console.error('Failed to initialize realtime leaderboard:', e);
             await fallbackToCsv();
