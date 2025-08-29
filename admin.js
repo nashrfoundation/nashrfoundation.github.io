@@ -257,7 +257,7 @@ function updateOverviewStats(donations) {
     const totalRaised = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
     const todayDonations = donations.filter(donation => {
         const today = new Date();
-        const donationDate = donation.createdAt?.toDate() || new Date();
+        const donationDate = (donation.createdAt && typeof donation.createdAt.toDate === 'function') ? donation.createdAt.toDate() : new Date();
         return donationDate.toDateString() === today.toDateString();
     });
     const todayAmount = todayDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
@@ -284,7 +284,11 @@ function updateOverviewStats(donations) {
 
 function updateRecentActivity(donations) {
     const recentDonations = donations
-        .sort((a, b) => (b.createdAt?.toDate() || new Date()) - (a.createdAt?.toDate() || new Date()))
+        .sort((a, b) => {
+            const bd = (b.createdAt && typeof b.createdAt.toDate === 'function') ? b.createdAt.toDate() : new Date();
+            const ad = (a.createdAt && typeof a.createdAt.toDate === 'function') ? a.createdAt.toDate() : new Date();
+            return bd - ad;
+        })
         .slice(0, 10);
     
     const activityList = document.getElementById('recent-activity-list');
@@ -308,11 +312,11 @@ function updateRecentActivity(donations) {
         
         const title = document.createElement('div');
         title.className = 'activity-title';
-        title.textContent = `${donation.name || 'Anonymous'} donated ₨${donation.amount?.toLocaleString()}`;
+        title.textContent = `${donation.name || 'Anonymous'} donated ₨${(donation.amount != null ? donation.amount.toLocaleString() : '0')}`;
         
         const time = document.createElement('div');
         time.className = 'activity-time';
-        time.textContent = formatTimeAgo(donation.createdAt?.toDate() || new Date());
+        time.textContent = formatTimeAgo((donation.createdAt && typeof donation.createdAt.toDate === 'function') ? donation.createdAt.toDate() : new Date());
         
         content.appendChild(title);
         content.appendChild(time);
@@ -355,7 +359,7 @@ function displayDonationsTable(donations) {
         const row = document.createElement('tr');
         
         const dateCell = document.createElement('td');
-        dateCell.textContent = formatDate(donation.createdAt?.toDate() || new Date());
+        dateCell.textContent = formatDate((donation.createdAt && typeof donation.createdAt.toDate === 'function') ? donation.createdAt.toDate() : new Date());
         
         const nameCell = document.createElement('td');
         nameCell.textContent = donation.name || 'Anonymous';
