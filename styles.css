@@ -195,7 +195,7 @@ header {
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     z-index: 1000;
-    padding: 2rem 0;
+    padding: 2.75rem 0;
 }
 
 header .container {
@@ -327,7 +327,7 @@ nav ul li a.active::after {
     justify-content: center;
     text-align: center;
     color: var(--white);
-    margin-top: 80px;
+    margin-top: 130px;
     overflow: hidden;
     contain: layout style paint;
     will-change: transform;
@@ -1333,9 +1333,9 @@ footer {
 /* Override existing mobile styles for better header layout */
 @media (max-width: 768px) {
 
-    /* Smaller header height */
+    /* Larger mobile header height to give logo more space */
     header {
-        padding: 1.25rem 0 !important;
+        padding: 1.75rem 0 !important;
     }
 
     /* Smaller logo */
@@ -1360,21 +1360,21 @@ footer {
         height: 22px !important;
     }
 
-    /* Adjust nav and hero for smaller header */
+    /* Adjust nav and hero for taller header */
     nav {
-        top: 110px !important;
+        top: 140px !important;
     }
 
     .hero {
-        margin-top: 110px !important;
+        margin-top: 140px !important;
     }
 }
 
 @media (max-width: 576px) {
 
-    /* Even more compact for small phones */
+    /* Taller header on very small screens */
     header {
-        padding: 1rem 0 !important;
+        padding: 1.4rem 0 !important;
     }
 
     .logo img {
@@ -1394,11 +1394,11 @@ footer {
     }
 
     nav {
-        top: 105px !important;
+        top: 130px !important;
     }
 
     .hero {
-        margin-top: 105px !important;
+        margin-top: 130px !important;
     }
 }
 

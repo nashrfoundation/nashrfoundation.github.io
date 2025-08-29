@@ -357,7 +357,7 @@ p {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: calc(var(--spacing-lg) + 0.5rem) var(--spacing-lg);
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -365,7 +365,7 @@ p {
 .logo-section {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: calc(var(--spacing-lg) + 0.25rem);
 }
 
 .admin-logo {
@@ -375,8 +375,8 @@ p {
 }
 
 .admin-header .header-content {
-    padding-top: var(--spacing-md);
-    padding-bottom: var(--spacing-md);
+    padding-top: calc(var(--spacing-lg) + 0.5rem);
+    padding-bottom: calc(var(--spacing-lg) + 0.5rem);
 }
 
 /* Make the logo visually bigger without changing navbar height */
@@ -386,19 +386,19 @@ p {
 }
 
 .admin-header .admin-logo {
-    transform: scale(1.35);
+    transform: scale(1.45);
     transform-origin: center left;
 }
 
 @media (max-width: 768px) {
     .admin-header .admin-logo {
-        transform: scale(1.2);
+        transform: scale(1.3);
     }
 }
 
 @media (max-width: 480px) {
     .admin-header .admin-logo {
-        transform: scale(1.1);
+        transform: scale(1.2);
     }
 }
 
