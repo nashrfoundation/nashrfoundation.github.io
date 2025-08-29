@@ -394,7 +394,7 @@ async function fallbackLeaderboardCsv() {
         data.sort((a,b) => a.rank - b.rank);
         displayLeaderboardTable(data);
         window._leaderboardData = data;
-        showError('Realtime data is unavailable due to Firestore rules. Showing CSV fallback.');
+        // Using CSV fallback silently to avoid distracting error toast
     } catch (e) {
         console.error('CSV fallback failed:', e);
         displayLeaderboardTable([]);
