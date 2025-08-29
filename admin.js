@@ -903,10 +903,29 @@ async function handleLeaderboardSubmit(e) {
             }
             success = true;
         } else {
-            // Add new entry - no need to specify rank, it will be auto-assigned based on amount
+            // Add new entry - compute next available rank to satisfy NOT NULL constraint
+            let nextRank = 1;
+            try {
+                const { data: maxRow, error: maxErr } = await supabase
+                    .from('leaderboard')
+                    .select('rank')
+                    .order('rank', { ascending: false })
+                    .limit(1)
+                    .maybeSingle();
+                if (maxErr) {
+                    // Log but do not block; default nextRank = 1
+                    console.warn('Failed to fetch max rank, defaulting to 1:', maxErr);
+                } else if (maxRow && typeof maxRow.rank === 'number') {
+                    nextRank = maxRow.rank + 1;
+                }
+            } catch (e2) {
+                console.warn('Max rank fetch threw, defaulting to 1:', e2);
+            }
+
             const { data, error } = await supabase
                 .from('leaderboard')
                 .insert({
+                    rank: nextRank,
                     name: name,
                     amount: amount
                 });
