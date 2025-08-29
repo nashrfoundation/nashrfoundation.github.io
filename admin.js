@@ -848,43 +848,104 @@ async function handleLeaderboardSubmit(e) {
     }
     
     try {
-        const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+        // Try Firestore first, fallback to REST API
+        let success = false;
         
-        if (editId) {
-            // Edit existing entry
-            const rankId = String(editId).padStart(2, '0');
-            const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
-            await fs.setDoc(docRef, {
-                rank: parseInt(editId, 10),
-                name: name,
-                amount: amount,
-                updatedAt: fs.serverTimestamp()
-            });
-            showSuccess('Leaderboard entry updated successfully!');
-        } else {
-            // Add new entry - find next available rank
-            const currentData = window._leaderboardData || [];
-            const nextRank = currentData.length > 0 ? Math.max(...currentData.map(d => d.rank)) + 1 : 1;
-            const rankId = String(nextRank).padStart(2, '0');
-            const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
-            await fs.setDoc(docRef, {
-                rank: nextRank,
-                name: name,
-                amount: amount,
-                createdAt: fs.serverTimestamp()
-            });
-            showSuccess('New leaderboard entry added successfully!');
+        try {
+            const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            
+            if (editId) {
+                // Edit existing entry
+                const rankId = String(editId).padStart(2, '0');
+                const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
+                await fs.setDoc(docRef, {
+                    rank: parseInt(editId, 10),
+                    name: name,
+                    amount: amount,
+                    updatedAt: fs.serverTimestamp()
+                });
+                success = true;
+            } else {
+                // Add new entry - find next available rank
+                const currentData = window._leaderboardData || [];
+                const nextRank = currentData.length > 0 ? Math.max(...currentData.map(d => d.rank)) + 1 : 1;
+                const rankId = String(nextRank).padStart(2, '0');
+                const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
+                await fs.setDoc(docRef, {
+                    rank: nextRank,
+                    name: name,
+                    amount: amount,
+                    createdAt: fs.serverTimestamp()
+                });
+                success = true;
+            }
+        } catch (firestoreError) {
+            console.log('Firestore write failed, trying REST API:', firestoreError);
+            
+            // Fallback to REST API
+            if (editId) {
+                // Edit existing entry via REST
+                const rankId = String(editId).padStart(2, '0');
+                const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/leaderboard/${rankId}?key=${API_KEY}`;
+                const response = await fetch(url, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fields: {
+                            rank: { integerValue: parseInt(editId, 10) },
+                            name: { stringValue: name },
+                            amount: { integerValue: amount },
+                            updatedAt: { timestampValue: new Date().toISOString() }
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`REST API failed: ${response.status}`);
+                }
+                success = true;
+            } else {
+                // Add new entry via REST
+                const currentData = window._leaderboardData || [];
+                const nextRank = currentData.length > 0 ? Math.max(...currentData.map(d => d.rank)) + 1 : 1;
+                const rankId = String(nextRank).padStart(2, '0');
+                const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/leaderboard?documentId=${rankId}&key=${API_KEY}`;
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        fields: {
+                            rank: { integerValue: nextRank },
+                            name: { stringValue: name },
+                            amount: { integerValue: amount },
+                            createdAt: { timestampValue: new Date().toISOString() }
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`REST API failed: ${response.status}`);
+                }
+                success = true;
+            }
         }
         
-        hideEntryForm();
-        // Refresh data after a short delay to allow Firestore to update
-        setTimeout(() => {
-            loadLeaderboardData();
-        }, 1000);
+        if (success) {
+            showSuccess(editId ? 'Leaderboard entry updated successfully!' : 'New leaderboard entry added successfully!');
+            hideEntryForm();
+            // Refresh data after a short delay
+            setTimeout(() => {
+                loadLeaderboardData();
+            }, 1000);
+        }
         
     } catch (error) {
         console.error('Failed to save leaderboard entry:', error);
-        showError('Failed to save entry. Check Firestore permissions.');
+        showError('Failed to save entry. Please try again.');
     }
 }
 
@@ -912,20 +973,45 @@ function hideEntryForm() {
     document.getElementById('entry-form').style.display = 'none';
 }
 
-function deleteLeaderboardEntry(rank) {
+async function deleteLeaderboardEntry(rank) {
     if (confirm(`Are you sure you want to delete the entry with rank ${rank}?`)) {
         try {
-            (async () => {
+            let success = false;
+            
+            try {
+                // Try Firestore first
                 const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
                 const rankId = String(rank).padStart(2, '0');
                 const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
                 await fs.deleteDoc(docRef);
+                success = true;
+            } catch (firestoreError) {
+                console.log('Firestore delete failed, trying REST API:', firestoreError);
+                
+                // Fallback to REST API
+                const rankId = String(rank).padStart(2, '0');
+                const url = `https://firestore.googleapis.com/v1/projects/${PROJECT_ID}/databases/(default)/documents/leaderboard/${rankId}?key=${API_KEY}`;
+                const response = await fetch(url, {
+                    method: 'DELETE'
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`REST API failed: ${response.status}`);
+                }
+                success = true;
+            }
+            
+            if (success) {
                 showSuccess('Leaderboard entry deleted.');
-                // Realtime listener will refresh table
-            })();
+                // Refresh data after a short delay
+                setTimeout(() => {
+                    loadLeaderboardData();
+                }, 1000);
+            }
+            
         } catch (error) {
             console.error('Failed to delete entry:', error);
-            showError('Failed to delete entry. Check Firestore permissions.');
+            showError('Failed to delete entry. Please try again.');
         }
     }
 }

@@ -195,7 +195,7 @@ header {
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     z-index: 1000;
-    padding: 0.1rem 0;
+    padding: 0.75rem 0;
 }
 
 header .container {
@@ -1335,7 +1335,7 @@ footer {
 
     /* Smaller header height */
     header {
-        padding: 0.25rem 0 !important;
+        padding: 0.5rem 0 !important;
     }
 
     /* Smaller logo */
@@ -1362,11 +1362,11 @@ footer {
 
     /* Adjust nav and hero for smaller header */
     nav {
-        top: 70px !important;
+        top: 80px !important;
     }
 
     .hero {
-        margin-top: 70px !important;
+        margin-top: 80px !important;
     }
 }
 
@@ -1374,7 +1374,7 @@ footer {
 
     /* Even more compact for small phones */
     header {
-        padding: 0.2rem 0 !important;
+        padding: 0.4rem 0 !important;
     }
 
     .logo img {
@@ -1394,11 +1394,11 @@ footer {
     }
 
     nav {
-        top: 65px !important;
+        top: 75px !important;
     }
 
     .hero {
-        margin-top: 65px !important;
+        margin-top: 75px !important;
     }
 }
 
