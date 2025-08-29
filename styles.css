@@ -542,7 +542,7 @@ table tr:hover {
 
 .get-involved {
     background-color: var(--bg-medium);
-    padding: var(--spacing-xl) 0 var(--spacing-lg);
+    padding: var(--spacing-lg) 0 var(--spacing-sm);
 }
 
 .involvement-options {
@@ -612,7 +612,7 @@ table tr:hover {
 footer {
     background-color: var(--bg-medium);
     color: var(--text-secondary);
-    padding: var(--spacing-lg) 0;
+    padding: var(--spacing-md) 0;
     border-top: 1px solid var(--bg-light);
 }
 
@@ -620,11 +620,11 @@ footer {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: var(--spacing-md);
-    margin-bottom: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
 }
 
 .footer-logo img {
-    height: 80px;
+    height: 64px;
     width: auto;
     border-radius: var(--border-radius-md);
 }
@@ -1414,10 +1414,12 @@ footer {
     left: 12px !important;
     right: 12px !important;
     bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
-    z-index: 10000 !important;
+    z-index: 2147483647 !important;
     width: auto !important;
     max-width: calc(100vw - 24px) !important;
     box-sizing: border-box !important;
+    transform: translateZ(0) !important;
+    will-change: transform !important;
 }
 
 #consent-banner .consent-container {
