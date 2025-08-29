@@ -188,11 +188,13 @@ header .container {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    overflow: visible;
 }
 
 .logo {
     display: flex;
     align-items: center;
+    overflow: visible;
 }
 
 .logo img {
@@ -201,7 +203,9 @@ header .container {
     width: auto;
     border-radius: var(--border-radius-md);
     filter: brightness(1.1) contrast(1.1);
-    transition: height 0.3s ease;
+    transition: height 0.3s ease, transform 0.3s ease;
+    transform: scale(1.25);
+    transform-origin: left center;
 }
 
 nav ul {
@@ -938,6 +942,7 @@ footer {
 @media (max-width: 768px) {
     .logo img {
         height: 100px;
+        transform: scale(1.12);
     }
 
     .mobile-menu-toggle {
@@ -1347,6 +1352,7 @@ footer {
 
     .logo img {
         height: 55px !important;
+        transform: scale(1.06);
     }
 
     .mobile-menu-toggle {

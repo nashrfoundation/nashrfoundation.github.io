@@ -204,7 +204,7 @@ p {
 }
 
 .modal-content .admin-logo {
-    height: 220px;
+    height: 280px;
     width: auto;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.25);
@@ -369,14 +369,72 @@ p {
 }
 
 .admin-logo {
-    height: 160px;
+    height: 112px;
     width: auto;
     border-radius: var(--border-radius);
 }
 
 .admin-header .header-content {
-    padding-top: var(--spacing-xl);
-    padding-bottom: var(--spacing-xl);
+    padding-top: var(--spacing-md);
+    padding-bottom: var(--spacing-md);
+}
+
+/* Make the logo visually bigger without changing navbar height */
+.admin-header .header-content,
+.logo-section {
+    overflow: visible;
+}
+
+.admin-header .admin-logo {
+    transform: scale(1.35);
+    transform-origin: center left;
+}
+
+@media (max-width: 768px) {
+    .admin-header .admin-logo {
+        transform: scale(1.2);
+    }
+}
+
+@media (max-width: 480px) {
+    .admin-header .admin-logo {
+        transform: scale(1.1);
+    }
+}
+
+/* Responsive adjustments for larger logos */
+@media (max-width: 768px) {
+    .modal-content .admin-logo {
+        height: 180px;
+    }
+    .modal-brand {
+        margin-top: var(--spacing-lg);
+        margin-bottom: var(--spacing-lg);
+    }
+    .admin-logo {
+        height: 120px;
+    }
+    .admin-header .header-content {
+        padding-top: var(--spacing-lg);
+        padding-bottom: var(--spacing-lg);
+    }
+}
+
+@media (max-width: 480px) {
+    .modal-content .admin-logo {
+        height: 140px;
+    }
+    .modal-brand {
+        margin-top: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+    }
+    .admin-logo {
+        height: 100px;
+    }
+    .admin-header .header-content {
+        padding-top: var(--spacing-md);
+        padding-bottom: var(--spacing-md);
+    }
 }
 
 .user-info {

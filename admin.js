@@ -19,6 +19,7 @@ let realtimeData = {};
 let leaderboardUnsub = null;
 const PROJECT_ID = firebaseConfig.projectId;
 const API_KEY = firebaseConfig.apiKey;
+let leaderboardRestTimer = null;
 
 // Using Firebase Auth (email/password). Create admins in Firebase Console.
 
@@ -360,27 +361,25 @@ function displayDonationsTable(donations) {
 // Leaderboard Section
 async function loadLeaderboardData() {
     try {
-        const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-        // Set up realtime subscription once
+        // Prefer REST polling to avoid onSnapshot permission issues
         if (leaderboardUnsub) {
-            leaderboardUnsub();
+            try { leaderboardUnsub(); } catch(_) {}
             leaderboardUnsub = null;
         }
-        const col = fs.collection(db, 'leaderboard');
-        leaderboardUnsub = fs.onSnapshot(col, (snapshot) => {
-            const data = snapshot.docs
-                .map(d => ({ id: d.id, ...d.data() }))
-                .map(x => ({ rank: Number(x.rank)||9999, name: x.name||'', amount: Number(x.amount)||0 }))
-                .sort((a,b) => a.rank - b.rank);
-            window._leaderboardData = data;
-            displayLeaderboardTable(data);
-        }, async (err) => {
-            console.error('Failed to subscribe leaderboard:', err);
-            // Fallback to CSV so admins can at least view data when Firestore rules block reads
-            // Try Firestore REST (public read via rules) before CSV
-            const restOk = await fallbackLeaderboardRest();
-            if (!restOk) await fallbackLeaderboardCsv();
-        });
+        if (leaderboardRestTimer) {
+            clearInterval(leaderboardRestTimer);
+            leaderboardRestTimer = null;
+        }
+        // Initial fetch
+        const ok = await fallbackLeaderboardRest();
+        if (!ok) await fallbackLeaderboardCsv();
+        // Poll every 10s for near-realtime updates
+        leaderboardRestTimer = setInterval(async () => {
+            const ok2 = await fallbackLeaderboardRest();
+            if (!ok2) {
+                // keep previous data; optionally fall back to CSV once
+            }
+        }, 10000);
     } catch (error) {
         console.error('Failed to load leaderboard data:', error);
         const restOk = await fallbackLeaderboardRest();
