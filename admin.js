@@ -410,14 +410,20 @@ async function fetchLeaderboardData() {
         const { data, error } = await supabase
             .from('leaderboard')
             .select('*')
-            .order('rank', { ascending: true });
+            .order('amount', { ascending: false });
             
         if (error) {
             throw error;
         }
         
-        window._leaderboardData = data || [];
-        displayLeaderboardTable(data || []);
+        // Update ranks based on amount order
+        const sortedData = (data || []).map((entry, index) => ({
+            ...entry,
+            rank: index + 1
+        }));
+        
+        window._leaderboardData = sortedData;
+        displayLeaderboardTable(sortedData);
         
     } catch (error) {
         console.error('Failed to fetch leaderboard data:', error);
@@ -897,14 +903,10 @@ async function handleLeaderboardSubmit(e) {
             }
             success = true;
         } else {
-            // Add new entry - find next available rank
-            const currentData = window._leaderboardData || [];
-            const nextRank = currentData.length > 0 ? Math.max(...currentData.map(d => d.rank)) + 1 : 1;
-            
+            // Add new entry - no need to specify rank, it will be auto-assigned based on amount
             const { data, error } = await supabase
                 .from('leaderboard')
                 .insert({
-                    rank: nextRank,
                     name: name,
                     amount: amount
                 });

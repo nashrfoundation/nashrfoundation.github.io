@@ -67,16 +67,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const { data, error } = await supabase
                 .from('leaderboard')
                 .select('*')
-                .order('rank', { ascending: true })
+                .order('amount', { ascending: false })
                 .limit(50);
 
             if (error) {
                 throw error;
             }
 
+            // Update ranks based on amount order
+            const sortedData = (data || []).map((entry, index) => ({
+                ...entry,
+                rank: index + 1
+            }));
+
             // Update table with initial data
             requestIdleCallback(() => {
-                updateTable(data || []);
+                updateTable(sortedData);
             });
             
             isInitialized = true;
@@ -100,15 +106,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     const { data: newData, error } = await supabase
                         .from('leaderboard')
                         .select('*')
-                        .order('rank', { ascending: true })
+                        .order('amount', { ascending: false })
                         .limit(50);
 
                     if (error) {
                         throw error;
                     }
 
+                    // Update ranks based on amount order
+                    const sortedData = (newData || []).map((entry, index) => ({
+                        ...entry,
+                        rank: index + 1
+                    }));
+
                     requestIdleCallback(() => {
-                        updateTable(newData || []);
+                        updateTable(sortedData);
                     });
                 } catch (err) {
                     console.error('Failed to fetch updated data:', err);
