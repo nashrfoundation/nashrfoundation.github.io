@@ -274,18 +274,23 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
             }
             function lockBanner(){
               banner.style.setProperty('position','fixed','important');
+              banner.style.setProperty('top','auto','important');
               banner.style.setProperty('left','12px','important');
               banner.style.setProperty('right','12px','important');
-              banner.style.setProperty('bottom','calc(env(safe-area-inset-bottom, 0px) + 12px)','important');
+              banner.style.setProperty('bottom','calc(env(safe-area-inset-bottom, 0px) + 24px)','important');
               banner.style.setProperty('z-index','2147483647','important');
               banner.style.setProperty('width','auto','important');
               banner.style.setProperty('max-width','calc(100vw - 24px)','important');
+              banner.style.setProperty('transform','translateZ(0)','important');
+              banner.style.setProperty('pointer-events','auto','important');
+              banner.style.setProperty('display','block','important');
             }
             lockBanner();
             window.addEventListener('scroll', lockBanner, { passive: true });
             window.addEventListener('resize', lockBanner);
             const mo = new MutationObserver(lockBanner);
-            mo.observe(banner, { attributes: true, attributeFilter: ['style','class'] });
+            mo.observe(banner, { attributes: true, childList: false, subtree: false });
+            setInterval(lockBanner, 500);
             document.addEventListener('visibilitychange', lockBanner);
           }
         } catch (e) {}

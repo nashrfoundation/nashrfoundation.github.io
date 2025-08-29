@@ -64,7 +64,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    contain: layout style;
+    contain: none;
     transform: none !important;
 }
 
@@ -1413,7 +1413,7 @@ footer {
     position: fixed !important;
     left: 12px !important;
     right: 12px !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 24px) !important;
     z-index: 2147483647 !important;
     width: auto !important;
     max-width: calc(100vw - 24px) !important;
