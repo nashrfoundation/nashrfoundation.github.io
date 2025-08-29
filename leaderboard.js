@@ -1,4 +1,19 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // Enhanced leaderboard with better error handling and loading states
+    function showLoadingState() {
+        const tableBody = document.querySelector('#leaderboard-data');
+        if (tableBody) {
+            tableBody.innerHTML = '<tr><td colspan="3" class="loading-state">Loading donor data...</td></tr>';
+        }
+    }
+    
+    function showErrorState(message) {
+        const tableBody = document.querySelector('#leaderboard-data');
+        if (tableBody) {
+            tableBody.innerHTML = `<tr><td colspan="3" class="error-state">${message}</td></tr>`;
+        }
+    }
+    
     // Function to load the leaderboard data from CSV
     function loadLeaderboardData() {
         fetch('leaderboard.csv')
@@ -59,6 +74,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Load the leaderboard data when the page loads
-    loadLeaderboardData();
+        // Show loading state first
+        showLoadingState();
+        
+        // Load the leaderboard data when the page loads
+        loadLeaderboardData();
 });

@@ -22,6 +22,17 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     
     <title>Nashr Foundation - Empowering Communities Through Essential Support</title>
     <meta name="description" content="Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.">
+    <meta name="keywords" content="charity, foundation, Pakistan, education, food, clean water, donations, nonprofit, community support">
+    <meta name="author" content="Nashr Foundation">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Nashr Foundation - Empowering Communities Through Essential Support">
+    <meta property="og:description" content="Providing education, food, water, and basic necessities to vulnerable communities across Pakistan.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nashrfoundation.github.io/">
+    <meta property="og:image" content="https://nashrfoundation.github.io/logo.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Nashr Foundation - Empowering Communities">
+    <meta name="twitter:description" content="Providing essential support to vulnerable communities across Pakistan.">
     <link rel="canonical" href="https://nashrfoundation.github.io/">
 
     <!-- Preload LCP image and optimized fonts. -->
@@ -73,6 +84,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <noscript><link rel="stylesheet" href="styles.css"></noscript>
 </head>
 <body>
+    <!-- Skip Navigation for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K5F6S4VV"
 height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -84,7 +98,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <img src="logo.webp" alt="Nashr Foundation Logo" width="100" height="100" decoding="async">
                 </a>
             </div>
-            <nav>
+            <nav id="mobile-nav" aria-label="Main navigation">
                 <ul>
                     <li><a href="index.html" class="active">Home</a></li>
                     <li><a href="donate.html">Donate</a></li>
@@ -100,7 +114,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="donate-button">
                 <a href="donate.html" class="btn">Donate Now</a>
             </div>
-            <div class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" role="button" tabindex="0">
+            <div class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" role="button" tabindex="0" aria-controls="mobile-nav">
                 <span></span>
                 <span></span>
                 <span></span>
@@ -108,7 +122,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </div>
     </header>
 
-    <main>
+    <main id="main-content">
         <section class="hero">
             <div class="hero-image">
                 <img src="hero_background.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async">
@@ -163,10 +177,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
             <div class="footer-bottom">
                 <p>© 2025 Nashr Foundation. All rights reserved.</p>
+                <div class="footer-legal">
+                    <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                    <span class="separator">|</span>
+                    <a href="https://www.termsfeed.com/live/5d35a484-61af-4b36-8b16-f00ae12fb3ce" target="_blank" rel="noopener noreferrer">Terms & Conditions</a>
+                </div>
             </div>
         </div>
     </footer>
 
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
     <!-- Deferred scripts that do not block rendering -->
     <script src="https://unpkg.com/aos@2.3.4/dist/aos.js" defer></script>
     <script src="leaderboard.js" defer></script>
@@ -181,25 +203,37 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     menuToggle.setAttribute('aria-expanded', isExpanded);
                 });
             }
+            
+            // Register Service Worker for PWA functionality
+            if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('Service Worker registered successfully:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            }
+            
+            // Enhanced image loading with fade-in effect
+            const heroImage = document.querySelector('.hero-image img');
+            if (heroImage) {
+                heroImage.addEventListener('load', function() {
+                    this.classList.add('loaded');
+                });
+                
+                // Fallback for already loaded images
+                if (heroImage.complete) {
+                    heroImage.classList.add('loaded');
+                }
+            }
         });
     </script>
-        <footer style="background-color: #111; padding: 20px 0; text-align: center; color: #ccc; font-size: 14px;">
-  <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077" 
-     target="_blank" 
-     style="color: #00aaff; text-decoration: none; margin-right: 15px;">
-    Privacy Policy
-  </a>
-  |
-  <a href="https://www.termsfeed.com/live/5d35a484-61af-4b36-8b16-f00ae12fb3ce" 
-     target="_blank" 
-     style="color: #00aaff; text-decoration: none; margin-left: 15px;">
-    Terms & Conditions
-  </a>
-</footer>
+
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Organization",
+  "@type": "NonProfit",
   "name": "Nashr Foundation",
   "url": "https://nashrfoundation.github.io",
   "logo": "https://nashrfoundation.github.io/logo.webp",
@@ -209,7 +243,52 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     "https://www.tiktok.com/@nashr756",
     "https://www.youtube.com/@nashrfoundation"
   ],
-  "description": "Nashr Foundation provides education, food, clean water, and basic needs across Pakistan."
+  "description": "Nashr Foundation provides education, food, clean water, and basic needs across Pakistan.",
+  "foundingDate": "2025",
+  "address": {
+    "@type": "PostalAddress",
+    "addressCountry": "PK"
+  },
+  "contactPoint": {
+    "@type": "ContactPoint",
+    "email": "nashrfoundationpk@gmail.com",
+    "contactType": "customer service"
+  },
+  "areaServed": {
+    "@type": "Country",
+    "name": "Pakistan"
+  },
+  "serviceType": ["Education", "Food Security", "Clean Water", "Basic Necessities"],
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Community Support Services",
+    "itemListElement": [
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Educational Support",
+          "description": "Supporting learning opportunities for all children"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Food Security",
+          "description": "Providing food security to communities"
+        }
+      },
+      {
+        "@type": "Offer",
+        "itemOffered": {
+          "@type": "Service",
+          "name": "Clean Water Access",
+          "description": "Ensuring access to safe drinking water"
+        }
+      }
+    ]
+  }
 }
 </script>
 

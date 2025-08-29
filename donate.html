@@ -21,6 +21,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate - Nashr Foundation</title>
+    <meta name="description" content="Make a difference today by donating to Nashr Foundation. Your contribution helps provide education, food, clean water, and basic necessities to vulnerable communities across Pakistan.">
+    <meta name="keywords" content="donate, charity, foundation, Pakistan, education, food, clean water, donations, nonprofit, community support">
+    <meta name="author" content="Nashr Foundation">
+    <meta name="robots" content="index, follow">
+    <meta property="og:title" content="Donate - Nashr Foundation">
+    <meta property="og:description" content="Make a difference today by donating to Nashr Foundation. Your contribution helps provide essential services to communities in need.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nashrfoundation.github.io/donate.html">
+    <meta property="og:image" content="https://nashrfoundation.github.io/logo.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Donate - Nashr Foundation">
+    <meta name="twitter:description" content="Make a difference today by donating to Nashr Foundation.">
 
     <!-- Preload LCP image and optimized fonts -->
     <link rel="preload" fetchpriority="high" as="image" href="hero_background.webp" type="image/webp">
@@ -34,13 +46,45 @@
     <!-- Your external CSS file -->
     <link rel="stylesheet" href="styles.css">
     
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+    
     <!-- Custom Styles -->
     <style>
         .fund-tracker { padding: 40px 20px; background: #000000; color: #f0f0f0; text-align: center; }
         .fund-tracker h2, .fund-tracker p { color: #ffffff; }
         .progress-bar-container { background: #333333; border: 1px solid #555555; border-radius: 50px; overflow: hidden; max-width: 800px; margin: 20px auto; }
         .fund-details { font-size: 1.2em; font-weight: bold; font-family: 'Merriweather', serif; color: #f0f0f0; }
-        .progress-bar { background: #28a745; height: 35px; width: 0; text-align: center; line-height: 35px; color: white; transition: width 1s ease-in-out; border-radius: 50px; font-weight: bold;}
+        .progress-bar { 
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%); 
+            height: 35px; 
+            width: 0; 
+            text-align: center; 
+            line-height: 35px; 
+            color: white; 
+            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-radius: 50px; 
+            font-weight: bold; 
+            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3); 
+            position: relative; 
+            overflow: hidden; 
+        }
+        
+        .progress-bar::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
         .fund-details span { color: #28a745; }
         #qr-code-details img { max-width: 200px; margin: 20px auto; display: block; }
         .payment-option, .payment-option label { cursor: pointer; }
@@ -50,6 +94,9 @@
     </style>
 </head>
 <body>
+    <!-- Skip Navigation for Accessibility -->
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+    
     <!-- Google Tag Manager (noscript) -->
     <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K5F6S4VV"
     height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
@@ -58,7 +105,7 @@
     <header>
         <div class="container">
             <div class="logo"> <a href="index.html"> <img src="logo.webp" alt="Nashr Foundation Logo" width="100" height="100" decoding="async"> </a> </div>
-            <nav> <ul> <li><a href="index.html">Home</a></li> <li><a href="donate.html" class="active">Donate</a></li> </ul> </nav>
+            <nav id="mobile-nav" aria-label="Main navigation"> <ul> <li><a href="index.html">Home</a></li> <li><a href="donate.html" class="active">Donate</a></li> </ul> </nav>
             <div class="social-icons">
                 <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"> <img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"> </a>
                 <a href="https://www.facebook.com/share/16V3Zippz8/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"> <img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"> </a>
@@ -67,11 +114,11 @@
                 <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"> <img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"> </a>
             </div>
             <div class="donate-button"> <a href="donate.html" class="btn">Donate Now</a> </div>
-            <div class="mobile-menu-toggle" role="button" tabindex="0"> <span></span> <span></span> <span></span> </div>
+            <div class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" role="button" tabindex="0" aria-controls="mobile-nav"> <span></span> <span></span> <span></span> </div>
         </div>
     </header>
 
-    <main>
+    <main id="main-content">
         <section class="hero">
             <div class="hero-image"> <img src="hero_background.webp" alt="Children accessing clean water" fetchpriority="high" decoding="async"> </div>
             <div class="hero-overlay"></div>
@@ -96,7 +143,7 @@
                         <div class="donation-tab" data-tab="monthly" role="tab" aria-selected="false" tabindex="-1">Monthly Donation</div>
                     </div>
                     <div class="donation-form">
-                        <form id="donation-form" novalidate>
+                        <form id="donation-form" novalidate aria-label="Donation form">
                             <div id="donation-type-display">One-time Donation</div>
                             <input id="donation-type-input" name="donation_type" type="hidden" value="one-time"/>
                             <div class="form-group">
@@ -155,12 +202,99 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
     <footer>
         <div class="container">
             <div class="footer-content"> <div class="footer-logo"><img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" decoding="async"></div> <div class="footer-info"> <p>Nashr Foundation</p><p>Established 2025</p> <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p> </div> <div class="footer-social"> <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"></a> <a href="https://www.facebook.com/share/16V3Zippz8/" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"></a> <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async"></a> <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async"></a> <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"></a> </div> </div>
-            <div class="footer-bottom"><p>© 2025 Nashr Foundation. All rights reserved.</p></div>
+            <div class="footer-bottom">
+                <p>© 2025 Nashr Foundation. All rights reserved.</p>
+                <div class="footer-legal">
+                    <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077" target="_blank" rel="noopener noreferrer">Privacy Policy</a>
+                    <span class="separator">|</span>
+                    <a href="https://www.termsfeed.com/live/5d35a484-61af-4b36-8b16-f00ae12fb3ce" target="_blank" rel="noopener noreferrer">Terms & Conditions</a>
+                </div>
+            </div>
         </div>
     </footer>
     
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Enhanced validation and user feedback functions
+            function showValidationErrors(errors) {
+                // Remove existing error messages
+                const existingErrors = document.querySelector('.validation-errors');
+                if (existingErrors) existingErrors.remove();
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'validation-errors';
+                errorDiv.innerHTML = `
+                    <ul>
+                        ${errors.map(error => `<li>${error}</li>`).join('')}
+                    </ul>
+                `;
+                
+                const form = document.getElementById('donation-form');
+                form.insertBefore(errorDiv, form.firstChild);
+                
+                // Scroll to errors
+                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            
+            function showSuccessMessage(message) {
+                // Remove existing messages
+                const existingMessages = document.querySelectorAll('.success-message, .error-message');
+                existingMessages.forEach(msg => msg.remove());
+                
+                const successDiv = document.createElement('div');
+                successDiv.className = 'success-message';
+                successDiv.textContent = message;
+                
+                const form = document.getElementById('donation-form');
+                form.insertBefore(successDiv, form.firstChild);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (successDiv.parentNode) {
+                        successDiv.remove();
+                    }
+                }, 5000);
+            }
+            
+            function showErrorMessage(message) {
+                // Remove existing messages
+                const existingMessages = document.querySelectorAll('.success-message, .error-message');
+                existingMessages.forEach(msg => msg.remove());
+                
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-message';
+                errorDiv.textContent = message;
+                
+                const form = document.getElementById('donation-form');
+                form.insertBefore(errorDiv, form.firstChild);
+                
+                // Auto-remove after 5 seconds
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.remove();
+                    }
+                }, 5000);
+            }
+            // Enhanced Mobile Menu Functionality
+            const mobileMenuToggle = document.querySelector(".mobile-menu-toggle");
+            const nav = document.querySelector("nav");
+            
+            if (mobileMenuToggle && nav) {
+                mobileMenuToggle.addEventListener("click", function() {
+                    const isExpanded = nav.classList.toggle("active");
+                    this.classList.toggle("active");
+                    this.setAttribute("aria-expanded", isExpanded);
+                });
+                
+                nav.querySelectorAll("a").forEach(link => {
+                    link.addEventListener("click", function() {
+                        nav.classList.remove("active");
+                        mobileMenuToggle.classList.remove("active");
+                        mobileMenuToggle.setAttribute("aria-expanded", "false");
+                    });
+                });
+            }
+            
             // UI interaction logic, no changes needed here.
             const amountRaised=7e4,targetAmount=2e5,percentage=amountRaised/targetAmount*100,progressBar=document.getElementById("fund-progress-bar");progressBar&&setTimeout(()=>{progressBar.style.width=percentage+"%",progressBar.textContent=Math.round(percentage)+"%"},500);const donationTabs=document.querySelectorAll(".donation-tab"),donationTypeInput=document.getElementById("donation-type-input"),donationTypeDisplay=document.getElementById("donation-type-display");donationTabs.forEach(e=>{e.addEventListener("click",function(){donationTabs.forEach(e=>{e.classList.remove("active"),e.setAttribute("aria-selected","false"),e.setAttribute("tabindex","-1")}),this.classList.add("active"),this.setAttribute("aria-selected","true"),this.setAttribute("tabindex","0");const t=this.dataset.tab;donationTypeInput.value=t,donationTypeDisplay.textContent=t.charAt(0).toUpperCase()+t.slice(1).replace("-"," ")+" Donation"}),e.addEventListener("keydown",function(t){"Enter"!==t.key&&" "!==t.key||(t.preventDefault(),this.click())})});const amountOptions=document.querySelectorAll(".amount-option"),donationAmountInput=document.getElementById("donation-amount-input"),customAmountContainer=document.getElementById("custom-amount-container"),customAmountInput=document.getElementById("custom-amount");amountOptions.forEach(e=>{e.addEventListener("click",function(){amountOptions.forEach(e=>{e.classList.remove("active")}),this.classList.add("active");const t=this.dataset.amount;"custom"===t?(customAmountContainer.style.display="block",customAmountInput.focus(),donationAmountInput.value=""): (customAmountContainer.style.display="none",donationAmountInput.value=t,customAmountInput.value="")}),e.addEventListener("keydown",function(t){"Enter"!==t.key&&" "!==t.key||(t.preventDefault(),this.click())})}),customAmountInput&&(customAmountInput.addEventListener("input",function(){donationAmountInput.value=this.value&&this.value>0?this.value:""}),customAmountInput.addEventListener("blur",function(){if(!this.value||this.value<=0){customAmountContainer.style.display="none";const e=document.querySelector('.amount-option[data-amount="2500"]');e&&(amountOptions.forEach(e=>e.classList.remove("active")),e.classList.add("active"),donationAmountInput.value="2500")}}),customAmountInput.addEventListener("keydown",function(e){"Escape"===e.key&&this.blur()}));const anonymousCheckbox=document.getElementById("anonymous-donation"),leaderboardCheckbox=document.getElementById("leaderboard-consent");anonymousCheckbox&&leaderboardCheckbox&&anonymousCheckbox.addEventListener("change",function(){this.checked?(leaderboardCheckbox.checked=!1,leaderboardCheckbox.disabled=!0):(leaderboardCheckbox.disabled=!1,leaderboardCheckbox.checked=!0)});const mobileMenuToggle=document.querySelector(".mobile-menu-toggle"),nav=document.querySelector("nav");mobileMenuToggle&&nav&&(mobileMenuToggle.addEventListener("click",function(){nav.classList.toggle("active"),this.classList.toggle("active")}),nav.querySelectorAll("a").forEach(e=>{e.addEventListener("click",function(){nav.classList.remove("active"),mobileMenuToggle.classList.remove("active")})}));const paymentMethodInputs=document.querySelectorAll(".payment-option input[type='radio']");paymentMethodInputs.forEach(e=>{e.addEventListener("change",function(){const t=this.value;document.querySelectorAll(".payment-details-content").forEach(e=>{e.style.display="none"});const o=document.getElementById(`${t}-details`);o&&(o.style.display="block")})}),document.querySelectorAll(".payment-option").forEach(e=>{e.addEventListener("click",t=>{const o=e.querySelector('input[type="radio"]');o&&"INPUT"!==t.target.tagName&&(o.checked=!0,o.dispatchEvent(new Event("change")))})});
         });
@@ -202,6 +336,7 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
             }
             
             submitButton.disabled = true;
+            submitButton.classList.add('loading');
             submitButton.textContent = "Processing...";
 
             const name = document.getElementById("donor-name").value;
@@ -214,24 +349,33 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
             const anonymous = document.getElementById("anonymous-donation").checked;
             const leaderboardConsent = document.getElementById("leaderboard-consent").checked;
 
+            // Enhanced validation with better user feedback
+            const validationErrors = [];
+            
             if (!email && !phone) {
-              alert("Please provide either an email or phone number.");
-              submitButton.disabled = false; submitButton.textContent = "Complete Donation"; return;
+              validationErrors.push("Please provide either an email or phone number.");
             }
+            
             if (!amount || isNaN(amount) || Number(amount) <= 0) {
-              alert("Please enter a valid donation amount.");
-              submitButton.disabled = false; submitButton.textContent = "Complete Donation"; return;
+              validationErrors.push("Please enter a valid donation amount.");
             }
+            
             if (["paypal", "stripe"].includes(paymentMethod)) {
-              alert(`Live integration for ${paymentMethod.toUpperCase()} is coming soon. Please use Bank Transfer, JazzCash, or EasyPaisa.`);
-              submitButton.disabled = false; submitButton.textContent = "Complete Donation"; return;
+              validationErrors.push(`${paymentMethod.toUpperCase()} integration is coming soon. Please use Bank Transfer, JazzCash, or EasyPaisa.`);
+            }
+            
+            if (validationErrors.length > 0) {
+              showValidationErrors(validationErrors);
+              submitButton.disabled = false;
+              submitButton.textContent = "Complete Donation";
+              return;
             }
 
             const donationData = { name: anonymous ? "Anonymous" : name || "Anonymous", email: email || null, phone: phone ? (countryCode + phone) : null, amount: Number(amount), donationType, paymentMethod, leaderboardConsent: !anonymous && leaderboardConsent, createdAt: serverTimestamp() };
 
             try {
               await addDoc(collection(db, "donations"), donationData);
-              alert("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
+              showSuccessMessage("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
               form.reset();
               // Manually reset UI elements after submission
               document.getElementById("custom-amount-container").style.display = 'none';
@@ -243,32 +387,56 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
               document.getElementById("leaderboard-consent").disabled = false;
             } catch (error) {
               console.error("❌ Error submitting donation to Firestore:", error);
-              alert("Something went wrong while recording your donation. Please try again.");
+              showErrorMessage("Something went wrong while recording your donation. Please try again.");
             } finally {
               submitButton.disabled = false;
+              submitButton.classList.remove('loading');
               submitButton.textContent = "Complete Donation";
             }
         });
       } catch (error) {
           console.error("🔥 Critical Firebase Initialization Error:", error);
-          alert("A critical error occurred while loading the donation form. Please refresh the page and try again.");
+          showErrorMessage("A critical error occurred while loading the donation form. Please refresh the page and try again.");
+          
+          // Disable form submission if Firebase fails
+          const submitButton = document.getElementById("submit-donation-btn");
+          if (submitButton) {
+              submitButton.disabled = true;
+              submitButton.textContent = "Form Unavailable";
+          }
       }
     </script>
    
-    <footer style="background-color: #111; padding: 20px 0; text-align: center; color: #ccc; font-size: 14px;">
-      <a href="https://www.privacypolicies.com/live/35cd151b-c4f2-4d6e-8922-07292e454077" target="_blank" style="color: #00aaff; text-decoration: none; margin-right: 15px;">Privacy Policy</a> |
-      <a href="https://www.termsfeed.com/live/5d35a484-61af-4b36-8b16-f00ae12fb3ce" target="_blank" style="color: #00aaff; text-decoration: none; margin-left: 15px;">Terms & Conditions</a>
-    </footer>
+
 
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
-      "@type": "Organization",
-      "name": "Nashr Foundation",
-      "url": "https://nashrfoundation.github.io",
-      "logo": "https://nashrfoundation.github.io/logo.webp",
-      "sameAs": ["https://www.instagram.com/nashrfoundation", "https://www.facebook.com/nashrfoundation", "https://www.tiktok.com/@nashr756", "https://www.youtube.com/@nashrfoundation"],
-      "description": "Nashr Foundation provides education, food, clean water, and basic needs across Pakistan."
+      "@type": "DonateAction",
+      "name": "Donate to Nashr Foundation",
+      "description": "Make a donation to support education, food, water, and basic necessities for vulnerable communities in Pakistan",
+      "url": "https://nashrfoundation.github.io/donate.html",
+      "target": {
+        "@type": "EntryPoint",
+        "urlTemplate": "https://nashrfoundation.github.io/donate.html",
+        "inLanguage": "en-US",
+        "actionPlatform": [
+          "http://schema.org/DesktopWebPlatform",
+          "http://schema.org/MobileWebPlatform"
+        ]
+      },
+      "recipient": {
+        "@type": "NonProfit",
+        "name": "Nashr Foundation",
+        "url": "https://nashrfoundation.github.io"
+      },
+      "object": {
+        "@type": "Service",
+        "name": "Community Support Services",
+        "description": "Education, food security, clean water, and basic necessities for vulnerable communities"
+      },
+      "currency": "PKR",
+      "priceRange": "₨500 - ₨10,000+"
     }
     </script>
 </body>
