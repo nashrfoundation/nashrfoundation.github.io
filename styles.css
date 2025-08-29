@@ -542,7 +542,7 @@ table tr:hover {
 
 .get-involved {
     background-color: var(--bg-medium);
-    padding: var(--spacing-xl) 0;
+    padding: var(--spacing-xl) 0 var(--spacing-lg);
 }
 
 .involvement-options {
@@ -1124,7 +1124,7 @@ footer {
     }
 
     .footer-logo img {
-        height: 140px;
+        height: 100px;
     }
 
     .footer-social img {
@@ -1139,7 +1139,7 @@ footer {
     }
     /* Enlarge footer logo significantly on desktop */
     .footer-logo img {
-        height: 240px;
+        height: 160px;
     }
 }
 
@@ -1425,7 +1425,7 @@ footer {
     align-items: flex-start !important;
     justify-content: space-between !important;
     gap: 12px !important;
-    flex-wrap: wrap !important;
+    flex-wrap: nowrap !important;
     max-width: none !important;
     padding: 0 !important;
 }
@@ -1434,7 +1434,7 @@ footer {
 #consent-banner span {
     white-space: normal !important;
     word-break: normal !important;
-    overflow-wrap: anywhere !important;
+    overflow-wrap: break-word !important;
 }
 
 #consent-banner .btn {
@@ -1442,9 +1442,10 @@ footer {
 }
 
 @media (max-width: 576px) {
-    #consent-banner .container {
+    #consent-banner .consent-container {
         flex-direction: column !important;
         align-items: stretch !important;
+        gap: 10px !important;
     }
     #consent-banner .btn {
         width: 100% !important;
