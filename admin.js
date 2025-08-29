@@ -16,6 +16,7 @@ let app, db, auth;
 let currentUser = null;
 let charts = {};
 let realtimeData = {};
+let leaderboardUnsub = null;
 
 // Using Firebase Auth (email/password). Create admins in Firebase Console.
 
@@ -358,15 +359,26 @@ function displayDonationsTable(donations) {
 async function loadLeaderboardData() {
     try {
         const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-        const snapshot = await fs.getDocs(fs.collection(db, 'leaderboard'));
-        const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
-            .map(x => ({ rank: Number(x.rank)||9999, name: x.name||'', amount: Number(x.amount)||0 }))
-            .sort((a,b) => a.rank - b.rank);
-        displayLeaderboardTable(data);
-        window._leaderboardData = data;
+        // Set up realtime subscription once
+        if (leaderboardUnsub) {
+            leaderboardUnsub();
+            leaderboardUnsub = null;
+        }
+        const col = fs.collection(db, 'leaderboard');
+        leaderboardUnsub = fs.onSnapshot(col, (snapshot) => {
+            const data = snapshot.docs
+                .map(d => ({ id: d.id, ...d.data() }))
+                .map(x => ({ rank: Number(x.rank)||9999, name: x.name||'', amount: Number(x.amount)||0 }))
+                .sort((a,b) => a.rank - b.rank);
+            window._leaderboardData = data;
+            displayLeaderboardTable(data);
+        }, async (err) => {
+            console.error('Failed to subscribe leaderboard:', err);
+            // Fallback to CSV so admins can at least view data when Firestore rules block reads
+            await fallbackLeaderboardCsv();
+        });
     } catch (error) {
         console.error('Failed to load leaderboard data:', error);
-        // Fallback to CSV so admins can at least view data when Firestore rules block reads
         await fallbackLeaderboardCsv();
     }
 }
@@ -765,20 +777,17 @@ async function handleLeaderboardEntry(e) {
         } else {
             rank = list.length ? Math.max(...list.map(x => x.rank)) + 1 : 1;
         }
-        const docRef = fs.doc(fs.collection(db, 'leaderboard'), String(rank));
+        const rankId = String(rank).padStart(2, '0');
+        const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
         await fs.setDoc(docRef, { rank, name, amount });
         showSuccess('Leaderboard entry saved.');
-        await loadLeaderboardData();
         e.target.reset();
         document.getElementById('edit-entry-id').value = '';
         hideEntryForm();
+        // Realtime listener will refresh table
     } catch (error) {
         console.error('Failed to save entry:', error);
-        if (String(error).includes('Missing or insufficient permissions')) {
-            showError('Write blocked by Firestore rules. Please sign in or update rules.');
-        } else {
-            showError('Failed to save leaderboard entry. Please try again.');
-        }
+        showError('Failed to save entry. Check Firestore permissions and sign-in.');
     }
 }
 
@@ -812,10 +821,11 @@ function deleteLeaderboardEntry(rank) {
         try {
             (async () => {
                 const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-                const docRef = fs.doc(fs.collection(db, 'leaderboard'), String(rank));
+                const rankId = String(rank).padStart(2, '0');
+                const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
                 await fs.deleteDoc(docRef);
                 showSuccess('Leaderboard entry deleted.');
-                await loadLeaderboardData();
+                // Realtime listener will refresh table
             })();
         } catch (error) {
             console.error('Failed to delete entry:', error);
