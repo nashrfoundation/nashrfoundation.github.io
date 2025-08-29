@@ -713,19 +713,27 @@ async function handlePasswordChange(e) {
         showError('New passwords do not match.');
         return;
     }
-    
-    if (currentPassword !== ADMIN_CREDENTIALS.password) {
-        showError('Current password is incorrect.');
-        return;
-    }
-    
+    // Validate current password by reauthenticating the current user
     try {
-        // In production, update Firebase Auth password
-        ADMIN_CREDENTIALS.password = newPassword;
+        const authModule = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+        const user = auth.currentUser;
+        if (!user) {
+            showError('You must be logged in to change password.');
+            return;
+        }
+
+        // Reauthenticate with the provided current password
+        const credential = authModule.EmailAuthProvider.credential(user.email, currentPassword);
+        await authModule.reauthenticateWithCredential(user, credential);
+
+        // Update password
+        await authModule.updatePassword(user, newPassword);
         showSuccess('Password updated successfully!');
         e.target.reset();
     } catch (error) {
-        showError('Failed to update password. Please try again.');
+        console.error('Password update failed:', error);
+        const message = error?.code === 'auth/wrong-password' ? 'Current password is incorrect.' : 'Failed to update password. Please try again.';
+        showError(message);
     }
 }
 
