@@ -1095,19 +1095,24 @@ footer {
 /* Skip Navigation Link */
 .skip-link {
     position: absolute;
-    top: -40px;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+.skip-link:focus {
     left: 6px;
+    top: 6px;
+    width: auto;
+    height: auto;
     background: var(--primary);
     color: var(--white);
     padding: 8px;
     text-decoration: none;
     border-radius: var(--border-radius-sm);
     z-index: 10000;
-    transition: top 0.3s ease;
-}
-
-.skip-link:focus {
-    top: 6px;
 }
 
 /* Enhanced Footer Legal Links */

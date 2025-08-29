@@ -23,13 +23,13 @@
 </head>
 <body>
     <!-- Login Modal -->
-    <div id="login-modal" class="modal">
-        <div class="modal-content">
+    <div id="login-modal" class="modal" style="display: flex;">
+        <div class="modal-content" role="dialog" aria-labelledby="admin-login-title" aria-describedby="admin-login-desc">
             <div class="modal-brand">
                 <img src="logo.webp" alt="Nashr Foundation" class="admin-logo" width="40" height="40">
-                <h2>Admin Login</h2>
+                <h2 id="admin-login-title">Admin Login</h2>
             </div>
-            <p class="modal-subtitle">Sign in to manage the donor leaderboard.</p>
+            <p id="admin-login-desc" class="modal-subtitle">Sign in to manage the donor leaderboard.</p>
             <form id="login-form" class="login-form">
                 <div class="form-group">
                     <label for="admin-email">Email</label>
@@ -79,6 +79,10 @@
             <section id="leaderboard" class="dashboard-section active">
                 <div class="section-header">
                     <h2>Leaderboard</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="addLeaderboardEntry()">Add Entry</button>
+                        <button class="btn btn-secondary" onclick="exportLeaderboardCsv()">Export CSV</button>
+                    </div>
                 </div>
                 <div class="leaderboard-editor">
                     <div class="current-leaderboard">
@@ -89,13 +93,34 @@
                                         <th>Rank</th>
                                         <th>Name</th>
                                         <th>Amount</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="admin-leaderboard-body">
-                                    <tr><td colspan="3" class="loading">Loading leaderboard...</td></tr>
+                                    <tr><td colspan="4" class="loading">Loading leaderboard...</td></tr>
                                 </tbody>
                             </table>
                         </div>
+                    </div>
+                    <div class="entry-form" id="entry-form" style="display: none;">
+                        <h3 id="form-title">Add New Entry</h3>
+                        <form id="leaderboard-form">
+                            <input type="hidden" id="edit-entry-id">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="entry-name">Name</label>
+                                    <input type="text" id="entry-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="entry-amount">Amount (PKR)</label>
+                                    <input type="number" id="entry-amount" min="1" required>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Save Entry</button>
+                                <button type="button" class="btn btn-outline" onclick="cancelEdit()">Cancel</button>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </section>

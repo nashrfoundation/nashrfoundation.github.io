@@ -397,13 +397,50 @@ function displayLeaderboardTable(leaderboardData) {
         
         const amountCell = document.createElement('td');
         amountCell.textContent = `₨${entry.amount.toLocaleString()}`;
-        // No actions in CSV-driven mode
+        const actionsCell = document.createElement('td');
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn btn-outline btn-sm';
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = () => editLeaderboardEntry(entry);
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger btn-sm';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteLeaderboardEntry(entry.rank);
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(deleteBtn);
         row.appendChild(rankCell);
         row.appendChild(nameCell);
         row.appendChild(amountCell);
+        row.appendChild(actionsCell);
         
         tableBody.appendChild(row);
     });
+}
+
+// CSV Export
+function exportLeaderboardCsv() {
+    const table = document.getElementById('admin-leaderboard-table');
+    if (!table) return;
+    let csv = 'Rank,Name,Amount\n';
+    const rows = Array.from(table.querySelectorAll('tbody tr'));
+    rows.forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        if (tds.length >= 3) {
+            const rank = tds[0].textContent.trim();
+            const name = tds[1].textContent.trim();
+            const amount = tds[2].textContent.trim().replace(/[^0-9]/g, '');
+            csv += `${rank},${name},${amount}\n`;
+        }
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'leaderboard.csv';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
 }
 
 // Analytics Section
