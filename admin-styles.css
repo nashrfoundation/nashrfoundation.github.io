@@ -199,12 +199,13 @@ p {
     align-items: center;
     gap: var(--spacing-md);
     justify-content: center;
-    margin-bottom: var(--spacing-sm);
+    margin-top: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
 }
 
 .modal-content .admin-logo {
-    width: 112px;
-    height: 112px;
+    height: 220px;
+    width: auto;
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0,0,0,0.25);
 }
@@ -368,9 +369,14 @@ p {
 }
 
 .admin-logo {
-    width: 112px;
-    height: 112px;
+    height: 160px;
+    width: auto;
     border-radius: var(--border-radius);
+}
+
+.admin-header .header-content {
+    padding-top: var(--spacing-xl);
+    padding-bottom: var(--spacing-xl);
 }
 
 .user-info {
