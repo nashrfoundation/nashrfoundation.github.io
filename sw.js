@@ -1,7 +1,7 @@
 // Service Worker for Nashr Foundation Website
 // Provides offline functionality and caching for better user experience
 
-const CACHE_NAME = 'nashr-foundation-v1.0.0';
+const CACHE_NAME = 'nashr-foundation-v1.0.2';
 const urlsToCache = [
   './',
   './index.html',
