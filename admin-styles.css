@@ -304,7 +304,7 @@ p {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: var(--spacing-sm) var(--spacing-lg);
     max-width: 1400px;
     margin: 0 auto;
 }
@@ -316,8 +316,8 @@ p {
 }
 
 .admin-logo {
-    width: 40px;
-    height: 40px;
+    width: 56px;
+    height: 56px;
     border-radius: var(--border-radius);
 }
 

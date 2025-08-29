@@ -357,25 +357,13 @@ function displayDonationsTable(donations) {
 // Leaderboard Section
 async function loadLeaderboardData() {
     try {
-        const response = await fetch('leaderboard.csv', { cache: 'no-store' });
-        const text = await response.text();
-        const rows = text.trim().split('\n');
-        const data = [];
-        for (let i = 1; i < rows.length; i++) {
-            const line = rows[i];
-            if (!line) continue;
-            const firstComma = line.indexOf(',');
-            const secondComma = line.indexOf(',', firstComma + 1);
-            if (firstComma === -1 || secondComma === -1) continue;
-            const rankStr = line.slice(0, firstComma).trim();
-            const name = line.slice(firstComma + 1, secondComma).trim();
-            const amountStr = line.slice(secondComma + 1).trim();
-            const rank = parseInt(rankStr, 10);
-            const amount = parseInt(amountStr.replace(/,/g, ''), 10);
-            if (!isNaN(rank) && !isNaN(amount)) data.push({ rank, name, amount });
-        }
-        data.sort((a,b) => a.rank - b.rank);
+        const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+        const snapshot = await fs.getDocs(fs.collection(db, 'leaderboard'));
+        const data = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+            .map(x => ({ rank: Number(x.rank)||9999, name: x.name||'', amount: Number(x.amount)||0 }))
+            .sort((a,b) => a.rank - b.rank);
         displayLeaderboardTable(data);
+        window._leaderboardData = data;
     } catch (error) {
         console.error('Failed to load leaderboard data:', error);
         displayLeaderboardTable([]);
@@ -738,20 +726,21 @@ async function handleLeaderboardEntry(e) {
     const editId = document.getElementById('edit-entry-id').value;
     
     try {
+        const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+        const list = Array.isArray(window._leaderboardData) ? window._leaderboardData : [];
+        let rank;
         if (editId) {
-            // Update existing entry
-            console.log('Updating entry:', { editId, name, amount });
-            showSuccess('Leaderboard entry updated successfully!');
+            rank = parseInt(editId, 10);
         } else {
-            // Add new entry
-            console.log('Adding new entry:', { name, amount });
-            showSuccess('Leaderboard entry added successfully!');
+            rank = list.length ? Math.max(...list.map(x => x.rank)) + 1 : 1;
         }
-        
+        const docRef = fs.doc(fs.collection(db, 'leaderboard'), String(rank));
+        await fs.setDoc(docRef, { rank, name, amount });
+        showSuccess('Leaderboard entry saved.');
+        await loadLeaderboardData();
         e.target.reset();
         document.getElementById('edit-entry-id').value = '';
         hideEntryForm();
-        loadLeaderboardData();
     } catch (error) {
         showError('Failed to save leaderboard entry. Please try again.');
     }
@@ -785,9 +774,13 @@ function hideEntryForm() {
 function deleteLeaderboardEntry(rank) {
     if (confirm(`Are you sure you want to delete the entry with rank ${rank}?`)) {
         try {
-            console.log('Deleting entry with rank:', rank);
-            showSuccess('Leaderboard entry deleted successfully!');
-            loadLeaderboardData();
+            (async () => {
+                const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+                const docRef = fs.doc(fs.collection(db, 'leaderboard'), String(rank));
+                await fs.deleteDoc(docRef);
+                showSuccess('Leaderboard entry deleted.');
+                await loadLeaderboardData();
+            })();
         } catch (error) {
             showError('Failed to delete entry. Please try again.');
         }
@@ -871,7 +864,10 @@ function formatTimeAgo(date) {
 
 function updateLastUpdatedTime() {
     const now = new Date();
-    document.getElementById('last-updated-time').textContent = now.toLocaleString();
+    const el = document.getElementById('last-updated-time');
+    if (el) {
+        el.textContent = now.toLocaleString();
+    }
 }
 
 function setupDateRangePicker() {
