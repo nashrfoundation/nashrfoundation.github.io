@@ -531,30 +531,31 @@ function createPaymentMethodsChart(data) {
         charts.paymentMethods.destroy();
     }
     
-    charts.paymentMethods = new Chart(ctx, {
-        type: 'doughnut',
-        data: {
-            labels: data.map(d => d.method),
-            datasets: [{
-                data: data.map(d => d.count),
-                backgroundColor: [
-                    '#2A8D9C',
-                    '#FFB52E',
-                    '#28a745',
-                    '#dc3545'
-                ]
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    position: 'bottom'
+    try {
+        charts.paymentMethods = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: data.map(d => d.method),
+                datasets: [{
+                    data: data.map(d => d.count),
+                    backgroundColor: [
+                        '#2A8D9C',
+                        '#FFB52E',
+                        '#28a745',
+                        '#dc3545'
+                    ]
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom'
+                    }
                 }
             }
-        }
-    });
+        });
     } catch (error) {
         console.error('Failed to create payment methods chart:', error);
     }
@@ -573,31 +574,32 @@ function createTrafficChart(data) {
         charts.traffic.destroy();
     }
     
-    charts.traffic = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: data.map(d => d.date),
-            datasets: [{
-                label: 'Visitors',
-                data: data.map(d => d.visitors),
-                backgroundColor: '#2A8D9C'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+    try {
+        charts.traffic = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.map(d => d.date),
+                datasets: [{
+                    label: 'Visitors',
+                    data: data.map(d => d.visitors),
+                    backgroundColor: '#2A8D9C'
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
                 }
             }
-        }
-    });
+        });
     } catch (error) {
         console.error('Failed to create traffic chart:', error);
     }
@@ -616,39 +618,40 @@ function createConversionChart(data) {
         charts.conversion.destroy();
     }
     
-    charts.conversion = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.map(d => d.date),
-            datasets: [{
-                label: 'Conversion Rate (%)',
-                data: data.map(d => d.rate),
-                borderColor: '#FFB52E',
-                backgroundColor: 'rgba(255, 181, 46, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+    try {
+        charts.conversion = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(d => d.date),
+                datasets: [{
+                    label: 'Conversion Rate (%)',
+                    data: data.map(d => d.rate),
+                    borderColor: '#FFB52E',
+                    backgroundColor: 'rgba(255, 181, 46, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return value.toFixed(1) + '%';
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value.toFixed(1) + '%';
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
     } catch (error) {
         console.error('Failed to create conversion chart:', error);
     }

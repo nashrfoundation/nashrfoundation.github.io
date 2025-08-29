@@ -227,6 +227,37 @@ p {
     color: var(--text-muted);
 }
 
+/* Enhanced Login Form */
+.login-form .input-lg {
+    padding: var(--spacing-md);
+    font-size: 1rem;
+}
+
+.password-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field .toggle-password {
+    margin-left: var(--spacing-sm);
+    padding: 0.5rem 0.75rem;
+    border: 1px solid var(--border-color);
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+}
+
+.btn-lg {
+    padding: 0.9rem 1.1rem;
+    font-size: 1rem;
+}
+
+.full-width {
+    width: 100%;
+}
+
 .form-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
