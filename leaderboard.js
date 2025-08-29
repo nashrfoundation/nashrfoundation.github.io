@@ -1,22 +1,61 @@
+// Optimized Leaderboard JavaScript for Nashr Foundation
+// Performance optimized with better caching and reduced DOM manipulations
+
 document.addEventListener('DOMContentLoaded', function() {
+    // Cache DOM elements for better performance
+    const tableBody = document.querySelector('#leaderboard-data');
+    let isInitialized = false;
+    
+    // Use requestIdleCallback for non-critical operations
+    const requestIdleCallback = window.requestIdleCallback || function(cb) {
+        return setTimeout(cb, 1);
+    };
+
     function showLoadingState() {
-        const tableBody = document.querySelector('#leaderboard-data');
         if (tableBody) {
             tableBody.innerHTML = '<tr><td colspan="3" class="loading-state">Loading donor data...</td></tr>';
         }
     }
 
     function showErrorState(message) {
-        const tableBody = document.querySelector('#leaderboard-data');
         if (tableBody) {
             tableBody.innerHTML = `<tr><td colspan="3" class="error-state">${message}</td></tr>`;
         }
     }
 
+    // Optimized function to update table with minimal DOM manipulation
+    function updateTable(data) {
+        if (!tableBody) return;
+        
+        // Use DocumentFragment for better performance
+        const fragment = document.createDocumentFragment();
+        
+        if (data.length === 0) {
+            const row = document.createElement('tr');
+            row.innerHTML = '<td colspan="3" class="loading-state">No donors yet</td>';
+            fragment.appendChild(row);
+        } else {
+            data.forEach(entry => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${String(entry.rank || 9999).padStart(2, '0')}</td>
+                    <td>${entry.name || 'Anonymous'}</td>
+                    <td>₨ ${Number(entry.amount || 0).toLocaleString()}</td>
+                `;
+                fragment.appendChild(row);
+            });
+        }
+        
+        // Single DOM update
+        tableBody.innerHTML = '';
+        tableBody.appendChild(fragment);
+    }
+
     async function setupRealtimeLeaderboard() {
         try {
+            // Dynamic imports for better performance
             const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
-            const { getFirestore, collection, onSnapshot } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+            const { getFirestore, collection, onSnapshot, query, orderBy, limit } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
 
             const firebaseConfig = {
                 apiKey: "AIzaSyBw9khGmocvn0bqGDOgumWDwUhQk1JuOMM",
@@ -31,72 +70,86 @@ document.addEventListener('DOMContentLoaded', function() {
             const app = initializeApp(firebaseConfig);
             const db = getFirestore(app);
 
-            const tableBody = document.querySelector('#leaderboard-data');
-            if (!tableBody) return;
+            // Optimized query with ordering and limiting
+            const leaderboardQuery = query(
+                collection(db, 'leaderboard'),
+                orderBy('rank', 'asc'),
+                limit(50)
+            );
 
-            onSnapshot(collection(db, 'leaderboard'), (snapshot) => {
-                const data = snapshot.docs.map(d => d.data()).filter(Boolean);
-                data.sort((a,b) => (a.rank||9999) - (b.rank||9999));
-                tableBody.innerHTML = '';
-                data.forEach(entry => {
-                    const row = document.createElement('tr');
-                    const rankCell = document.createElement('td');
-                    rankCell.textContent = String(entry.rank).padStart(2, '0');
-                    const nameCell = document.createElement('td');
-                    nameCell.textContent = entry.name;
-                    const amountCell = document.createElement('td');
-                    amountCell.textContent = '₨ ' + Number(entry.amount||0).toLocaleString();
-                    row.appendChild(rankCell);
-                    row.appendChild(nameCell);
-                    row.appendChild(amountCell);
-                    tableBody.appendChild(row);
+            onSnapshot(leaderboardQuery, (snapshot) => {
+                const data = snapshot.docs
+                    .map(d => d.data())
+                    .filter(Boolean)
+                    .sort((a, b) => (a.rank || 9999) - (b.rank || 9999));
+                
+                // Use requestIdleCallback for non-critical updates
+                requestIdleCallback(() => {
+                    updateTable(data);
                 });
-                if (data.length === 0) {
-                    tableBody.innerHTML = '<tr><td colspan="3" class="loading-state">No donors yet</td></tr>';
-                }
+                
+                isInitialized = true;
             }, async (err) => {
                 console.error('Realtime leaderboard error:', err);
-                // Fallback to CSV if Firestore is not accessible
-                await fallbackToCsv();
+                if (!isInitialized) {
+                    await fallbackToCsv();
+                }
             });
         } catch (e) {
             console.error('Failed to initialize realtime leaderboard:', e);
-            // Fallback to CSV if Firestore init fails
             await fallbackToCsv();
         }
     }
 
     async function fallbackToCsv() {
         try {
-            const res = await fetch('leaderboard.csv', { cache: 'no-store' });
+            // Use cache-first strategy for CSV
+            const res = await fetch('leaderboard.csv', { 
+                cache: 'force-cache',
+                headers: {
+                    'Cache-Control': 'max-age=3600'
+                }
+            });
+            
             if (!res.ok) throw new Error('CSV fetch failed');
+            
             const text = await res.text();
             const rows = text.trim().split('\n');
-            const tableBody = document.querySelector('#leaderboard-data');
-            if (!tableBody) return;
-            tableBody.innerHTML = '';
+            const data = [];
+            
+            // Parse CSV data
             for (let i = 1; i < rows.length; i++) {
                 const line = rows[i];
                 if (!line) continue;
+                
                 const cells = line.split(',');
                 if (cells.length >= 3) {
-                    const tr = document.createElement('tr');
-                    const rankTd = document.createElement('td'); rankTd.textContent = cells[0].trim();
-                    const nameTd = document.createElement('td'); nameTd.textContent = cells[1].trim();
-                    const amountTd = document.createElement('td'); amountTd.textContent = '₨ ' + cells[2].trim().replace(/,/g, '');
-                    tr.appendChild(rankTd); tr.appendChild(nameTd); tr.appendChild(amountTd);
-                    tableBody.appendChild(tr);
+                    data.push({
+                        rank: parseInt(cells[0].trim()) || 9999,
+                        name: cells[1].trim(),
+                        amount: cells[2].trim().replace(/,/g, '')
+                    });
                 }
             }
-            if (!tableBody.children.length) {
-                showErrorState('No donor data available');
-            }
+            
+            // Sort data
+            data.sort((a, b) => a.rank - b.rank);
+            
+            // Update table in idle time
+            requestIdleCallback(() => {
+                updateTable(data);
+            });
+            
         } catch (err) {
             console.error('CSV fallback failed:', err);
             showErrorState('Error loading donor data');
         }
     }
 
+    // Initialize with loading state
     showLoadingState();
+    
+    // Start realtime leaderboard setup
     setupRealtimeLeaderboard();
 });
+

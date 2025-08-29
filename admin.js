@@ -838,6 +838,15 @@ async function handleLeaderboardSubmit(e) {
         return;
     }
     
+    // Debug: Check authentication state
+    console.log('Current user:', currentUser);
+    console.log('Auth state:', auth.currentUser);
+    
+    if (!auth.currentUser) {
+        showError('You must be logged in to add entries.');
+        return;
+    }
+    
     try {
         const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
         

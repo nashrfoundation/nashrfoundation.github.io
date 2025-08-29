@@ -42,48 +42,84 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <link rel="apple-touch-icon" href="/logo.webp">
     <link rel="canonical" href="https://nashrfoundation.github.io/">
 
-    <!-- Preload LCP image and optimized fonts. -->
+    <!-- Preload LCP image for faster loading -->
     <link rel="preload" fetchpriority="high" as="image" href="hero_background.webp" type="image/webp">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&display=swap" as="style">
+    <link rel="preload" fetchpriority="high" as="image" href="hero_background_mobile.webp" type="image/webp" media="(max-width: 768px)">
     
-    <!-- Asynchronously load the optimized fonts so they don't block rendering -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:wght@400;700&family=Merriweather:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <!-- Preconnect to external domains for faster resource loading -->
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect" href="https://www.googletagmanager.com">
+    <link rel="preconnect" href="https://cdn.jsdelivr.net">
 
     <!-- Inlined Critical CSS for instant rendering of above-the-fold content -->
     <style>
+        /* Font display swap to prevent layout shifts */
+        @font-face {
+            font-family: 'Merriweather';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/merriweather/v30/u-440qyriQwlOrhSvowK_l5-fCZM.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Merriweather';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/merriweather/v30/u-4n0qyriQwlOrhSvowK_l52xwNpWg.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 400;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/lora/v32/0QI6MX1D_JOuGQbT0gvTJPa787weuyJGmKM.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        @font-face {
+            font-family: 'Lora';
+            font-style: normal;
+            font-weight: 700;
+            font-display: swap;
+            src: url(https://fonts.gstatic.com/s/lora/v32/0QI6MX1D_JOuGQbT0gvTJPa787z5uyJGmKM.woff2) format('woff2');
+            unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+        }
+        
         :root{--bg-dark:#1a1a1a;--bg-medium:#2c2c2c;--text-primary:#f0f0f0;--text-secondary:#b0b0b0;--primary:#2A8D9C;--primary-light:#3AA7B8;--accent:#FFB52E;--white:#FFFFFF;--overlay-color:rgba(0,0,0,0.6);--heading-font:'Merriweather',serif;--body-font:'Lora',serif;--spacing-xs:0.5rem;--spacing-sm:1rem;--spacing-md:2rem;--border-radius-sm:4px;--border-radius-md:8px}
         *,:after,:before{margin:0;padding:0;box-sizing:border-box}
         html{font-size:16.5px;scroll-behavior:smooth}
-        body{font-family:var(--body-font);line-height:1.9;color:var(--text-primary);background-color:var(--bg-dark);overflow-x:hidden}
+        body{font-family:var(--body-font);line-height:1.9;color:var(--text-primary);background-color:var(--bg-dark);overflow-x:hidden;min-height:100vh;display:flex;flex-direction:column}
         h1,h2,h3{font-family:var(--heading-font);font-weight:700;line-height:1.3;margin-bottom:var(--spacing-sm);color:var(--primary-light)}
         h1{font-size:2.5rem;letter-spacing:-.5px}
         p{margin-bottom:var(--spacing-sm);color:var(--text-secondary)}
         a{color:var(--accent);text-decoration:none}
-        img{max-width:100%;height:auto}
+        img{max-width:100%;height:auto;display:block}
         .container{width:100%;max-width:1200px;margin:0 auto;padding:0 var(--spacing-sm)}
         .btn{display:inline-block;padding:.75rem 1.5rem;background-color:var(--accent);color:var(--bg-dark);border:2px solid var(--accent);border-radius:var(--border-radius-sm);font-weight:600;text-align:center;cursor:pointer;transition:all .3s ease}
         .btn-large{padding:.85rem 1.75rem;font-size:1.1rem}
-        header{position:fixed;top:0;left:0;width:100%;background-color:rgba(44,44,44,.95);backdrop-filter:blur(10px);z-index:1000;padding:var(--spacing-xs) 0}
-        header .container{display:flex;align-items:center;justify-content:space-between}
-        .logo img{height:88px;max-height:100px;width:auto;border-radius:var(--border-radius-md)}
+        header{position:fixed;top:0;left:0;width:100%;background-color:rgba(44,44,44,.95);backdrop-filter:blur(10px);z-index:1000;padding:var(--spacing-xs) 0;height:80px}
+        header .container{display:flex;align-items:center;justify-content:space-between;height:100%}
+        .logo img{height:88px;max-height:100px;width:auto;border-radius:var(--border-radius-md);aspect-ratio:1/1}
         nav ul{display:flex;list-style:none}
         nav ul li{margin-left:var(--spacing-md)}
         nav ul li a{font-weight:500;padding:.5rem;position:relative;color:var(--text-primary)}
         .social-icons{display:flex;align-items:center}
         .social-icons a{margin-left:var(--spacing-xs)}
-        .social-icons img{width:24px;height:24px;filter:brightness(.8) invert(.9)}
+        .social-icons img{width:24px;height:24px;filter:brightness(.8) invert(.9);aspect-ratio:1/1}
         .donate-button{margin-left:var(--spacing-md)}
         .mobile-menu-toggle{display:none;flex-direction:column;justify-content:space-between;width:30px;height:21px;cursor:pointer}
         .mobile-menu-toggle span{display:block;height:3px;width:100%;background-color:var(--text-primary);border-radius:3px;transition:all .2s ease}
         .hero{position:relative;height:100vh;min-height:600px;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--white);margin-top:80px;overflow:hidden}
         .hero-image{position:absolute;top:0;left:0;width:100%;height:100%;z-index:-2}
-        .hero-image img{width:100%;height:100%;object-fit:cover}
+        .hero-image img{width:100%;height:100%;object-fit:cover;aspect-ratio:16/9}
         .hero-overlay{position:absolute;top:0;left:0;width:100%;height:100%;background-color:var(--overlay-color);z-index:-1}
         .hero-content{max-width:800px;padding:var(--spacing-md);z-index:1}
-        .hero-content h1{font-size:3.5rem;margin-bottom:var(--spacing-md);color:var(--white)}
-        .hero-content p{font-size:1.4rem;margin-bottom:var(--spacing-md);color:var(--text-primary)}
-        @media (max-width:768px){.logo img{height:72px}.mobile-menu-toggle{display:flex}.donate-button{display:none}nav{position:fixed;top:80px;left:0;width:100%;background-color:rgba(44,44,44,.95);max-height:0;overflow:hidden;transition:max-height .5s ease}nav.active{max-height:300px}nav ul{flex-direction:column;padding:1.5rem}nav ul li{margin:0 0 1rem}.hero-content h1{font-size:2.2rem}}
+        .hero-content h1{font-size:3.5rem;margin-bottom:var(--spacing-md);color:var(--white);min-height:4.2rem}
+        .hero-content p{font-size:1.4rem;margin-bottom:var(--spacing-md);color:var(--text-secondary);min-height:2.8rem}
+        main{flex:1}
+        @media (max-width:768px){.logo img{height:72px}.mobile-menu-toggle{display:flex}.donate-button{display:none}nav{position:fixed;top:80px;left:0;width:100%;background-color:rgba(44,44,44,.95);max-height:0;overflow:hidden;transition:max-height .5s ease}nav.active{max-height:300px}nav ul{flex-direction:column;padding:1.5rem}nav ul li{margin:0 0 1rem}.hero-content h1{font-size:2.2rem;min-height:2.6rem}.hero-content p{font-size:1.1rem;min-height:2.2rem}}
     </style>
     
     <!-- Asynchronously load the full stylesheet. -->
@@ -250,12 +286,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json">
     
-    <!-- Deferred scripts that do not block rendering (GTM only; GA code removed) -->
+    <!-- Deferred scripts that do not block rendering -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js" defer></script>
     <script src="leaderboard.js" defer></script>
+    <script src="performance.js" defer></script>
     <script defer>
+        // Use requestIdleCallback for non-critical operations to prevent forced reflows
+        const requestIdleCallback = window.requestIdleCallback || function(cb) {
+            return setTimeout(cb, 1);
+        };
+        
         document.addEventListener('DOMContentLoaded', function() {
-            AOS.init({ duration: 800, once: true, offset: 100 });
+            // Initialize AOS with optimized settings
+            if (typeof AOS !== 'undefined') {
+                AOS.init({ 
+                    duration: 800, 
+                    once: true, 
+                    offset: 100,
+                    disable: 'mobile' // Disable on mobile for better performance
+                });
+            }
+            
+            // Mobile menu toggle with optimized event handling
             const menuToggle = document.querySelector('.mobile-menu-toggle');
             const nav = document.querySelector('nav');
             if (menuToggle && nav) {
@@ -265,27 +317,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 });
             }
             
-            // Register Service Worker for PWA functionality
-            if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register('./sw.js')
-                    .then(registration => {
-                        console.log('Service Worker registered successfully:', registration);
-                    })
-                    .catch(error => {
-                        console.log('Service Worker registration failed:', error);
-                    });
-            }
+            // Register Service Worker in idle time
+            requestIdleCallback(() => {
+                if ('serviceWorker' in navigator) {
+                    navigator.serviceWorker.register('./sw.js')
+                        .then(registration => {
+                            console.log('Service Worker registered successfully:', registration);
+                        })
+                        .catch(error => {
+                            console.log('Service Worker registration failed:', error);
+                        });
+                }
+            });
             
-            // Enhanced image loading with fade-in effect
+            // Optimized image loading without forced reflows
             const heroImage = document.querySelector('.hero-image img');
             if (heroImage) {
+                // Use passive event listener for better performance
                 heroImage.addEventListener('load', function() {
-                    this.classList.add('loaded');
-                });
+                    requestIdleCallback(() => {
+                        this.classList.add('loaded');
+                    });
+                }, { passive: true });
                 
                 // Fallback for already loaded images
                 if (heroImage.complete) {
-                    heroImage.classList.add('loaded');
+                    requestIdleCallback(() => {
+                        heroImage.classList.add('loaded');
+                    });
                 }
             }
         });
