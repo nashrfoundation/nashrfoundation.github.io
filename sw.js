@@ -3,19 +3,22 @@
 
 const CACHE_NAME = 'nashr-foundation-v1.0.0';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/donate.html',
-  '/styles.css',
-  '/leaderboard.js',
-  '/logo.webp',
-  '/hero_background.webp',
-  '/hero_background_mobile.webp',
-  '/facebook_icon.webp',
-  '/twitter_icon.webp',
-  '/instagram_icon.webp',
-  '/tik-tok.webp',
-  '/youtube.webp'
+  './',
+  './index.html',
+  './donate.html',
+  './admin.html',
+  './styles.css',
+  './admin-styles.css',
+  './admin.js',
+  './leaderboard.js',
+  './logo.webp',
+  './hero_background.webp',
+  './hero_background_mobile.webp',
+  './facebook_icon.webp',
+  './twitter_icon.webp',
+  './instagram_icon.webp',
+  './tik-tok.webp',
+  './youtube.webp'
 ];
 
 // Install event - cache resources

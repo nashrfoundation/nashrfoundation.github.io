@@ -1179,6 +1179,22 @@ footer {
     outline-offset: 2px;
 }
 
+/* QR Code Placeholder */
+.qr-placeholder {
+    width: 200px;
+    height: 200px;
+    background-color: var(--bg-light);
+    border: 2px dashed var(--border-color);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    text-align: center;
+    margin: 20px auto;
+}
+
 /* Loading States */
 .btn:disabled {
     opacity: 0.6;

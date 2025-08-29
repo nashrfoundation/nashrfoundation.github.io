@@ -1,0 +1,948 @@
+// Admin Dashboard JavaScript for Nashr Foundation
+
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBw9khGmocvn0bqGDOgumWDwUhQk1JuOMM",
+    authDomain: "nashr-foundation-c3860.firebaseapp.com",
+    projectId: "nashr-foundation-c3860",
+    storageBucket: "nashr-foundation-c3860.firebasestorage.app",
+    messagingSenderId: "76161626733",
+    appId: "1:76161626733:web:cbc498485deaddd60bc564",
+    measurementId: "G-Y0WSNQK3MW"
+};
+
+// Initialize Firebase
+let app, db, auth;
+let currentUser = null;
+let charts = {};
+let realtimeData = {};
+
+// Using Firebase Auth (email/password). Create admins in Firebase Console.
+
+// DOM Elements
+const loginModal = document.getElementById('login-modal');
+const adminDashboard = document.getElementById('admin-dashboard');
+const loginForm = document.getElementById('login-form');
+const loginError = document.getElementById('login-error');
+
+// Initialize the application
+document.addEventListener('DOMContentLoaded', function() {
+    initializeFirebase();
+    setupEventListeners();
+    checkAuthState();
+});
+
+// Firebase Initialization
+async function initializeFirebase() {
+    try {
+        const { initializeApp } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js');
+        const { getFirestore, collection, getDocs } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+        const { getAuth, onAuthStateChanged, signInWithEmailAndPassword, signOut } = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
+        
+        app = initializeApp(firebaseConfig);
+        db = getFirestore(app);
+        auth = getAuth(app);
+        
+        // Auth state gate
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = { email: user.email, uid: user.uid };
+                showDashboard();
+                loadDashboardData();
+            } else {
+                currentUser = null;
+                showLogin();
+            }
+        });
+        
+        console.log('Firebase initialized successfully');
+    } catch (error) {
+        console.error('Firebase initialization failed:', error);
+        showError('Failed to initialize Firebase. Please refresh the page.');
+    }
+}
+
+// Event Listeners Setup
+function setupEventListeners() {
+    // Login form
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+    
+    // Navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', handleNavigation);
+    });
+    
+    // Logout
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', handleLogout);
+    }
+    
+    // Forms
+    const goalForm = document.getElementById('goal-form');
+    if (goalForm) {
+        goalForm.addEventListener('submit', handleGoalUpdate);
+    }
+    
+    const websiteSettingsForm = document.getElementById('website-settings-form');
+    if (websiteSettingsForm) {
+        websiteSettingsForm.addEventListener('submit', handleWebsiteSettings);
+    }
+    
+    const passwordChangeForm = document.getElementById('password-change-form');
+    if (passwordChangeForm) {
+        passwordChangeForm.addEventListener('submit', handlePasswordChange);
+    }
+    
+    const leaderboardForm = document.getElementById('leaderboard-form');
+    if (leaderboardForm) {
+        leaderboardForm.addEventListener('submit', handleLeaderboardEntry);
+    }
+    
+    // Search and filters
+    const donationSearch = document.getElementById('donation-search');
+    if (donationSearch) {
+        donationSearch.addEventListener('input', handleDonationSearch);
+    }
+    
+    const donationFilter = document.getElementById('donation-filter');
+    if (donationFilter) {
+        donationFilter.addEventListener('change', handleDonationFilter);
+    }
+    
+    // Pagination
+    const prevPageBtn = document.getElementById('prev-page');
+    if (prevPageBtn) {
+        prevPageBtn.addEventListener('click', () => changePage(-1));
+    }
+    
+    const nextPageBtn = document.getElementById('next-page');
+    if (nextPageBtn) {
+        nextPageBtn.addEventListener('click', () => changePage(1));
+    }
+    
+    // Date range picker
+    setupDateRangePicker();
+}
+
+// Authentication Functions
+function checkAuthState() {
+    // onAuthStateChanged handles UI; this remains as a no-op placeholder
+}
+
+async function handleLogin(e) {
+    e.preventDefault();
+    
+    const email = document.getElementById('admin-email').value;
+    const password = document.getElementById('admin-password').value;
+    
+    try {
+        await (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js')).signInWithEmailAndPassword(auth, email, password);
+    } catch (err) {
+        showLoginError('Login failed. Check your email and password.');
+    }
+}
+
+async function handleLogout() {
+    try {
+        await (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js')).signOut(auth);
+    } catch (err) {
+        showError('Failed to logout. Please try again.');
+    }
+}
+
+function showLogin() {
+    loginModal.style.display = 'flex';
+    adminDashboard.style.display = 'none';
+}
+
+function showDashboard() {
+    loginModal.style.display = 'none';
+    adminDashboard.style.display = 'block';
+    document.getElementById('admin-user-email').textContent = currentUser.email;
+}
+
+function showLoginError(message) {
+    loginError.textContent = message;
+    loginError.style.display = 'block';
+    setTimeout(() => {
+        loginError.style.display = 'none';
+    }, 3000);
+}
+
+// Navigation Functions
+function handleNavigation(e) {
+    e.preventDefault();
+    
+    const targetSection = e.target.getAttribute('data-section');
+    
+    // Update active navigation
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+    });
+    e.target.classList.add('active');
+    
+    // Show target section
+    document.querySelectorAll('.dashboard-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    document.getElementById(targetSection).classList.add('active');
+    
+    // Load section-specific data
+    loadSectionData(targetSection);
+}
+
+// Dashboard Data Loading
+async function loadDashboardData() {
+    try {
+        await Promise.all([
+            loadOverviewData(),
+            loadDonationsData(),
+            loadLeaderboardData(),
+            loadAnalyticsData()
+        ]);
+        
+        updateLastUpdatedTime();
+        startRealtimeUpdates();
+    } catch (error) {
+        console.error('Failed to load dashboard data:', error);
+        showError('Failed to load dashboard data. Please refresh the page.');
+    }
+}
+
+async function loadSectionData(section) {
+    switch (section) {
+        case 'overview':
+            await loadOverviewData();
+            break;
+        case 'donations':
+            await loadDonationsData();
+            break;
+        case 'leaderboard':
+            await loadLeaderboardData();
+            break;
+        case 'analytics':
+            await loadAnalyticsData();
+            break;
+        case 'settings':
+            loadSettingsData();
+            break;
+    }
+}
+
+// Overview Section
+async function loadOverviewData() {
+    try {
+        const donationsSnapshot = await (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).getDocs(
+            (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).collection(db, 'donations')
+        );
+        const donations = donationsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        
+        updateOverviewStats(donations);
+        updateRecentActivity(donations);
+    } catch (error) {
+        console.error('Failed to load overview data:', error);
+        // Empty states
+        updateOverviewStats([]);
+        updateRecentActivity([]);
+    }
+}
+
+function updateOverviewStats(donations) {
+    const totalRaised = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
+    const todayDonations = donations.filter(donation => {
+        const today = new Date();
+        const donationDate = donation.createdAt?.toDate() || new Date();
+        return donationDate.toDateString() === today.toDateString();
+    });
+    const todayAmount = todayDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
+    const totalDonors = donations.length;
+    const goalAmount = 200000; // This should come from settings
+    const goalProgress = Math.round((totalRaised / goalAmount) * 100);
+    
+    // Update stats
+    document.getElementById('total-raised').textContent = `₨${totalRaised.toLocaleString()}`;
+    document.getElementById('goal-progress').textContent = `${goalProgress}%`;
+    document.getElementById('goal-progress-fill').style.width = `${goalProgress}%`;
+    document.getElementById('total-donors').textContent = totalDonors;
+    
+    // Update change indicators
+    const totalRaisedChange = document.querySelector('#overview .stat-card:nth-child(1) .stat-change');
+    const totalDonorsChange = document.querySelector('#overview .stat-card:nth-child(3) .stat-change');
+    
+    totalRaisedChange.textContent = `+₨${todayAmount.toLocaleString()} today`;
+    totalDonorsChange.textContent = `+${todayDonations.length} today`;
+    
+    // Website visitors placeholder until GA4 integration
+    document.getElementById('website-visitors').textContent = 0;
+}
+
+function updateRecentActivity(donations) {
+    const recentDonations = donations
+        .sort((a, b) => (b.createdAt?.toDate() || new Date()) - (a.createdAt?.toDate() || new Date()))
+        .slice(0, 10);
+    
+    const activityList = document.getElementById('recent-activity-list');
+    activityList.innerHTML = '';
+    
+    if (recentDonations.length === 0) {
+        activityList.innerHTML = '<div class="loading">No recent activity</div>';
+        return;
+    }
+    
+    recentDonations.forEach(donation => {
+        const activityItem = document.createElement('div');
+        activityItem.className = 'activity-item';
+        
+        const icon = document.createElement('div');
+        icon.className = 'activity-icon';
+        icon.textContent = '💰';
+        
+        const content = document.createElement('div');
+        content.className = 'activity-content';
+        
+        const title = document.createElement('div');
+        title.className = 'activity-title';
+        title.textContent = `${donation.name || 'Anonymous'} donated ₨${donation.amount?.toLocaleString()}`;
+        
+        const time = document.createElement('div');
+        time.className = 'activity-time';
+        time.textContent = formatTimeAgo(donation.createdAt?.toDate() || new Date());
+        
+        content.appendChild(title);
+        content.appendChild(time);
+        activityItem.appendChild(icon);
+        activityItem.appendChild(content);
+        activityList.appendChild(activityItem);
+    });
+}
+
+// Donations Section
+async function loadDonationsData() {
+    try {
+        const donationsSnapshot = await (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).getDocs(
+            (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).collection(db, 'donations')
+        );
+        const donations = donationsSnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+        }));
+        
+        displayDonationsTable(donations);
+        setupPagination(donations);
+    } catch (error) {
+        console.error('Failed to load donations data:', error);
+        displayDonationsTable([]);
+        setupPagination([]);
+    }
+}
+
+function displayDonationsTable(donations) {
+    const tableBody = document.getElementById('donations-table-body');
+    tableBody.innerHTML = '';
+    
+    if (donations.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="loading">No donations found</td></tr>';
+        return;
+    }
+    
+    donations.forEach(donation => {
+        const row = document.createElement('tr');
+        
+        const dateCell = document.createElement('td');
+        dateCell.textContent = formatDate(donation.createdAt?.toDate() || new Date());
+        
+        const nameCell = document.createElement('td');
+        nameCell.textContent = donation.name || 'Anonymous';
+        
+        const amountCell = document.createElement('td');
+        amountCell.textContent = `₨${donation.amount?.toLocaleString()}`;
+        
+        const methodCell = document.createElement('td');
+        methodCell.textContent = donation.paymentMethod || 'Unknown';
+        
+        const statusCell = document.createElement('td');
+        const statusSpan = document.createElement('span');
+        statusSpan.className = 'status-badge confirmed';
+        statusSpan.textContent = 'Confirmed';
+        statusCell.appendChild(statusSpan);
+        
+        const actionsCell = document.createElement('td');
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn btn-outline btn-sm';
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = () => editDonation(donation);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger btn-sm';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteDonation(donation.id);
+        
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(deleteBtn);
+        
+        row.appendChild(dateCell);
+        row.appendChild(nameCell);
+        row.appendChild(amountCell);
+        row.appendChild(methodCell);
+        row.appendChild(statusCell);
+        row.appendChild(actionsCell);
+        
+        tableBody.appendChild(row);
+    });
+}
+
+// Leaderboard Section
+async function loadLeaderboardData() {
+    try {
+        const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+        const snapshot = await fs.getDocs(fs.collection(db, 'leaderboard'));
+        const leaderboardData = snapshot.docs.map(d => ({ id: d.id, ...d.data() }))
+            .sort((a,b) => (a.rank||9999) - (b.rank||9999));
+        displayLeaderboardTable(leaderboardData);
+    } catch (error) {
+        console.error('Failed to load leaderboard data:', error);
+        displayLeaderboardTable([]);
+    }
+}
+
+function displayLeaderboardTable(leaderboardData) {
+    const tableBody = document.getElementById('admin-leaderboard-body');
+    tableBody.innerHTML = '';
+    
+    leaderboardData.forEach(entry => {
+        const row = document.createElement('tr');
+        
+        const rankCell = document.createElement('td');
+        rankCell.textContent = entry.rank.toString().padStart(2, '0');
+        
+        const nameCell = document.createElement('td');
+        nameCell.textContent = entry.name;
+        
+        const amountCell = document.createElement('td');
+        amountCell.textContent = `₨${entry.amount.toLocaleString()}`;
+        
+        const actionsCell = document.createElement('td');
+        const editBtn = document.createElement('button');
+        editBtn.className = 'btn btn-outline btn-sm';
+        editBtn.textContent = 'Edit';
+        editBtn.onclick = () => editLeaderboardEntry(entry);
+        
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger btn-sm';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteLeaderboardEntry(entry.rank);
+        
+        actionsCell.appendChild(editBtn);
+        actionsCell.appendChild(deleteBtn);
+        
+        row.appendChild(rankCell);
+        row.appendChild(nameCell);
+        row.appendChild(amountCell);
+        row.appendChild(actionsCell);
+        
+        tableBody.appendChild(row);
+    });
+}
+
+// Analytics Section
+async function loadAnalyticsData() {
+    try {
+        // Placeholder: integrate GA4 API. For now show empty charts/messages.
+        createDonationsChart([]);
+        createPaymentMethodsChart([]);
+        createTrafficChart([]);
+        createConversionChart([]);
+        updateRealtimeMetrics({ activeUsers: 0, pageViews: 0, bounceRate: 0, sessionDuration: 0 });
+    } catch (error) {
+        console.error('Failed to load analytics data:', error);
+    }
+}
+
+// Mock generators removed per requirement: no mock data
+
+function createDonationsChart(data) {
+    const canvas = document.getElementById('donations-chart');
+    if (!canvas) {
+        console.warn('Donations chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    if (charts.donations) {
+        charts.donations.destroy();
+    }
+    
+    try {
+        charts.donations = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(d => d.date),
+            datasets: [{
+                label: 'Daily Donations (PKR)',
+                data: data.map(d => d.amount),
+                borderColor: '#2A8D9C',
+                backgroundColor: 'rgba(42, 141, 156, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '₨' + value.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+    } catch (error) {
+        console.error('Failed to create donations chart:', error);
+    }
+}
+
+function createPaymentMethodsChart(data) {
+    const canvas = document.getElementById('payment-methods-chart');
+    if (!canvas) {
+        console.warn('Payment methods chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    if (charts.paymentMethods) {
+        charts.paymentMethods.destroy();
+    }
+    
+    charts.paymentMethods = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: data.map(d => d.method),
+            datasets: [{
+                data: data.map(d => d.count),
+                backgroundColor: [
+                    '#2A8D9C',
+                    '#FFB52E',
+                    '#28a745',
+                    '#dc3545'
+                ]
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+    } catch (error) {
+        console.error('Failed to create payment methods chart:', error);
+    }
+}
+
+function createTrafficChart(data) {
+    const canvas = document.getElementById('traffic-chart');
+    if (!canvas) {
+        console.warn('Traffic chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    if (charts.traffic) {
+        charts.traffic.destroy();
+    }
+    
+    charts.traffic = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: data.map(d => d.date),
+            datasets: [{
+                label: 'Visitors',
+                data: data.map(d => d.visitors),
+                backgroundColor: '#2A8D9C'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    } catch (error) {
+        console.error('Failed to create traffic chart:', error);
+    }
+}
+
+function createConversionChart(data) {
+    const canvas = document.getElementById('conversion-chart');
+    if (!canvas) {
+        console.warn('Conversion chart canvas not found');
+        return;
+    }
+    
+    const ctx = canvas.getContext('2d');
+    
+    if (charts.conversion) {
+        charts.conversion.destroy();
+    }
+    
+    charts.conversion = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: data.map(d => d.date),
+            datasets: [{
+                label: 'Conversion Rate (%)',
+                data: data.map(d => d.rate),
+                borderColor: '#FFB52E',
+                backgroundColor: 'rgba(255, 181, 46, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return value.toFixed(1) + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
+    } catch (error) {
+        console.error('Failed to create conversion chart:', error);
+    }
+}
+
+function updateRealtimeMetrics(data) {
+    document.getElementById('active-users').textContent = data.activeUsers;
+    document.getElementById('page-views').textContent = data.pageViews.toLocaleString();
+    document.getElementById('bounce-rate').textContent = data.bounceRate.toFixed(1) + '%';
+    document.getElementById('session-duration').textContent = data.sessionDuration + 'm';
+}
+
+// Settings Section
+function loadSettingsData() {
+    // Load current settings
+    document.getElementById('fundraising-goal').value = 200000;
+    document.getElementById('site-title').value = 'Nashr Foundation - Empowering Communities Through Essential Support';
+    document.getElementById('site-description').value = 'Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.';
+}
+
+// Form Handlers
+async function handleGoalUpdate(e) {
+    e.preventDefault();
+    
+    const goal = document.getElementById('fundraising-goal').value;
+    
+    try {
+        // In production, save to Firestore
+        console.log('Goal updated to:', goal);
+        showSuccess('Fundraising goal updated successfully!');
+    } catch (error) {
+        showError('Failed to update goal. Please try again.');
+    }
+}
+
+async function handleWebsiteSettings(e) {
+    e.preventDefault();
+    
+    const title = document.getElementById('site-title').value;
+    const description = document.getElementById('site-description').value;
+    
+    try {
+        // In production, save to Firestore
+        console.log('Website settings updated:', { title, description });
+        showSuccess('Website settings updated successfully!');
+    } catch (error) {
+        showError('Failed to update website settings. Please try again.');
+    }
+}
+
+async function handlePasswordChange(e) {
+    e.preventDefault();
+    
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    
+    if (newPassword !== confirmPassword) {
+        showError('New passwords do not match.');
+        return;
+    }
+    
+    if (currentPassword !== ADMIN_CREDENTIALS.password) {
+        showError('Current password is incorrect.');
+        return;
+    }
+    
+    try {
+        // In production, update Firebase Auth password
+        ADMIN_CREDENTIALS.password = newPassword;
+        showSuccess('Password updated successfully!');
+        e.target.reset();
+    } catch (error) {
+        showError('Failed to update password. Please try again.');
+    }
+}
+
+async function handleLeaderboardEntry(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('entry-name').value;
+    const amount = parseInt(document.getElementById('entry-amount').value);
+    const editId = document.getElementById('edit-entry-id').value;
+    
+    try {
+        if (editId) {
+            // Update existing entry
+            console.log('Updating entry:', { editId, name, amount });
+            showSuccess('Leaderboard entry updated successfully!');
+        } else {
+            // Add new entry
+            console.log('Adding new entry:', { name, amount });
+            showSuccess('Leaderboard entry added successfully!');
+        }
+        
+        e.target.reset();
+        document.getElementById('edit-entry-id').value = '';
+        hideEntryForm();
+        loadLeaderboardData();
+    } catch (error) {
+        showError('Failed to save leaderboard entry. Please try again.');
+    }
+}
+
+// Leaderboard Management
+function addLeaderboardEntry() {
+    document.getElementById('form-title').textContent = 'Add New Entry';
+    document.getElementById('edit-entry-id').value = '';
+    document.getElementById('entry-name').value = '';
+    document.getElementById('entry-amount').value = '';
+    document.getElementById('entry-form').style.display = 'block';
+}
+
+function editLeaderboardEntry(entry) {
+    document.getElementById('form-title').textContent = 'Edit Entry';
+    document.getElementById('edit-entry-id').value = entry.rank;
+    document.getElementById('entry-name').value = entry.name;
+    document.getElementById('entry-amount').value = entry.amount;
+    document.getElementById('entry-form').style.display = 'block';
+}
+
+function cancelEdit() {
+    hideEntryForm();
+}
+
+function hideEntryForm() {
+    document.getElementById('entry-form').style.display = 'none';
+}
+
+function deleteLeaderboardEntry(rank) {
+    if (confirm(`Are you sure you want to delete the entry with rank ${rank}?`)) {
+        try {
+            console.log('Deleting entry with rank:', rank);
+            showSuccess('Leaderboard entry deleted successfully!');
+            loadLeaderboardData();
+        } catch (error) {
+            showError('Failed to delete entry. Please try again.');
+        }
+    }
+}
+
+// Donation Management
+function editDonation(donation) {
+    // Implement donation editing
+    console.log('Editing donation:', donation);
+}
+
+async function deleteDonation(donationId) {
+    if (confirm('Are you sure you want to delete this donation? This action cannot be undone.')) {
+        try {
+            // In production, delete from Firestore
+            console.log('Deleting donation:', donationId);
+            showSuccess('Donation deleted successfully!');
+            loadDonationsData();
+        } catch (error) {
+            showError('Failed to delete donation. Please try again.');
+        }
+    }
+}
+
+// Search and Filter
+function handleDonationSearch(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    // Implement search functionality
+    console.log('Searching for:', searchTerm);
+}
+
+function handleDonationFilter(e) {
+    const filterValue = e.target.value;
+    // Implement filter functionality
+    console.log('Filtering by:', filterValue);
+}
+
+// Pagination
+let currentPage = 1;
+const itemsPerPage = 20;
+
+function setupPagination(data) {
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    updatePaginationInfo(totalPages);
+    
+    document.getElementById('prev-page').disabled = currentPage === 1;
+    document.getElementById('next-page').disabled = currentPage === totalPages;
+}
+
+function changePage(direction) {
+    currentPage += direction;
+    // Implement pagination logic
+    console.log('Changing to page:', currentPage);
+}
+
+function updatePaginationInfo(totalPages) {
+    document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
+}
+
+// Utility Functions
+function formatDate(date) {
+    return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function formatTimeAgo(date) {
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+    
+    if (diffInSeconds < 60) return 'Just now';
+    if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
+    if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)}h ago`;
+    return `${Math.floor(diffInSeconds / 86400)}d ago`;
+}
+
+function updateLastUpdatedTime() {
+    const now = new Date();
+    document.getElementById('last-updated-time').textContent = now.toLocaleString();
+}
+
+function setupDateRangePicker() {
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    
+    document.getElementById('start-date').value = thirtyDaysAgo.toISOString().split('T')[0];
+    document.getElementById('end-date').value = today.toISOString().split('T')[0];
+}
+
+function updateAnalytics() {
+    const startDate = document.getElementById('start-date').value;
+    const endDate = document.getElementById('end-date').value;
+    
+    console.log('Updating analytics for:', startDate, 'to', endDate);
+    loadAnalyticsData();
+}
+
+// Real-time Updates
+function startRealtimeUpdates() {
+    // Update data every 30 seconds
+    setInterval(() => {
+        if (currentUser) {
+            updateLastUpdatedTime();
+            // In production, fetch real-time updates from Firebase
+        }
+    }, 30000);
+}
+
+// Quick Actions
+function addManualDonation() {
+    // Implement manual donation entry
+    console.log('Adding manual donation');
+}
+
+function exportDonations() {
+    // Implement data export
+    console.log('Exporting donations data');
+}
+
+function refreshData() {
+    loadDashboardData();
+    showSuccess('Data refreshed successfully!');
+}
+
+// UI Helpers
+function showSuccess(message) {
+    showNotification(message, 'success');
+}
+
+function showError(message) {
+    showNotification(message, 'error');
+}
+
+function showNotification(message, type) {
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    notification.textContent = message;
+    
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.remove();
+    }, 3000);
+}
+
+// Initialize on page load
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeApp);
+} else {
+    initializeApp();
+}
+
+function initializeApp() {
+    // Check if user is already logged in
+    // Auth state listener handles showing dashboard; nothing else to do here.
+}

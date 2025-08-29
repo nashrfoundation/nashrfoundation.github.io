@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Nashr Foundation</title>
+    <meta name="description" content="Admin dashboard for Nashr Foundation - Monitor donations, manage leaderboard, and track website performance">
+    
+    <!-- Preload critical resources -->
+    <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" as="style">
+    <link rel="preload" href="admin-styles.css" as="style">
+    
+    <!-- Fonts -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    
+    <!-- Admin Styles -->
+    <link rel="stylesheet" href="admin-styles.css">
+    
+    <!-- Chart.js for analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Firebase SDKs will be dynamically imported by admin.js -->
+</head>
+<body>
+    <!-- Login Modal -->
+    <div id="login-modal" class="modal">
+        <div class="modal-content">
+            <h2>Admin Login</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="admin-email">Email</label>
+                    <input type="email" id="admin-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="admin-password">Password</label>
+                    <input type="password" id="admin-password" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Login</button>
+            </form>
+            <div id="login-error" class="error-message" style="display: none;"></div>
+        </div>
+    </div>
+
+    <!-- Main Admin Dashboard -->
+    <div id="admin-dashboard" style="display: none;">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="logo.webp" alt="Nashr Foundation Logo" class="admin-logo">
+                    <h1>Admin Dashboard</h1>
+                </div>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <span id="admin-user-email"></span>
+                        <button id="logout-btn" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="admin-nav">
+            <ul>
+                <li><a href="#overview" class="nav-link active" data-section="overview">Overview</a></li>
+                <li><a href="#donations" class="nav-link" data-section="donations">Donations</a></li>
+                <li><a href="#leaderboard" class="nav-link" data-section="leaderboard">Leaderboard</a></li>
+                <li><a href="#analytics" class="nav-link" data-section="analytics">Analytics</a></li>
+                <li><a href="#settings" class="nav-link" data-section="settings">Settings</a></li>
+            </ul>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="admin-main">
+            <!-- Overview Section -->
+            <section id="overview" class="dashboard-section active">
+                <div class="section-header">
+                    <h2>Dashboard Overview</h2>
+                    <div class="last-updated">Last updated: <span id="last-updated-time"></span></div>
+                </div>
+                
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <h3>Total Raised</h3>
+                            <div class="stat-value" id="total-raised">₨0</div>
+                            <div class="stat-change positive">+₨0 today</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">🎯</div>
+                        <div class="stat-content">
+                            <h3>Goal Progress</h3>
+                            <div class="stat-value" id="goal-progress">0%</div>
+                            <div class="progress-bar-mini">
+                                <div class="progress-fill" id="goal-progress-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <h3>Total Donors</h3>
+                            <div class="stat-value" id="total-donors">0</div>
+                            <div class="stat-change positive">+0 today</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📱</div>
+                        <div class="stat-content">
+                            <h3>Website Visitors</h3>
+                            <div class="stat-value" id="website-visitors">0</div>
+                            <div class="stat-change positive">+0 today</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="recent-activity">
+                    <h3>Recent Activity</h3>
+                    <div class="activity-list" id="recent-activity-list">
+                        <div class="loading">Loading recent activity...</div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="quick-actions">
+                    <h3>Quick Actions</h3>
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" onclick="addManualDonation()">Add Manual Donation</button>
+                        <button class="btn btn-secondary" onclick="exportDonations()">Export Data</button>
+                        <button class="btn btn-secondary" onclick="refreshData()">Refresh Data</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Donations Section -->
+            <section id="donations" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Donation Management</h2>
+                    <div class="header-actions">
+                        <input type="text" id="donation-search" placeholder="Search donations..." class="search-input">
+                        <select id="donation-filter" class="filter-select">
+                            <option value="all">All Donations</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="anonymous">Anonymous</option>
+                            <option value="named">Named</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="donations-table-container">
+                    <table class="admin-table" id="donations-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Name</th>
+                                <th>Amount</th>
+                                <th>Payment Method</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donations-table-body">
+                            <tr><td colspan="6" class="loading">Loading donations...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="pagination" id="donations-pagination">
+                    <button class="btn btn-outline" id="prev-page">Previous</button>
+                    <span id="page-info">Page 1 of 1</span>
+                    <button class="btn btn-outline" id="next-page">Next</button>
+                </div>
+            </section>
+
+            <!-- Leaderboard Section -->
+            <section id="leaderboard" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Leaderboard Management</h2>
+                    <button class="btn btn-primary" onclick="addLeaderboardEntry()">Add Entry</button>
+                </div>
+
+                <div class="leaderboard-editor">
+                    <div class="current-leaderboard">
+                        <h3>Current Leaderboard</h3>
+                        <div class="leaderboard-table-container">
+                            <table class="admin-table" id="admin-leaderboard-table">
+                                <thead>
+                                    <tr>
+                                        <th>Rank</th>
+                                        <th>Name</th>
+                                        <th>Amount</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-leaderboard-body">
+                                    <tr><td colspan="4" class="loading">Loading leaderboard...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Add/Edit Entry Form -->
+                    <div class="entry-form" id="entry-form" style="display: none;">
+                        <h3 id="form-title">Add New Entry</h3>
+                        <form id="leaderboard-form">
+                            <input type="hidden" id="edit-entry-id">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="entry-name">Name</label>
+                                    <input type="text" id="entry-name" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="entry-amount">Amount (PKR)</label>
+                                    <input type="number" id="entry-amount" min="1" required>
+                                </div>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">Save Entry</button>
+                                <button type="button" class="btn btn-outline" onclick="cancelEdit()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Analytics Section -->
+            <section id="analytics" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Website Analytics</h2>
+                    <div class="date-range-picker">
+                        <input type="date" id="start-date" class="date-input">
+                        <span>to</span>
+                        <input type="date" id="end-date" class="date-input">
+                        <button class="btn btn-primary" onclick="updateAnalytics()">Update</button>
+                    </div>
+                </div>
+
+                <!-- Analytics Charts -->
+                <div class="analytics-grid">
+                    <div class="chart-container">
+                        <h3>Donations Over Time</h3>
+                        <canvas id="donations-chart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Payment Methods Distribution</h3>
+                        <canvas id="payment-methods-chart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Visitor Traffic</h3>
+                        <canvas id="traffic-chart"></canvas>
+                    </div>
+                    
+                    <div class="chart-container">
+                        <h3>Conversion Rate</h3>
+                        <canvas id="conversion-chart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Real-time Metrics -->
+                <div class="realtime-metrics">
+                    <h3>Real-time Metrics</h3>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <span class="metric-label">Active Users</span>
+                            <span class="metric-value" id="active-users">0</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Page Views (24h)</span>
+                            <span class="metric-value" id="page-views">0</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Bounce Rate</span>
+                            <span class="metric-value" id="bounce-rate">0%</span>
+                        </div>
+                        <div class="metric-item">
+                            <span class="metric-label">Avg Session Duration</span>
+                            <span class="metric-value" id="session-duration">0m</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settings" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Admin Settings</h2>
+                </div>
+
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>Fundraising Goal</h3>
+                        <form id="goal-form">
+                            <div class="form-group">
+                                <label for="fundraising-goal">Target Amount (PKR)</label>
+                                <input type="number" id="fundraising-goal" min="1" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Goal</button>
+                        </form>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>Website Settings</h3>
+                        <form id="website-settings-form">
+                            <div class="form-group">
+                                <label for="site-title">Site Title</label>
+                                <input type="text" id="site-title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="site-description">Site Description</label>
+                                <textarea id="site-description" rows="3"></textarea>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Update Settings</button>
+                        </form>
+                    </div>
+
+                    <div class="setting-card">
+                        <h3>Admin Account</h3>
+                        <form id="password-change-form">
+                            <div class="form-group">
+                                <label for="current-password">Current Password</label>
+                                <input type="password" id="current-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="new-password">New Password</label>
+                                <input type="password" id="new-password" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-password">Confirm Password</label>
+                                <input type="password" id="confirm-password" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Change Password</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="admin.js" defer></script>
+</body>
+</html>

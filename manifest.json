@@ -2,7 +2,7 @@
   "name": "Nashr Foundation",
   "short_name": "Nashr",
   "description": "Empowering communities through essential support - education, food, clean water, and basic necessities",
-  "start_url": "/",
+  "start_url": "./",
   "display": "standalone",
   "background_color": "#1a1a1a",
   "theme_color": "#2A8D9C",
@@ -24,6 +24,6 @@
   "categories": ["charity", "non-profit", "education", "social"],
   "lang": "en",
   "dir": "ltr",
-  "scope": "/",
+  "scope": "./",
   "prefer_related_applications": false
 }
