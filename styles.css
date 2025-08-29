@@ -212,13 +212,12 @@ header .container {
 }
 
 .logo img {
-    height: 100px;
-    max-height: 100px;
+    height: 160px;
+    max-height: 180px;
     width: auto;
     border-radius: var(--border-radius-md);
     filter: brightness(1.1) contrast(1.1);
     transition: height 0.3s ease, transform 0.3s ease;
-    transform: scale(1.25);
     transform-origin: left center;
 }
 
