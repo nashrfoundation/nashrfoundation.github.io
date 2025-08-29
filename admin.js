@@ -17,6 +17,8 @@ let currentUser = null;
 let charts = {};
 let realtimeData = {};
 let leaderboardUnsub = null;
+const PROJECT_ID = firebaseConfig.projectId;
+const API_KEY = firebaseConfig.apiKey;
 
 // Using Firebase Auth (email/password). Create admins in Firebase Console.
 
@@ -375,11 +377,14 @@ async function loadLeaderboardData() {
         }, async (err) => {
             console.error('Failed to subscribe leaderboard:', err);
             // Fallback to CSV so admins can at least view data when Firestore rules block reads
-            await fallbackLeaderboardCsv();
+            // Try Firestore REST (public read via rules) before CSV
+            const restOk = await fallbackLeaderboardRest();
+            if (!restOk) await fallbackLeaderboardCsv();
         });
     } catch (error) {
         console.error('Failed to load leaderboard data:', error);
-        await fallbackLeaderboardCsv();
+        const restOk = await fallbackLeaderboardRest();
+        if (!restOk) await fallbackLeaderboardCsv();
     }
 }
 
@@ -410,6 +415,30 @@ async function fallbackLeaderboardCsv() {
     } catch (e) {
         console.error('CSV fallback failed:', e);
         displayLeaderboardTable([]);
+    }
+}
+
+async function fallbackLeaderboardRest() {
+    try {
+        if (!PROJECT_ID || !API_KEY) return false;
+        const url = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(PROJECT_ID)}/databases/(default)/documents/leaderboard?pageSize=200&key=${encodeURIComponent(API_KEY)}`;
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) return false;
+        const json = await res.json();
+        if (!json.documents) return false;
+        const data = json.documents.map(doc => {
+            const f = doc.fields || {};
+            const rank = Number((f.rank && (f.rank.integerValue||f.rank.doubleValue)) || 9999);
+            const name = f.name ? (f.name.stringValue||'') : '';
+            const amount = Number((f.amount && (f.amount.integerValue||f.amount.doubleValue)) || 0);
+            return { rank, name, amount };
+        }).sort((a,b) => a.rank - b.rank);
+        window._leaderboardData = data;
+        displayLeaderboardTable(data);
+        return true;
+    } catch (e) {
+        console.error('REST fallback failed:', e);
+        return false;
     }
 }
 
