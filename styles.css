@@ -52,6 +52,7 @@
 html {
     font-size: 16.5px;
     scroll-behavior: smooth;
+    transform: none !important;
 }
 
 body {
@@ -64,6 +65,7 @@ body {
     display: flex;
     flex-direction: column;
     contain: layout style;
+    transform: none !important;
 }
 
 h1,
@@ -1418,7 +1420,7 @@ footer {
     box-sizing: border-box !important;
 }
 
-#consent-banner .container {
+#consent-banner .consent-container {
     display: flex !important;
     align-items: flex-start !important;
     justify-content: space-between !important;
