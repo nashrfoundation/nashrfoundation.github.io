@@ -63,7 +63,7 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    contain: layout style paint;
+    contain: layout style;
 }
 
 h1,
