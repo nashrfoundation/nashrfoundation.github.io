@@ -281,12 +281,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           if (decided === 'accepted') updateConsent(true);
           // Hard-lock banner to viewport in case any styles mutate later
           if (banner) {
+            // Ensure banner is a direct child of <body> to avoid layout side-effects
+            if (banner.parentNode && banner.parentNode !== document.body) {
+              document.body.appendChild(banner);
+            }
             function lockBanner(){
               banner.style.setProperty('position','fixed','important');
               banner.style.setProperty('left','12px','important');
               banner.style.setProperty('right','12px','important');
               banner.style.setProperty('bottom','calc(env(safe-area-inset-bottom, 0px) + 12px)','important');
               banner.style.setProperty('z-index','10000','important');
+              banner.style.setProperty('width','auto','important');
+              banner.style.setProperty('max-width','calc(100vw - 24px)','important');
             }
             lockBanner();
             window.addEventListener('scroll', lockBanner, { passive: true });
