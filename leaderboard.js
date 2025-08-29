@@ -54,12 +54,45 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.length === 0) {
                     tableBody.innerHTML = '<tr><td colspan="3" class="loading-state">No donors yet</td></tr>';
                 }
-            }, (err) => {
+            }, async (err) => {
                 console.error('Realtime leaderboard error:', err);
-                showErrorState('Error loading donor data');
+                // Fallback to CSV if Firestore is not accessible
+                await fallbackToCsv();
             });
         } catch (e) {
             console.error('Failed to initialize realtime leaderboard:', e);
+            // Fallback to CSV if Firestore init fails
+            await fallbackToCsv();
+        }
+    }
+
+    async function fallbackToCsv() {
+        try {
+            const res = await fetch('leaderboard.csv', { cache: 'no-store' });
+            if (!res.ok) throw new Error('CSV fetch failed');
+            const text = await res.text();
+            const rows = text.trim().split('\n');
+            const tableBody = document.querySelector('#leaderboard-data');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+            for (let i = 1; i < rows.length; i++) {
+                const line = rows[i];
+                if (!line) continue;
+                const cells = line.split(',');
+                if (cells.length >= 3) {
+                    const tr = document.createElement('tr');
+                    const rankTd = document.createElement('td'); rankTd.textContent = cells[0].trim();
+                    const nameTd = document.createElement('td'); nameTd.textContent = cells[1].trim();
+                    const amountTd = document.createElement('td'); amountTd.textContent = '₨ ' + cells[2].trim().replace(/,/g, '');
+                    tr.appendChild(rankTd); tr.appendChild(nameTd); tr.appendChild(amountTd);
+                    tableBody.appendChild(tr);
+                }
+            }
+            if (!tableBody.children.length) {
+                showErrorState('No donor data available');
+            }
+        } catch (err) {
+            console.error('CSV fallback failed:', err);
             showErrorState('Error loading donor data');
         }
     }

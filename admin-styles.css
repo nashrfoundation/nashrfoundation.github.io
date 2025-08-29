@@ -180,12 +180,13 @@ p {
 }
 
 .modal-content {
-    background-color: var(--bg-primary);
-    border-radius: var(--border-radius-lg);
-    padding: var(--spacing-xl);
-    max-width: 400px;
-    width: 90%;
-    box-shadow: var(--shadow-lg);
+    background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+    border-radius: 16px;
+    padding: calc(var(--spacing-xl) + 4px);
+    max-width: 460px;
+    width: 92%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    border: 1px solid var(--border-light);
 }
 
 .modal-content h2 {
@@ -202,8 +203,10 @@ p {
 }
 
 .modal-content .admin-logo {
-    width: 72px;
-    height: 72px;
+    width: 88px;
+    height: 88px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.25);
 }
 
 .modal-subtitle {
@@ -214,9 +217,9 @@ p {
 
 /* Modern input styling for login */
 .login-form .input-lg {
-    padding: 0.9rem 1rem;
-    font-size: 1rem;
-    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    font-size: 1.05rem;
+    border-radius: 12px;
     border: 1px solid var(--border-color);
     background-color: var(--bg-secondary);
 }
@@ -229,7 +232,9 @@ p {
 }
 
 .password-field .toggle-password {
-    border-radius: 8px;
+    border-radius: 10px;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
 }
 
 /* Form Styles */
@@ -289,8 +294,9 @@ p {
 }
 
 .btn-lg {
-    padding: 0.9rem 1.1rem;
-    font-size: 1rem;
+    padding: 1rem 1.25rem;
+    font-size: 1.05rem;
+    border-radius: 12px;
 }
 
 .full-width {
