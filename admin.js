@@ -84,6 +84,12 @@ function setupEventListeners() {
         logoutBtn.addEventListener('click', handleLogout);
     }
     
+    // Leaderboard form
+    const leaderboardForm = document.getElementById('leaderboard-form');
+    if (leaderboardForm) {
+        leaderboardForm.addEventListener('submit', handleLeaderboardSubmit);
+    }
+    
     // Forms (settings and donations removed)
     
     // Removed donations and analytics listeners
@@ -820,6 +826,59 @@ async function handleLeaderboardEntry(e) {
 }
 
 // Leaderboard Management
+async function handleLeaderboardSubmit(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('entry-name').value.trim();
+    const amount = parseInt(document.getElementById('entry-amount').value, 10);
+    const editId = document.getElementById('edit-entry-id').value;
+    
+    if (!name || isNaN(amount) || amount <= 0) {
+        showError('Please enter a valid name and amount.');
+        return;
+    }
+    
+    try {
+        const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
+        
+        if (editId) {
+            // Edit existing entry
+            const rankId = String(editId).padStart(2, '0');
+            const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
+            await fs.setDoc(docRef, {
+                rank: parseInt(editId, 10),
+                name: name,
+                amount: amount,
+                updatedAt: fs.serverTimestamp()
+            });
+            showSuccess('Leaderboard entry updated successfully!');
+        } else {
+            // Add new entry - find next available rank
+            const currentData = window._leaderboardData || [];
+            const nextRank = currentData.length > 0 ? Math.max(...currentData.map(d => d.rank)) + 1 : 1;
+            const rankId = String(nextRank).padStart(2, '0');
+            const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
+            await fs.setDoc(docRef, {
+                rank: nextRank,
+                name: name,
+                amount: amount,
+                createdAt: fs.serverTimestamp()
+            });
+            showSuccess('New leaderboard entry added successfully!');
+        }
+        
+        hideEntryForm();
+        // Refresh data after a short delay to allow Firestore to update
+        setTimeout(() => {
+            loadLeaderboardData();
+        }, 1000);
+        
+    } catch (error) {
+        console.error('Failed to save leaderboard entry:', error);
+        showError('Failed to save entry. Check Firestore permissions.');
+    }
+}
+
 function addLeaderboardEntry() {
     document.getElementById('form-title').textContent = 'Add New Entry';
     document.getElementById('edit-entry-id').value = '';
