@@ -34,14 +34,12 @@
                 <div class="form-group">
                     <label for="admin-email">Email</label>
                     <div class="input-group">
-                        <span class="input-icon" aria-hidden="true">✉️</span>
                         <input type="email" id="admin-email" class="input-lg" placeholder="name@example.com" autocomplete="username" required>
                     </div>
                 </div>
                 <div class="form-group">
                     <label for="admin-password">Password</label>
                     <div class="input-group password-field">
-                        <span class="input-icon" aria-hidden="true">🔒</span>
                         <input type="password" id="admin-password" class="input-lg" placeholder="••••••••" autocomplete="current-password" required>
                         <button type="button" class="toggle-password" aria-label="Show password" onclick="const i=document.getElementById('admin-password'); const show=i.type==='password'; i.type=show?'text':'password'; this.setAttribute('aria-label', show?'Hide password':'Show password'); this.textContent = show ? 'Hide' : 'Show';">Show</button>
                     </div>
