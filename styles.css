@@ -1404,6 +1404,51 @@ footer {
 
 
 /* Payment Method Styles */
+.consent-fix-placeholder {}
+
+/* Force consent banner to stay fixed and readable across devices */
+#consent-banner {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 12px) !important;
+    z-index: 10000 !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    box-sizing: border-box !important;
+}
+
+#consent-banner .container {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+    gap: 12px !important;
+    flex-wrap: wrap !important;
+    max-width: none !important;
+    padding: 0 !important;
+}
+
+#consent-banner strong,
+#consent-banner span {
+    white-space: normal !important;
+    word-break: normal !important;
+    overflow-wrap: anywhere !important;
+}
+
+#consent-banner .btn {
+    white-space: nowrap !important;
+}
+
+@media (max-width: 576px) {
+    #consent-banner .container {
+        flex-direction: column !important;
+        align-items: stretch !important;
+    }
+    #consent-banner .btn {
+        width: 100% !important;
+        min-width: 0 !important;
+    }
+}
 .payment-options {
     display: flex;
     flex-wrap: wrap;
