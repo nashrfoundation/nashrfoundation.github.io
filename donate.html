@@ -644,7 +644,7 @@
             const countryCode = document.getElementById("country-code").value;
             const amount = document.getElementById("donation-amount-input").value;
             const donationType = document.getElementById("donation-type-input").value;
-            const paymentMethod = document.querySelector('input[name="payment_method"]:checked').value;
+            const paymentMethod = 'secure';
             const anonymous = document.getElementById("anonymous-donation").checked;
             const leaderboardConsent = document.getElementById("leaderboard-consent").checked;
 
@@ -659,12 +659,7 @@
               validationErrors.push("Please enter a valid donation amount.");
             }
             
-            if (paymentMethod === "bank-card") {
-              // Check if bank payment processor is ready
-              if (!window.bankPaymentProcessor) {
-                validationErrors.push("Payment system is not ready. Please refresh the page and try again.");
-              }
-            }
+
             
             if (validationErrors.length > 0) {
               showValidationErrors(validationErrors);
@@ -677,7 +672,16 @@
 
             // Process donation payment
             try {
+              console.log('🔄 Form submission - starting payment process');
               const amount = parseInt(document.getElementById("donation-amount-input").value);
+              console.log('💰 Amount to process:', amount);
+              
+              if (!window.stripePaymentProcessor) {
+                console.error('❌ Payment processor not found');
+                showErrorMessage('Payment system not ready. Please refresh the page.');
+                return;
+              }
+              
               await window.stripePaymentProcessor.processDonation(amount);
               
               // Note: User will be redirected to payment page

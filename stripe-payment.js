@@ -18,6 +18,8 @@ class PaymentProcessor {
 
     async processDonation(amount) {
         try {
+            console.log('🚀 Starting donation process for amount:', amount);
+            
             // Get donor information for tracking
             const donorName = document.getElementById('donor-name')?.value || 'Anonymous';
             const donorEmail = document.getElementById('donor-email')?.value || '';
@@ -26,13 +28,17 @@ class PaymentProcessor {
             const anonymous = document.getElementById('anonymous-donation')?.checked || false;
             const leaderboardConsent = document.getElementById('leaderboard-consent')?.checked || false;
 
+            console.log('📝 Donor info:', { donorName, donorEmail, donorPhone, anonymous, leaderboardConsent });
+
             // Validate required fields
             if (!donorEmail && !donorPhone) {
+                console.log('❌ Validation failed: No email or phone');
                 this.showErrorMessage('Please provide either an email or phone number for payment confirmation.');
                 return;
             }
 
             if (!amount || amount <= 0) {
+                console.log('❌ Validation failed: Invalid amount');
                 this.showErrorMessage('Please select a valid donation amount.');
                 return;
             }
@@ -41,9 +47,12 @@ class PaymentProcessor {
             const paymentLink = this.paymentLinks[amount];
             
             if (!paymentLink) {
+                console.log('❌ No payment link found for amount:', amount);
                 this.showErrorMessage('Payment link not configured for this amount. Please contact us.');
                 return;
             }
+
+            console.log('🔗 Payment link:', paymentLink);
 
             // Store donor info in localStorage for after payment
             const donorData = {
@@ -58,8 +67,10 @@ class PaymentProcessor {
             };
             
             localStorage.setItem('pendingDonation', JSON.stringify(donorData));
+            console.log('💾 Donor data stored in localStorage');
 
             // Redirect to payment page
+            console.log('🔄 Redirecting to payment page...');
             window.location.href = paymentLink;
 
         } catch (error) {
