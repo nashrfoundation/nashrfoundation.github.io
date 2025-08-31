@@ -57,6 +57,11 @@
     <!-- Bank Payment Integration -->
     <script src="bank-payment.js"></script>
     
+    <!-- Supabase Integration -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase-config.js"></script>
+    <script src="supabase-integration.js"></script>
+    
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json">
     
@@ -103,18 +108,19 @@
         .phone-input select { padding: 10px 8px; border-radius: 4px; border: 1px solid #ccc; margin-right: 10px; background-color: #fff; font-size: 1rem; }
         .phone-input input { flex: 1; }
         
-        /* Bank Payment Form Styles */
+        /* Bank Payment Form Styles - Dark Theme */
         .bank-card-form {
             margin: 20px 0;
-            padding: 20px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #e9ecef;
+            padding: 25px;
+            background: #1a1a1a;
+            border-radius: 12px;
+            border: 2px solid #333;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
         .form-row {
             display: flex;
-            gap: 15px;
+            gap: 20px;
         }
         
         .form-row .form-group {
@@ -123,31 +129,42 @@
         
         .card-input {
             position: relative;
-            padding: 12px 12px 12px 40px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            background: white;
+            padding: 15px 15px 15px 50px;
+            border: 2px solid #444;
+            border-radius: 8px;
+            background: #2a2a2a;
+            color: #ffffff;
             font-size: 16px;
-            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            font-family: 'Merriweather', serif;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .card-input::placeholder {
+            color: #888;
         }
         
         .card-input:focus {
-            border-color: #80bdff;
+            border-color: #28a745;
             outline: 0;
-            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+            background: #333;
         }
         
         .card-input.error {
             border-color: #dc3545;
+            box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
         }
         
         .card-icon {
             position: absolute;
-            left: 12px;
+            left: 15px;
             top: 50%;
             transform: translateY(-50%);
-            width: 24px;
-            height: 16px;
+            width: 28px;
+            height: 20px;
+            opacity: 0.8;
         }
         
         .card-icon svg {
@@ -156,28 +173,33 @@
         }
         
         .field-error {
-            color: #dc3545;
-            font-size: 12px;
-            margin-top: 5px;
+            color: #ff6b6b;
+            font-size: 13px;
+            margin-top: 8px;
             display: block;
+            font-weight: 500;
         }
         
         .security-info {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 1px solid #e9ecef;
+            margin-top: 25px;
+            padding-top: 20px;
+            border-top: 2px solid #333;
         }
         
         .security-badge {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             color: #28a745;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
+            background: rgba(40, 167, 69, 0.1);
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: 1px solid rgba(40, 167, 69, 0.3);
         }
         
         .security-badge svg {
@@ -186,30 +208,95 @@
         
         .card-types {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
         
         .card-type {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 500;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
             text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         
         .card-type.visa {
-            background: #1976D2;
+            background: linear-gradient(135deg, #1976D2, #1565C0);
             color: white;
         }
         
         .card-type.mastercard {
-            background: #FF5722;
+            background: linear-gradient(135deg, #FF5722, #E64A19);
             color: white;
         }
         
         .card-type.amex {
-            background: #4CAF50;
+            background: linear-gradient(135deg, #4CAF50, #388E3C);
             color: white;
+        }
+        
+        /* Form group labels - Dark theme */
+        .bank-card-form .form-group label {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 8px;
+            display: block;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Payment details section - Dark theme */
+        #bank-card-details {
+            background: #1a1a1a;
+            border-radius: 12px;
+            padding: 20px;
+            border: 2px solid #333;
+        }
+        
+        #bank-card-details h3 {
+            color: #ffffff;
+            margin-bottom: 10px;
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        #bank-card-details p {
+            color: #cccccc;
+            font-size: 16px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+        
+        /* Ensure form controls in card form match theme */
+        .bank-card-form .form-control {
+            background: #2a2a2a;
+            border: 2px solid #444;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .bank-card-form .form-control:focus {
+            border-color: #28a745;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+            background: #333;
+            outline: none;
+        }
+        
+        /* Card input specific overrides */
+        .bank-card-form .card-input {
+            background: #2a2a2a !important;
+            color: #ffffff !important;
+            border: 2px solid #444 !important;
+        }
+        
+        .bank-card-form .card-input:focus {
+            background: #333 !important;
+            border-color: #28a745 !important;
         }
     </style>
 </head>
@@ -604,14 +691,24 @@
                 const paymentResult = await window.bankPaymentProcessor.processPayment(donationData);
                 
                 if (paymentResult.success) {
-                  // Record donation in Firebase
+                  // Add transaction ID to donation data
+                  donationData.transactionId = paymentResult.transactionId;
+                  
+                  // Process complete donation in Supabase (donation + leaderboard)
+                  const supabaseResult = await window.supabaseIntegration.processCompleteDonation(donationData);
+                  
+                  // Also record in Firebase for backup
                   await addDoc(collection(db, "donations"), {
                     ...donationData,
-                    transactionId: paymentResult.transactionId,
                     paymentStatus: 'completed'
                   });
                   
-                  showSuccessMessage("🎉 Thank you! Your donation has been processed successfully.");
+                  // Show success message with leaderboard info
+                  const successMessage = supabaseResult.leaderboard 
+                    ? `🎉 Thank you! Your donation has been processed successfully and you've been added to our leaderboard!`
+                    : `🎉 Thank you! Your donation has been processed successfully!`;
+                  
+                  showSuccessMessage(successMessage);
                   form.reset();
                   // Reset form UI
                   document.getElementById("custom-amount-container").style.display = 'none';
