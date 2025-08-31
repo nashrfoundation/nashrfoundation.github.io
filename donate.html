@@ -412,7 +412,10 @@
                                 <div class="checkbox-group"> <input checked id="leaderboard-consent" name="leaderboard_consent" type="checkbox" value="yes"/> <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label> </div>
                                 <div class="checkbox-group"> <input id="anonymous-donation" name="anonymous_donation" type="checkbox" value="yes"/> <label for="anonymous-donation">Make my donation anonymous</label> </div>
                             </div>
-                            <div class="form-submit"> <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button> </div>
+                            <div class="form-submit"> 
+                <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button> 
+                <button type="button" onclick="testPayment()" style="margin-top: 10px; background: #ff6b6b;">Test Payment Redirect</button>
+            </div>
                             <div class="secure-badge"> <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> <span>Your payment information is secure and protected</span> </div>
                         </form>
                     </div>
@@ -620,9 +623,9 @@
         const form = document.getElementById("donation-form");
         const submitButton = document.getElementById("submit-donation-btn");
 
-        // Bank payment processor is initialized in bank-payment.js
-        // Show bank card details by default since it's the only payment method
-        document.getElementById('bank-card-details').style.display = 'block';
+        // Payment processor is initialized in stripe-payment.js
+        console.log('🔧 Checking payment processor initialization...');
+        console.log('window.stripePaymentProcessor:', window.stripePaymentProcessor);
 
         form.addEventListener("submit", async (e) => {
             // This is the most important line. It stops the page reload.
@@ -740,6 +743,21 @@
       "currency": "PKR",
       "priceRange": "₨500 - ₨10,000+"
     }
+    </script>
+    
+    <script>
+        function testPayment() {
+            console.log('🧪 Testing payment redirect...');
+            console.log('Payment processor:', window.stripePaymentProcessor);
+            
+            if (window.stripePaymentProcessor) {
+                console.log('✅ Payment processor found, testing redirect...');
+                window.stripePaymentProcessor.processDonation(2500);
+            } else {
+                console.log('❌ Payment processor not found!');
+                alert('Payment processor not initialized. Check console for details.');
+            }
+        }
     </script>
 </body>
 </html>
