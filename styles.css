@@ -265,22 +265,35 @@ nav ul li a.active::after {
 .social-icons {
     display: flex;
     align-items: center;
+    gap: var(--spacing-xs);
 }
 
 .social-icons a {
-    margin-left: var(--spacing-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    border-radius: 6px;
+    transition: all var(--transition-fast);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.social-icons a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 .social-icons img {
     width: 24px;
     height: 24px;
-    transition: transform var(--transition-fast), filter var(--transition-fast);
-    filter: brightness(0.8) invert(0.9);
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+    opacity: 0.8;
+    border-radius: 4px;
 }
 
 .social-icons img:hover {
-    transform: scale(1.12);
-    filter: brightness(1) invert(1);
+    transform: scale(1.15);
+    opacity: 1;
 }
 
 .donate-button {
@@ -646,22 +659,35 @@ footer {
 .footer-social {
     display: flex;
     align-items: center;
+    gap: var(--spacing-sm);
 }
 
 .footer-social a {
-    margin-right: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border-radius: 8px;
+    transition: all var(--transition-fast);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.footer-social a:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
 }
 
 .footer-social img {
     width: 32px;
     height: 32px;
-    filter: brightness(0.8) invert(0.9);
-    transition: transform var(--transition-fast), filter var(--transition-fast);
+    opacity: 0.8;
+    transition: transform var(--transition-fast), opacity var(--transition-fast);
+    border-radius: 4px;
 }
 
 .footer-social img:hover {
     transform: scale(1.2);
-    filter: brightness(1) invert(1);
+    opacity: 1;
 }
 
 .footer-bottom {
@@ -1698,7 +1724,7 @@ footer {
 
 .social-icons a:hover img {
     transform: scale(1.1);
-    filter: brightness(0) invert(1);
+    opacity: 1;
 }
 
 /* Improved Table Design */

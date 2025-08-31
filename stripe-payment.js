@@ -4,10 +4,10 @@
 class PaymentProcessor {
     constructor() {
         this.paymentLinks = {
-            1000: 'https://buy.stripe.com/test_5kQfZj4Z67KB5c54IgaEE00',
-            2500: 'https://buy.stripe.com/test_5kQfZj4Z67KB5c54IgaEE00', 
-            5000: 'https://buy.stripe.com/test_5kQfZj4Z67KB5c54IgaEE00',
-            10000: 'https://buy.stripe.com/test_5kQfZj4Z67KB5c54IgaEE00'
+            1000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01',
+            2500: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01', 
+            5000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01',
+            10000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01'
         };
         this.initializePaymentLinks();
     }

@@ -414,7 +414,6 @@
                             </div>
                             <div class="form-submit"> 
                 <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button> 
-                <button type="button" onclick="testPayment()" style="margin-top: 10px; background: #ff6b6b;">Test Payment Redirect</button>
             </div>
                             <div class="secure-badge"> <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> <span>Your payment information is secure and protected</span> </div>
                         </form>
@@ -801,19 +800,6 @@
     }
     </script>
     
-    <script>
-        function testPayment() {
-            console.log('🧪 Testing payment redirect...');
-            console.log('Payment processor:', window.stripePaymentProcessor);
-            
-            if (window.stripePaymentProcessor) {
-                console.log('✅ Payment processor found, testing redirect...');
-                window.stripePaymentProcessor.processDonation(2500);
-            } else {
-                console.log('❌ Payment processor not found!');
-                alert('Payment processor not initialized. Check console for details.');
-            }
-        }
-    </script>
+
 </body>
 </html>
