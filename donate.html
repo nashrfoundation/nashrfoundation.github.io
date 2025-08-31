@@ -54,6 +54,9 @@
     <!-- Your external CSS file -->
     <link rel="stylesheet" href="styles.css">
     
+    <!-- Bank Payment Integration -->
+    <script src="bank-payment.js"></script>
+    
     <!-- PWA Manifest -->
     <link rel="manifest" href="./manifest.json">
     
@@ -99,6 +102,115 @@
         .phone-input { display: flex; align-items: center; }
         .phone-input select { padding: 10px 8px; border-radius: 4px; border: 1px solid #ccc; margin-right: 10px; background-color: #fff; font-size: 1rem; }
         .phone-input input { flex: 1; }
+        
+        /* Bank Payment Form Styles */
+        .bank-card-form {
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+        
+        .form-row {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .form-row .form-group {
+            flex: 1;
+        }
+        
+        .card-input {
+            position: relative;
+            padding: 12px 12px 12px 40px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            background: white;
+            font-size: 16px;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        
+        .card-input:focus {
+            border-color: #80bdff;
+            outline: 0;
+            box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+        }
+        
+        .card-input.error {
+            border-color: #dc3545;
+        }
+        
+        .card-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 24px;
+            height: 16px;
+        }
+        
+        .card-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+        
+        .field-error {
+            color: #dc3545;
+            font-size: 12px;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        .security-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #28a745;
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .security-badge svg {
+            color: #28a745;
+        }
+        
+        .card-types {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .card-type {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+        
+        .card-type.visa {
+            background: #1976D2;
+            color: white;
+        }
+        
+        .card-type.mastercard {
+            background: #FF5722;
+            color: white;
+        }
+        
+        .card-type.amex {
+            background: #4CAF50;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -169,25 +281,53 @@
                             <div class="form-group">
                                 <label>Payment Method</label>
                                 <div class="payment-options">
-                                    <div class="payment-option" data-method="bank-transfer"> <input checked name="payment_method" type="radio" value="bank-transfer" id="bank-transfer"/> <label for="bank-transfer">Bank Transfer</label> </div>
-                                    <div class="payment-option" data-method="jazzcash"> <input name="payment_method" type="radio" value="jazzcash" id="jazzcash"/> <label for="jazzcash">JazzCash</label> </div>
-                                    <div class="payment-option" data-method="easy-paisa"> <input name="payment_method" type="radio" value="easy-paisa" id="easy-paisa"/> <label for="easy-paisa">Easy Paisa</label> </div>
-                                    <div class="payment-option" data-method="qr-code"> <input name="payment_method" type="radio" value="qr-code" id="qr-code"/> <label for="qr-code">QR Code</label> </div>
-                                    <div class="payment-option" data-method="paypal"> <input name="payment_method" type="radio" value="paypal" id="paypal"/> <label for="paypal">PayPal</label> </div>
-                                    <div class="payment-option" data-method="stripe"> <input name="payment_method" type="radio" value="stripe" id="stripe"/> <label for="stripe">Stripe (Card)</label> </div>
+                                    <div class="payment-option" data-method="bank-card"> <input checked name="payment_method" type="radio" value="bank-card" id="bank-card"/> <label for="bank-card">Credit/Debit Card</label> </div>
                                 </div>
                             </div>
-                            <div class="payment-details-content" id="bank-transfer-details"> <h3>Bank Transfer Details</h3> <p>You can make a direct bank transfer using the details below:</p> <pre>Account Title: Talal Nadeem
-Account Number: 7410200028601
-IBAN: PK74 ASCM 0007 4102 0002 8601
-Branch code: 0741
-Bank Name: Askari Bank Limited
-SWIFT Code: ASCMPKKAXXX</pre> </div>
-                            <div class="payment-details-content" id="jazzcash-details" style="display: none;"> <h3>JazzCash Payment Details</h3> <p>Please send your donation to the following JazzCash account:</p> <pre>Account Title: Your Name<br>Account Number: 03XX-XXXXXXX</pre> </div>
-                            <div class="payment-details-content" id="easy-paisa-details" style="display: none;"> <h3>Easy Paisa Payment Details</h3> <p>Please send your donation to the following Easy Paisa account:</p> <pre>Account Title: Your Name<br>Account Number: 03XX-XXXXXXX</pre> </div>
-                            <div class="payment-details-content" id="qr-code-details" style="display: none;"> <h3>Pay with QR Code</h3> <p>Scan the QR code below using your mobile payment app.</p> <div class="qr-placeholder">QR Code will be displayed here</div> </div>
-                            <div class="payment-details-content" id="paypal-details" style="display: none;"> <h3>PayPal Payment</h3> <p>You will be redirected to PayPal to complete your donation securely.</p> </div>
-                            <div class="payment-details-content" id="stripe-details" style="display: none;"> <h3>Stripe (Credit/Debit Card)</h3> <p>Secure card payments powered by Stripe.</p> </div>
+                            <div class="payment-details-content" id="bank-card-details"> <h3>Direct Bank Payment</h3> <p>Enter your card details below to complete your donation securely.</p> 
+                                <div class="bank-card-form">
+                                    <div class="form-group">
+                                        <label for="card-number">Card Number</label>
+                                        <input type="text" id="card-number" class="form-control card-input" 
+                                               placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                        <div class="card-icon" id="card-icon"></div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label for="expiry-date">Expiry Date</label>
+                                            <input type="text" id="expiry-date" class="form-control card-input" 
+                                                   placeholder="MM/YY" maxlength="5" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label for="cvv">CVV</label>
+                                            <input type="text" id="cvv" class="form-control card-input" 
+                                                   placeholder="123" maxlength="4" required>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="card-holder">Cardholder Name</label>
+                                        <input type="text" id="card-holder" class="form-control card-input" 
+                                               placeholder="As it appears on card" required>
+                                    </div>
+                                    
+                                    <div class="security-info">
+                                        <div class="security-badge">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+                                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
+                                                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                            Secure SSL Encrypted
+                                        </div>
+                                        <div class="card-types">
+                                            <span class="card-type visa">Visa</span>
+                                            <span class="card-type mastercard">Mastercard</span>
+                                            <span class="card-type amex">Amex</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                             <div class="form-group"> <label for="donor-name">Your Name</label> <input class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required type="text"/> </div>
                             <div class="form-group"> <label for="donor-email">Email Address</label> <input class="form-control" id="donor-email" name="email" placeholder="Enter your email address" type="email"/> </div>
                             <div class="form-group"> <label for="donor-phone">Phone Number</label> <div class="phone-input"> <select id="country-code" name="country_code"> <option value="+92" selected>+92 (Pakistan)</option> <option value="+1">+1 (USA)</option> <option value="+44">+44 (UK)</option> </select> <input class="form-control" id="donor-phone" name="phone" placeholder="Enter your phone number" type="tel" /> </div> </div>
@@ -403,6 +543,10 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
         const form = document.getElementById("donation-form");
         const submitButton = document.getElementById("submit-donation-btn");
 
+        // Bank payment processor is initialized in bank-payment.js
+        // Show bank card details by default since it's the only payment method
+        document.getElementById('bank-card-details').style.display = 'block';
+
         form.addEventListener("submit", async (e) => {
             // This is the most important line. It stops the page reload.
             e.preventDefault(); 
@@ -438,8 +582,11 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
               validationErrors.push("Please enter a valid donation amount.");
             }
             
-            if (["paypal", "stripe"].includes(paymentMethod)) {
-              validationErrors.push(`${paymentMethod.toUpperCase()} integration is coming soon. Please use Bank Transfer, JazzCash, or EasyPaisa.`);
+            if (paymentMethod === "bank-card") {
+              // Check if bank payment processor is ready
+              if (!window.bankPaymentProcessor) {
+                validationErrors.push("Payment system is not ready. Please refresh the page and try again.");
+              }
             }
             
             if (validationErrors.length > 0) {
@@ -451,25 +598,64 @@ SWIFT Code: ASCMPKKAXXX</pre> </div>
 
             const donationData = { name: anonymous ? "Anonymous" : name || "Anonymous", email: email || null, phone: phone ? (countryCode + phone) : null, amount: Number(amount), donationType, paymentMethod, leaderboardConsent: !anonymous && leaderboardConsent, createdAt: serverTimestamp() };
 
-            try {
-              await addDoc(collection(db, "donations"), donationData);
-              showSuccessMessage("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
-              form.reset();
-              // Manually reset UI elements after submission
-              document.getElementById("custom-amount-container").style.display = 'none';
-              document.getElementById("donation-amount-input").value = "2500";
-              document.querySelector('.amount-option.active')?.classList.remove("active");
-              document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
-              document.getElementById("bank-transfer").checked = true;
-              document.getElementById("bank-transfer").dispatchEvent(new Event("change"));
-              document.getElementById("leaderboard-consent").disabled = false;
-            } catch (error) {
-              console.error("❌ Error submitting donation to Firestore:", error);
-              showErrorMessage("Something went wrong while recording your donation. Please try again.");
-            } finally {
-              submitButton.disabled = false;
-              submitButton.classList.remove('loading');
-              submitButton.textContent = "Complete Donation";
+            if (paymentMethod === "bank-card") {
+              // Process bank payment
+              try {
+                const paymentResult = await window.bankPaymentProcessor.processPayment(donationData);
+                
+                if (paymentResult.success) {
+                  // Record donation in Firebase
+                  await addDoc(collection(db, "donations"), {
+                    ...donationData,
+                    transactionId: paymentResult.transactionId,
+                    paymentStatus: 'completed'
+                  });
+                  
+                  showSuccessMessage("🎉 Thank you! Your donation has been processed successfully.");
+                  form.reset();
+                  // Reset form UI
+                  document.getElementById("custom-amount-container").style.display = 'none';
+                  document.getElementById("donation-amount-input").value = "2500";
+                  document.querySelector('.amount-option.active')?.classList.remove("active");
+                  document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
+                  document.getElementById("bank-card").checked = true;
+                  document.getElementById("bank-card").dispatchEvent(new Event("change"));
+                  document.getElementById("leaderboard-consent").disabled = false;
+                  
+                } else {
+                  showErrorMessage("Payment processing failed. Please try again.");
+                }
+                
+              } catch (error) {
+                console.error("❌ Error processing payment:", error);
+                showErrorMessage(`Payment failed: ${error.message}`);
+              } finally {
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+                submitButton.textContent = "Complete Donation";
+              }
+            } else {
+              // Fallback for other payment methods (if any remain)
+              try {
+                await addDoc(collection(db, "donations"), donationData);
+                showSuccessMessage("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
+                form.reset();
+                // Manually reset UI elements after submission
+                document.getElementById("custom-amount-container").style.display = 'none';
+                document.getElementById("donation-amount-input").value = "2500";
+                document.querySelector('.amount-option.active')?.classList.remove("active");
+                document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
+                                  document.getElementById("bank-card").checked = true;
+                  document.getElementById("bank-card").dispatchEvent(new Event("change"));
+                document.getElementById("leaderboard-consent").disabled = false;
+              } catch (error) {
+                console.error("❌ Error submitting donation to Firestore:", error);
+                showErrorMessage("Something went wrong while recording your donation. Please try again.");
+              } finally {
+                submitButton.disabled = false;
+                submitButton.classList.remove('loading');
+                submitButton.textContent = "Complete Donation";
+              }
             }
         });
       } catch (error) {
