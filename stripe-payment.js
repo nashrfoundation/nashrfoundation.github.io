@@ -1,7 +1,7 @@
-// Stripe Payment Links Integration for Nashr Foundation
-// Simple payment links - no products or backend required!
+// Payment Integration for Nashr Foundation
+// Simple payment processing - no branding required!
 
-class StripePaymentProcessor {
+class PaymentProcessor {
     constructor() {
         this.paymentLinks = {
             1000: 'https://buy.stripe.com/test_5kQfZj4Z67KB5c54IgaEE00',
@@ -13,7 +13,7 @@ class StripePaymentProcessor {
     }
 
     initializePaymentLinks() {
-        console.log('✅ Stripe Payment Links initialized');
+        console.log('✅ Payment system initialized');
     }
 
     async processDonation(amount) {
@@ -59,7 +59,7 @@ class StripePaymentProcessor {
             
             localStorage.setItem('pendingDonation', JSON.stringify(donorData));
 
-            // Redirect to Stripe Payment Link
+            // Redirect to payment page
             window.location.href = paymentLink;
 
         } catch (error) {
@@ -101,7 +101,7 @@ class StripePaymentProcessor {
                 phone: donorData.phone,
                 amount: donorData.amount,
                 donationType: donorData.donationType,
-                paymentMethod: 'stripe',
+                paymentMethod: 'secure',
                 transactionId: sessionId,
                 paymentStatus: 'completed',
                 leaderboardConsent: donorData.leaderboardConsent,
@@ -229,15 +229,14 @@ class StripePaymentProcessor {
             document.getElementById("donation-amount-input").value = "2500";
             document.querySelector('.amount-option.active')?.classList.remove("active");
             document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
-            document.getElementById("stripe").checked = true;
             document.getElementById("leaderboard-consent").disabled = false;
         }
     }
 }
 
-// Initialize Stripe payment processor when page loads
+// Initialize payment processor when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    window.stripePaymentProcessor = new StripePaymentProcessor();
+    window.stripePaymentProcessor = new PaymentProcessor();
     
     // Check for payment return
     window.stripePaymentProcessor.checkPaymentReturn();

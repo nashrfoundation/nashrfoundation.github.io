@@ -54,10 +54,7 @@
     <!-- Your external CSS file -->
     <link rel="stylesheet" href="styles.css">
     
-    <!-- Bank Payment Integration (Demo Mode) -->
-    <script src="bank-payment.js"></script>
-    
-    <!-- Stripe Payment Links Integration -->
+    <!-- Stripe Payment Integration -->
     <script src="stripe-payment.js"></script>
     
     <!-- Supabase Integration -->
@@ -302,366 +299,9 @@
             border-color: #28a745 !important;
         }
         
-        /* Enhanced Card Preview Styles */
-        .card-preview-container {
-            display: flex;
-            justify-content: center;
-            margin-bottom: 30px;
-        }
+
         
-        .card-preview {
-            width: 100%;
-            max-width: 400px;
-            perspective: 1000px;
-        }
-        
-        .card-front {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 16px;
-            padding: 24px;
-            color: white;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-            min-height: 220px;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-        
-        .card-front::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 100%);
-            pointer-events: none;
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        
-        .card-chip {
-            width: 50px;
-            height: 40px;
-            background: linear-gradient(135deg, #ffd700 0%, #ffed4e 100%);
-            border-radius: 8px;
-            position: relative;
-        }
-        
-        .card-chip::before {
-            content: '';
-            position: absolute;
-            top: 8px;
-            left: 8px;
-            right: 8px;
-            bottom: 8px;
-            background: linear-gradient(135deg, #e6c200 0%, #ffd700 100%);
-            border-radius: 4px;
-        }
-        
-        .card-logo svg {
-            filter: brightness(0) invert(1);
-        }
-        
-        .card-number {
-            font-size: 1.4rem;
-            font-weight: 600;
-            letter-spacing: 2px;
-            margin-bottom: 20px;
-            font-family: 'Courier New', monospace;
-        }
-        
-        .card-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-        }
-        
-        .card-holder, .card-expiry {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .card-holder .label, .card-expiry .label {
-            font-size: 0.7rem;
-            opacity: 0.8;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 4px;
-        }
-        
-        .card-holder .value, .card-expiry .value {
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-        
-        /* Input Wrapper with Validation */
-        .input-wrapper {
-            position: relative;
-        }
-        
-        .validation-indicator {
-            position: absolute;
-            right: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .validation-indicator.valid {
-            opacity: 1;
-            background: #28a745;
-            color: white;
-        }
-        
-        .validation-indicator.valid::after {
-            content: '✓';
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .validation-indicator.invalid {
-            opacity: 1;
-            background: #dc3545;
-            color: white;
-        }
-        
-        .validation-indicator.invalid::after {
-            content: '✗';
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        /* Enhanced Card Type Detection */
-        .card-icon {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 28px;
-            height: 20px;
-            opacity: 0.8;
-            transition: opacity 0.3s ease;
-        }
-        
-        .card-icon.visa svg {
-            filter: brightness(0) invert(1);
-        }
-        
-        .card-icon.mastercard svg {
-            filter: brightness(0) invert(1);
-        }
-        
-        .card-icon.amex svg {
-            filter: brightness(0) invert(1);
-        }
-        
-        /* Enhanced Security Badge */
-        .security-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #28a745;
-            font-size: 14px;
-            font-weight: 600;
-            background: rgba(40, 167, 69, 0.1);
-            padding: 12px 16px;
-            border-radius: 8px;
-            border: 1px solid rgba(40, 167, 69, 0.3);
-            box-shadow: 0 2px 8px rgba(40, 167, 69, 0.1);
-        }
-        
-        .security-badge svg {
-            color: #28a745;
-            flex-shrink: 0;
-        }
-        
-        /* Enhanced Card Types */
-        .card-types {
-            display: flex;
-            gap: 12px;
-        }
-        
-        .card-type {
-            padding: 8px 12px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-            transition: transform 0.2s ease;
-        }
-        
-        .card-type:hover {
-            transform: translateY(-2px);
-        }
-        
-        .card-type.visa {
-            background: linear-gradient(135deg, #1976D2, #1565C0);
-            color: white;
-        }
-        
-        .card-type.mastercard {
-            background: linear-gradient(135deg, #FF5722, #E64A19);
-            color: white;
-        }
-        
-        .card-type.amex {
-            background: linear-gradient(135deg, #4CAF50, #388E3C);
-            color: white;
-        }
-        
-        /* Enhanced Form Styling */
-        .bank-card-form {
-            background: linear-gradient(145deg, #1a1a1a, #2a2a2a);
-            border: 2px solid #333;
-            border-radius: 16px;
-            padding: 30px;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .bank-card-form::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #28a745, #20c997, #28a745);
-            background-size: 200% 100%;
-            animation: gradient-shift 3s ease-in-out infinite;
-        }
-        
-        @keyframes gradient-shift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
-        
-        /* Enhanced Input Focus States */
-        .card-input:focus {
-            border-color: #28a745 !important;
-            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2) !important;
-            background: #333 !important;
-            transform: translateY(-1px);
-        }
-        
-        /* Loading State for Card Preview */
-        .card-preview.loading {
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        /* Mobile Responsive Card Preview */
-        @media (max-width: 768px) {
-            .card-preview {
-                max-width: 320px;
-            }
-            
-            .card-front {
-                padding: 20px;
-                min-height: 180px;
-            }
-            
-            .card-number {
-                font-size: 1.2rem;
-                letter-spacing: 1px;
-            }
-            
-            .card-details {
-                flex-direction: column;
-                gap: 10px;
-                align-items: flex-start;
-            }
-            
-            .bank-card-form {
-                padding: 20px;
-            }
-        }
-        
-        /* PayPal Payment Styles */
-        .paypal-buttons-container {
-            margin: 20px 0;
-        }
-        
-        .paypal-button-wrapper h4 {
-            color: #ffffff;
-            margin-bottom: 15px;
-            font-size: 18px;
-            text-align: center;
-        }
-        
-        .paypal-buttons-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .paypal-button-slot {
-            min-height: 50px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 2px dashed rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .paypal-button-slot:hover {
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(255, 255, 255, 0.4);
-        }
-        
-        .paypal-button-slot:empty::after {
-            content: 'PayPal Button Loading...';
-            color: #888;
-            font-style: italic;
-        }
-        
-        /* PayPal Button Customization */
-        .paypal-button-container {
-            width: 100%;
-            min-height: 50px;
-        }
-        
-        /* Payment Method Selection */
-        .payment-option[data-method="paypal"] {
-            border-color: #0070ba;
-            background: rgba(0, 112, 186, 0.1);
-        }
-        
-        .payment-option[data-method="paypal"]:hover {
-            border-color: #005ea6;
-            background: rgba(0, 112, 186, 0.2);
-        }
-        
-        .payment-option[data-method="paypal"] input:checked + label {
-            color: #0070ba;
-            font-weight: 600;
-        }
+
         
         /* Success/Error Message Styles */
         .success-message {
@@ -750,119 +390,18 @@
                                 <input id="donation-amount-input" name="donation_amount" type="hidden" value="2500"/>
                                 <div id="custom-amount-container" style="display: none;"> <input class="form-control" id="custom-amount" min="1" placeholder="Enter amount in PKR" type="number"/> </div>
                             </div>
-                            <div class="form-group">
-                                <label>Payment Method</label>
-                                <div class="payment-options">
-                                    <div class="payment-option" data-method="stripe"> <input checked name="payment_method" type="radio" value="stripe" id="stripe"/> <label for="stripe">Secure Payment (Stripe)</label> </div>
-                                    <div class="payment-option" data-method="bank-card"> <input name="payment_method" type="radio" value="bank-card" id="bank-card"/> <label for="bank-card">Direct Card (Demo)</label> </div>
-                                </div>
-                            </div>
-                            <div class="payment-details-content" id="stripe-details" style="display: block;"> 
+
+                                                        <div class="payment-details-content" id="stripe-details" style="display: block;"> 
                                 <h3>Secure Payment</h3> 
-                                <p>Pay securely with your credit/debit card through Stripe. Your payment information is protected by bank-level security.</p>
+                                <p>Your donation will be processed securely. Enter your information below to complete your donation.</p>
                                 
-                                <div class="stripe-payment-info">
+                                <div class="payment-info">
                                     <div class="security-badge">
                                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                                             <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
                                             <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
-                                        SSL Encrypted & PCI Compliant
-                                    </div>
-                                    
-                                    <div class="payment-methods">
-                                        <span class="payment-method">Visa</span>
-                                        <span class="payment-method">Mastercard</span>
-                                        <span class="payment-method">American Express</span>
-                                        <span class="payment-method">Discover</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="payment-details-content" id="bank-card-details" style="display: none;"> 
-                                <h3>Payment Demo</h3> 
-                                <p>This is a demonstration of our payment system. No real transactions will be processed. Enter any card details to see the interface in action.</p> 
-                                
-                                <!-- Card Preview Section -->
-                                <div class="card-preview-container">
-                                    <div class="card-preview" id="card-preview">
-                                        <div class="card-front">
-                                            <div class="card-header">
-                                                <div class="card-chip"></div>
-                                                <div class="card-logo" id="preview-card-logo">
-                                                    <svg viewBox="0 0 48 48" width="40" height="25">
-                                                        <path fill="#1976D2" d="M32 10A12 12 0 1 0 32 34A12 12 0 1 0 32 10Z"/>
-                                                        <path fill="#FFC107" d="M24 26A6 6 0 1 0 24 14A6 6 0 1 0 24 26Z"/>
-                                                    </svg>
-                                                </div>
-                                            </div>
-                                            <div class="card-number" id="preview-card-number">•••• •••• •••• ••••</div>
-                                            <div class="card-details">
-                                                <div class="card-holder">
-                                                    <span class="label">Cardholder</span>
-                                                    <span class="value" id="preview-card-holder">Your Name</span>
-                                                </div>
-                                                <div class="card-expiry">
-                                                    <span class="label">Expires</span>
-                                                    <span class="value" id="preview-card-expiry">MM/YY</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="bank-card-form">
-                                    <div class="form-group">
-                                        <label for="card-number">Card Number</label>
-                                        <div class="input-wrapper">
-                                            <input type="text" id="card-number" class="form-control card-input" 
-                                                   placeholder="1234 5678 9012 3456" maxlength="19" required>
-                                            <div class="card-icon" id="card-icon"></div>
-                                            <div class="validation-indicator" id="card-validation"></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="expiry-date">Expiry Date</label>
-                                            <div class="input-wrapper">
-                                                <input type="text" id="expiry-date" class="form-control card-input" 
-                                                       placeholder="MM/YY" maxlength="5" required>
-                                                <div class="validation-indicator" id="expiry-validation"></div>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="cvv">CVV</label>
-                                            <div class="input-wrapper">
-                                                <input type="text" id="cvv" class="form-control card-input" 
-                                                       placeholder="123" maxlength="4" required>
-                                                <div class="validation-indicator" id="cvv-validation"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="card-holder">Cardholder Name</label>
-                                        <div class="input-wrapper">
-                                            <input type="text" id="card-holder" class="form-control card-input" 
-                                                   placeholder="As it appears on card" required>
-                                            <div class="validation-indicator" id="holder-validation"></div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="security-info">
-                                        <div class="security-badge">
-                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-                                                <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-width="2"/>
-                                                <path d="M9 12L11 14L15 10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                            Demo Mode - No Real Transactions
-                                        </div>
-                                        <div class="card-types">
-                                            <span class="card-type visa">Visa</span>
-                                            <span class="card-type mastercard">Mastercard</span>
-                                            <span class="card-type amex">Amex</span>
-                                        </div>
+                                        Secure & Encrypted
                                     </div>
                                 </div>
                             </div>
@@ -873,8 +412,8 @@
                                 <div class="checkbox-group"> <input checked id="leaderboard-consent" name="leaderboard_consent" type="checkbox" value="yes"/> <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label> </div>
                                 <div class="checkbox-group"> <input id="anonymous-donation" name="anonymous_donation" type="checkbox" value="yes"/> <label for="anonymous-donation">Make my donation anonymous</label> </div>
                             </div>
-                            <div class="form-submit"> <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Demo Donation</button> </div>
-                            <div class="secure-badge"> <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> <span>Demo Mode - No real transactions will be processed</span> </div>
+                            <div class="form-submit"> <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button> </div>
+                            <div class="secure-badge"> <svg aria-hidden="true" fill="none" focusable="false" viewbox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 16V12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path><path d="M12 8H12.01" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"></path></svg> <span>Your payment information is secure and protected</span> </div>
                         </form>
                     </div>
                 </div>
@@ -1136,92 +675,21 @@
 
             const donationData = { name: anonymous ? "Anonymous" : name || "Anonymous", email: email || null, phone: phone ? (countryCode + phone) : null, amount: Number(amount), donationType, paymentMethod, leaderboardConsent: !anonymous && leaderboardConsent, createdAt: serverTimestamp() };
 
-            if (paymentMethod === "stripe") {
-              // Process Stripe payment
-              try {
-                const amount = parseInt(document.getElementById("donation-amount-input").value);
-                await window.stripePaymentProcessor.processDonation(amount);
-                
-                // Note: User will be redirected to Stripe Checkout
-                // The actual payment processing happens on Stripe's servers
-                
-              } catch (error) {
-                console.error("❌ Error processing Stripe payment:", error);
-                showErrorMessage(`Payment setup failed: ${error.message}`);
-              } finally {
-                submitButton.disabled = false;
-                submitButton.classList.remove('loading');
-                submitButton.textContent = "Complete Donation";
-              }
-            } else if (paymentMethod === "bank-card") {
-              // Process bank payment (Demo Mode)
-              try {
-                const paymentResult = await window.bankPaymentProcessor.processPayment(donationData);
-                
-                if (paymentResult.success) {
-                  // Add transaction ID to donation data
-                  donationData.transactionId = paymentResult.transactionId;
-                  donationData.paymentStatus = 'simulated';
-                  
-                  // Process complete donation in Supabase (donation + leaderboard)
-                  const supabaseResult = await window.supabaseIntegration.processCompleteDonation(donationData);
-                  
-                  // Also record in Firebase for backup
-                  await addDoc(collection(db, "donations"), {
-                    ...donationData,
-                    paymentStatus: 'simulated'
-                  });
-                  
-                  // Show success message with demo notice
-                  const successMessage = supabaseResult.leaderboard 
-                    ? `🎉 Thank you! Your donation simulation was successful and you've been added to our leaderboard! (Demo Mode)`
-                    : `🎉 Thank you! Your donation simulation was successful! (Demo Mode)`;
-                  
-                  showSuccessMessage(successMessage);
-                  form.reset();
-                  // Reset form UI
-                  document.getElementById("custom-amount-container").style.display = 'none';
-                  document.getElementById("donation-amount-input").value = "2500";
-                  document.querySelector('.amount-option.active')?.classList.remove("active");
-                  document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
-                  document.getElementById("bank-card").checked = true;
-                  document.getElementById("bank-card").dispatchEvent(new Event("change"));
-                  document.getElementById("leaderboard-consent").disabled = false;
-                  
-                } else {
-                  showErrorMessage("Payment simulation failed. Please try again.");
-                }
-                
-              } catch (error) {
-                console.error("❌ Error processing payment simulation:", error);
-                showErrorMessage(`Payment simulation failed: ${error.message}`);
-              } finally {
-                submitButton.disabled = false;
-                submitButton.classList.remove('loading');
-                submitButton.textContent = "Complete Demo Donation";
-              }
-            } else {
-              // Fallback for other payment methods (if any remain)
-              try {
-                await addDoc(collection(db, "donations"), donationData);
-                showSuccessMessage("🎉 Thank you! Your donation has been recorded.\n\nPlease send your payment screenshot to nashrfoundationpk@gmail.com.");
-                form.reset();
-                // Manually reset UI elements after submission
-                document.getElementById("custom-amount-container").style.display = 'none';
-                document.getElementById("donation-amount-input").value = "2500";
-                document.querySelector('.amount-option.active')?.classList.remove("active");
-                document.querySelector('.amount-option[data-amount="2500"]')?.classList.add("active");
-                                  document.getElementById("bank-card").checked = true;
-                  document.getElementById("bank-card").dispatchEvent(new Event("change"));
-                document.getElementById("leaderboard-consent").disabled = false;
-              } catch (error) {
-                console.error("❌ Error submitting donation to Firestore:", error);
-                showErrorMessage("Something went wrong while recording your donation. Please try again.");
-              } finally {
-                submitButton.disabled = false;
-                submitButton.classList.remove('loading');
-                submitButton.textContent = "Complete Demo Donation";
-              }
+            // Process donation payment
+            try {
+              const amount = parseInt(document.getElementById("donation-amount-input").value);
+              await window.stripePaymentProcessor.processDonation(amount);
+              
+              // Note: User will be redirected to payment page
+              // The actual payment processing happens on secure servers
+              
+            } catch (error) {
+              console.error("❌ Error processing payment:", error);
+              showErrorMessage(`Payment setup failed: ${error.message}`);
+            } finally {
+              submitButton.disabled = false;
+              submitButton.classList.remove('loading');
+              submitButton.textContent = "Complete Donation";
             }
         });
       } catch (error) {
