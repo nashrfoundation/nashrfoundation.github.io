@@ -97,6 +97,57 @@ class BankPaymentProcessor {
         if (cardNumber) {
             cardNumber.addEventListener('input', (e) => this.detectCardType(e.target.value));
         }
+
+        // Card preview updates
+        this.initializeCardPreview();
+    }
+
+    initializeCardPreview() {
+        // Card number preview
+        const cardNumber = document.getElementById('card-number');
+        if (cardNumber) {
+            cardNumber.addEventListener('input', (e) => this.updateCardPreview('number', e.target.value));
+        }
+
+        // Cardholder name preview
+        const cardHolder = document.getElementById('card-holder');
+        if (cardHolder) {
+            cardHolder.addEventListener('input', (e) => this.updateCardPreview('holder', e.target.value));
+        }
+
+        // Expiry date preview
+        const expiryDate = document.getElementById('expiry-date');
+        if (expiryDate) {
+            expiryDate.addEventListener('input', (e) => this.updateCardPreview('expiry', e.target.value));
+        }
+    }
+
+    updateCardPreview(type, value) {
+        switch (type) {
+            case 'number':
+                const previewNumber = document.getElementById('preview-card-number');
+                if (previewNumber) {
+                    if (value) {
+                        const formatted = value.replace(/\s/g, '').replace(/(\d{4})/g, '$1 ').trim();
+                        previewNumber.textContent = formatted || '•••• •••• •••• ••••';
+                    } else {
+                        previewNumber.textContent = '•••• •••• •••• ••••';
+                    }
+                }
+                break;
+            case 'holder':
+                const previewHolder = document.getElementById('preview-card-holder');
+                if (previewHolder) {
+                    previewHolder.textContent = value || 'Your Name';
+                }
+                break;
+            case 'expiry':
+                const previewExpiry = document.getElementById('preview-card-expiry');
+                if (previewExpiry) {
+                    previewExpiry.textContent = value || 'MM/YY';
+                }
+                break;
+        }
     }
 
     initializeCardValidation() {
@@ -133,6 +184,7 @@ class BankPaymentProcessor {
 
     detectCardType(cardNumber) {
         const cardIcon = document.getElementById('card-icon');
+        const previewCardLogo = document.getElementById('preview-card-logo');
         if (!cardIcon) return;
 
         const cleanNumber = cardNumber.replace(/\s/g, '');
@@ -146,8 +198,35 @@ class BankPaymentProcessor {
             cardType = 'amex';
         }
 
+        // Update input icon
         cardIcon.className = `card-icon ${cardType}`;
         cardIcon.innerHTML = this.getCardIconHTML(cardType);
+
+        // Update preview card logo
+        if (previewCardLogo) {
+            previewCardLogo.innerHTML = this.getCardIconHTML(cardType);
+            previewCardLogo.className = `card-logo ${cardType}`;
+        }
+
+        // Update card preview background based on card type
+        this.updateCardPreviewBackground(cardType);
+    }
+
+    updateCardPreviewBackground(cardType) {
+        const cardPreview = document.getElementById('card-preview');
+        if (!cardPreview) return;
+
+        const cardFront = cardPreview.querySelector('.card-front');
+        if (!cardFront) return;
+
+        const gradients = {
+            visa: 'linear-gradient(135deg, #1976D2 0%, #1565C0 100%)',
+            mastercard: 'linear-gradient(135deg, #FF5722 0%, #E64A19 100%)',
+            amex: 'linear-gradient(135deg, #4CAF50 0%, #388E3C 100%)',
+            default: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
+        };
+
+        cardFront.style.background = gradients[cardType] || gradients.default;
     }
 
     getCardIconHTML(cardType) {
@@ -211,11 +290,27 @@ class BankPaymentProcessor {
                 break;
         }
 
+        // Update validation indicator
+        this.updateValidationIndicator(field.id, isValid);
+
         if (!isValid) {
             this.showFieldError(field, errorMessage);
+        } else {
+            this.clearFieldError(field);
         }
 
         return isValid;
+    }
+
+    updateValidationIndicator(fieldId, isValid) {
+        const indicator = document.getElementById(`${fieldId.replace('-', '-')}-validation`);
+        if (!indicator) return;
+
+        if (isValid) {
+            indicator.className = 'validation-indicator valid';
+        } else {
+            indicator.className = 'validation-indicator invalid';
+        }
     }
 
     luhnCheck(cardNumber) {
@@ -280,39 +375,39 @@ class BankPaymentProcessor {
         };
     }
 
-    processPayment(donationData) {
-        return new Promise((resolve, reject) => {
+    async processPayment(donationData) {
+        try {
             // Validate the form first
             if (!this.validateForm()) {
-                reject(new Error('Please fix the errors in the form'));
-                return;
+                throw new Error('Please fix the errors in the form');
             }
 
             // Get card data
             const cardData = this.getCardData();
             
-            // Simulate payment processing
-            // In real implementation, this would send data to your bank's API
-            console.log('Processing payment with card data:', cardData);
-            console.log('Donation data:', donationData);
+            // Simulate payment processing (no real API calls)
+            console.log('🔍 Simulating card validation...');
+            
+            // Simulate processing delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Simulate successful payment
+            const transactionId = 'TXN_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            const bankReference = 'REF_' + Date.now();
+            
+            console.log('✅ Payment simulation completed successfully');
+            
+            return {
+                success: true,
+                transactionId: transactionId,
+                bankReference: bankReference,
+                message: 'Payment simulation completed successfully'
+            };
 
-            // Simulate API call delay
-            setTimeout(() => {
-                // For demo purposes, we'll simulate a successful payment
-                // In production, this would be an actual API call to your bank
-                const success = Math.random() > 0.1; // 90% success rate for demo
-                
-                if (success) {
-                    resolve({
-                        success: true,
-                        transactionId: 'TXN_' + Date.now(),
-                        message: 'Payment processed successfully'
-                    });
-                } else {
-                    reject(new Error('Payment was declined by the bank'));
-                }
-            }, 2000);
-        });
+        } catch (error) {
+            console.error('❌ Payment processing error:', error);
+            throw error;
+        }
     }
 }
 
