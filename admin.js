@@ -1116,7 +1116,7 @@ async function sendNewsletter() {
         console.log('Recipients after validation:', { beforeValidation, afterValidation: recipients.length, recipients });
         
         if (!recipients.length) {
-            showError('No recipients found. Add subscribers or provide emails.');
+            showError('No recipients found. Add subscribers in the Subscribers section or provide emails in the Recipients field.');
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -1592,6 +1592,41 @@ async function loadSubscribersData() {
     }
 }
 
+// Add test subscribers for development
+async function addTestSubscribers() {
+    try {
+        const testEmails = [
+            'test1@example.com',
+            'test2@example.com', 
+            'test3@example.com',
+            'admin@nashrfoundation.org'
+        ];
+        
+        const subscribers = testEmails.map(email => ({
+            email: email,
+            name: email.split('@')[0],
+            status: 'active',
+            source: 'admin_test',
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        }));
+        
+        const { error } = await supabase
+            .from('newsletter_subscribers')
+            .insert(subscribers);
+            
+        if (error) throw error;
+        
+        showSuccess(`Added ${testEmails.length} test subscribers!`);
+        await loadSubscribersData();
+        logActivity('test_subscribers_added', `Added ${testEmails.length} test subscribers`);
+        
+    } catch (error) {
+        console.error('Failed to add test subscribers:', error);
+        showError('Failed to add test subscribers. Please try again.');
+    }
+}
+
 function displaySubscribersTable(subscribers) {
     const tableBody = document.getElementById('subscribers-table-body');
     console.log('Displaying subscribers table:', { tableBody, subscribers, count: subscribers?.length });
@@ -1603,7 +1638,16 @@ function displaySubscribersTable(subscribers) {
 
     if (!subscribers || subscribers.length === 0) {
         console.log('No subscribers to display');
-        tableBody.innerHTML = '<tr><td colspan="5" class="loading">No subscribers found</td></tr>';
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="loading">
+                    <div>No subscribers found</div>
+                    <button onclick="addTestSubscribers()" class="btn btn-outline btn-sm" style="margin-top: 10px;">
+                        Add Test Subscribers
+                    </button>
+                </td>
+            </tr>
+        `;
         return;
     }
 
