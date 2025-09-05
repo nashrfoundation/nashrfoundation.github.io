@@ -17,6 +17,8 @@ let charts = {};
 let realtimeData = {};
 let leaderboardSubscription = null;
 let subscribersSubscription = null;
+let contentSubscription = null;
+let settingsSubscription = null;
 let donationsData = [];
 let logsData = [];
 let currentPage = 1;
@@ -44,7 +46,13 @@ async function initializeSupabase() {
     try {
         const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
         
-        supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+        supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey, {
+            auth: {
+                storageKey: 'nf_admin',
+                persistSession: true,
+                autoRefreshToken: true
+            }
+        });
         
         // Auth state listener
         supabase.auth.onAuthStateChange((event, session) => {
@@ -74,6 +82,8 @@ async function initializeSupabase() {
         // Initialize realtime subscriptions
         setupSubscribersSubscription();
         setupDonationsSubscription();
+        setupContentSubscription();
+        setupSettingsSubscription();
     } catch (error) {
         console.error('Supabase initialization failed:', error);
         showError('Failed to initialize Supabase. Please refresh the page.');
@@ -787,6 +797,60 @@ function setupSubscribersSubscription() {
         console.log('✅ Subscribers real-time subscription established');
     } catch (error) {
         console.error('Failed to set up subscribers subscription:', error);
+    }
+}
+
+function setupContentSubscription() {
+    try {
+        if (contentSubscription) {
+            contentSubscription.unsubscribe();
+            contentSubscription = null;
+        }
+        contentSubscription = supabase
+            .channel('content-changes')
+            .on('postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'content'
+                },
+                () => {
+                    // Refresh content editor if active
+                    if (document.getElementById('content')?.classList.contains('active')) {
+                        loadContentData();
+                    }
+                }
+            )
+            .subscribe();
+    } catch (error) {
+        console.error('Failed to set up content subscription:', error);
+    }
+}
+
+function setupSettingsSubscription() {
+    try {
+        if (settingsSubscription) {
+            settingsSubscription.unsubscribe();
+            settingsSubscription = null;
+        }
+        settingsSubscription = supabase
+            .channel('settings-changes')
+            .on('postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: 'settings'
+                },
+                () => {
+                    // Refresh settings editor if active
+                    if (document.getElementById('settings')?.classList.contains('active')) {
+                        loadSettingsData();
+                    }
+                }
+            )
+            .subscribe();
+    } catch (error) {
+        console.error('Failed to set up settings subscription:', error);
     }
 }
 
