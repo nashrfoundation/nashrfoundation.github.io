@@ -1082,8 +1082,10 @@ async function sendNewsletter() {
         
         if (!recipients.length) {
             showError('No recipients found. Add subscribers or provide emails.');
-            sendButton.innerHTML = originalText;
-            sendButton.disabled = false;
+            if (sendButton) {
+                sendButton.innerHTML = originalText;
+                sendButton.disabled = false;
+            }
             return;
         }
         
@@ -1091,8 +1093,10 @@ async function sendNewsletter() {
         const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
         if (!endpoint) {
             showError('Email service not configured. Set window.RESEND_FUNCTION_URL.');
-            sendButton.innerHTML = originalText;
-            sendButton.disabled = false;
+            if (sendButton) {
+                sendButton.innerHTML = originalText;
+                sendButton.disabled = false;
+            }
             return;
         }
         
@@ -1820,15 +1824,13 @@ function refreshDashboard() {
 function exportDonations() {
     try {
         const rows = donationsData && donationsData.length ? donationsData : [];
-        let csv = 'Date,Name,Amount,Payment Method
-';
+        let csv = 'Date,Name,Amount,Payment Method\n';
         rows.forEach(d => {
             const date = formatDate(d.created_at || d.createdAt || '-');
             const name = (d.name || 'Anonymous').replace(/,/g, '');
             const amount = Number(d.amount || 0);
             const method = (d.payment_method || 'Unknown').replace(/,/g, '');
-            csv += `${date},${name},${amount},${method}
-`;
+            csv += `${date},${name},${amount},${method}\n`;
         });
         downloadCSV(csv, 'donations.csv');
         showSuccess('Donations data exported successfully!');
@@ -1843,8 +1845,7 @@ function exportLeaderboardCsv() {
     const table = document.querySelector('#leaderboard .admin-table');
     if (!table) return;
     
-    let csv = 'Rank,Name,Amount
-';
+    let csv = 'Rank,Name,Amount\n';
     const rows = Array.from(table.querySelectorAll('tbody tr'));
     rows.forEach(tr => {
         const tds = tr.querySelectorAll('td');
@@ -1852,8 +1853,7 @@ function exportLeaderboardCsv() {
             const rank = tds[0].textContent.trim();
             const name = tds[1].textContent.trim();
             const amount = tds[2].textContent.trim().replace(/[^0-9]/g, '');
-            csv += `${rank},${name},${amount}
-`;
+            csv += `${rank},${name},${amount}\n`;
         }
     });
     
@@ -1863,16 +1863,14 @@ function exportLeaderboardCsv() {
 function exportLogs() {
     try {
         const rows = logsData && logsData.length ? logsData : [];
-        let csv = 'Timestamp,User,Action,Details,IP
-';
+        let csv = 'Timestamp,User,Action,Details,IP\n';
         rows.forEach(l => {
             const ts = formatDateTime(l.timestamp || '-');
             const user = (l.user || 'Unknown').replace(/,/g, '');
             const action = (l.action || 'Unknown').replace(/,/g, '');
             const details = ((l.details ?? '') + '').replace(/\n/g, ' ').replace(/,/g, '');
             const ip = (l.ip || '').replace(/,/g, '');
-            csv += `${ts},${user},${action},${details},${ip}
-`;
+            csv += `${ts},${user},${action},${details},${ip}\n`;
         });
         downloadCSV(csv, 'activity_logs.csv');
         showSuccess('Activity logs exported successfully!');
@@ -1886,16 +1884,14 @@ function exportLogs() {
 function exportSubscribers() {
     try {
         const subscribers = window._subscribers && window._subscribers.length ? window._subscribers : [];
-        let csv = 'Email,Name,Status,Subscribed Date,Source
-';
+        let csv = 'Email,Name,Status,Subscribed Date,Source\n';
         subscribers.forEach(s => {
             const email = (s.email || '').replace(/,/g, '');
             const name = (s.name || '').replace(/,/g, '');
             const status = (s.status || '').replace(/,/g, '');
             const date = s.created_at ? new Date(s.created_at).toLocaleDateString() : '';
             const source = (s.source || '').replace(/,/g, '');
-            csv += `${email},${name},${status},${date},${source}
-`;
+            csv += `${email},${name},${status},${date},${source}\n`;
         });
         downloadCSV(csv, 'newsletter_subscribers.csv');
         showSuccess('Newsletter subscribers exported successfully!');
