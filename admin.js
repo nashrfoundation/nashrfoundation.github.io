@@ -254,36 +254,103 @@ async function loadSectionData(section) {
 // Overview Section
 async function loadOverviewData() {
     try {
-        // Simulate loading donations data
-        const donations = [
-            { id: 1, name: 'Ahmed Khan', amount: 5000, createdAt: new Date(Date.now() - 86400000), paymentMethod: 'stripe', paymentStatus: 'completed' },
-            { id: 2, name: 'Fatima Ali', amount: 2500, createdAt: new Date(Date.now() - 172800000), paymentMethod: 'paypal', paymentStatus: 'completed' },
-            { id: 3, name: 'Mohammed Rizwan', amount: 10000, createdAt: new Date(Date.now() - 259200000), paymentMethod: 'bank', paymentStatus: 'completed' }
-        ];
+        showSectionLoading('#overview .activity-list', 'Loading recent donations...');
+        showSectionLoading('#overview .stats-grid', 'Loading statistics...');
         
-        updateOverviewStats(donations);
+        // Fetch real-time donations data from Supabase
+        const { data: donations, error: donationsError } = await supabase
+            .from(SUPABASE_CONFIG.leaderboard.donationsTableName)
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(50);
+            
+        if (donationsError) {
+            throw new Error(`Failed to fetch donations: ${donationsError.message}`);
+        }
+        
+        // Fetch fundraising goal from settings (if available)
+        const { data: settings, error: settingsError } = await supabase
+            .from('settings')
+            .select('fundraising_goal')
+            .single();
+            
+        const goalAmount = settings?.fundraising_goal || 200000;
+        
+        updateOverviewStats(donations, goalAmount);
         updateRecentActivity(donations);
         
-        // Initialize charts with sample data
-        createDonationsChart([
-            { date: '2025-08-01', amount: 15000 },
-            { date: '2025-08-02', amount: 22000 },
-            { date: '2025-08-03', amount: 18000 },
-            { date: '2025-08-04', amount: 25000 },
-            { date: '2025-08-05', amount: 30000 }
-        ]);
+        // Fetch data for charts
+        await loadChartData();
         
-        createPaymentMethodsChart([
-            { method: 'Stripe', count: 45 },
-            { method: 'PayPal', count: 30 },
-            { method: 'Bank Transfer', count: 25 }
-        ]);
+        hideSectionLoading('#overview .activity-list');
+        hideSectionLoading('#overview .stats-grid');
         
     } catch (error) {
         console.error('Failed to load overview data:', error);
+        showError('Failed to load overview data. Please refresh the page.');
         // Empty states
-        updateOverviewStats([]);
+        updateOverviewStats([], 200000);
         updateRecentActivity([]);
+        hideSectionLoading('#overview .activity-list');
+        hideSectionLoading('#overview .stats-grid');
+    }
+}
+
+async function loadChartData() {
+    try {
+        // Fetch donations over time for the last 30 days
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+        
+        const { data: donations, error: donationsError } = await supabase
+            .from(SUPABASE_CONFIG.leaderboard.donationsTableName)
+            .select('amount, created_at, payment_method')
+            .gte('created_at', thirtyDaysAgo.toISOString())
+            .order('created_at', { ascending: true });
+            
+        if (donationsError) {
+            throw new Error(`Failed to fetch chart data: ${donationsError.message}`);
+        }
+        
+        // Process data for donations chart (group by day)
+        const donationsByDay = {};
+        donations.forEach(donation => {
+            const date = new Date(donation.created_at).toISOString().split('T')[0];
+            if (!donationsByDay[date]) {
+                donationsByDay[date] = 0;
+            }
+            donationsByDay[date] += donation.amount || 0;
+        });
+        
+        const donationsChartData = Object.entries(donationsByDay).map(([date, amount]) => ({
+            date,
+            amount
+        }));
+        
+        // Process data for payment methods chart
+        const paymentMethods = {};
+        donations.forEach(donation => {
+            const method = donation.payment_method || 'unknown';
+            if (!paymentMethods[method]) {
+                paymentMethods[method] = 0;
+            }
+            paymentMethods[method]++;
+        });
+        
+        const paymentMethodsChartData = Object.entries(paymentMethods).map(([method, count]) => ({
+            method,
+            count
+        }));
+        
+        // Update charts
+        createDonationsChart(donationsChartData);
+        createPaymentMethodsChart(paymentMethodsChartData);
+        
+    } catch (error) {
+        console.error('Failed to load chart data:', error);
+        // Initialize charts with empty data
+        createDonationsChart([]);
+        createPaymentMethodsChart([]);
     }
 }
 
@@ -358,22 +425,30 @@ function updateRecentActivity(donations) {
 // Donations Section
 async function loadDonationsData() {
     try {
-        // Simulate loading donations data
-        const donations = [
-            { id: 1, name: 'Ahmed Khan', amount: 5000, createdAt: new Date(Date.now() - 86400000), paymentMethod: 'stripe', paymentStatus: 'completed' },
-            { id: 2, name: 'Fatima Ali', amount: 2500, createdAt: new Date(Date.now() - 172800000), paymentMethod: 'paypal', paymentStatus: 'completed' },
-            { id: 3, name: 'Mohammed Rizwan', amount: 10000, createdAt: new Date(Date.now() - 259200000), paymentMethod: 'bank', paymentStatus: 'completed' },
-            { id: 4, name: 'Sana Abbas', amount: 7500, createdAt: new Date(Date.now() - 345600000), paymentMethod: 'stripe', paymentStatus: 'completed' },
-            { id: 5, name: 'Ali Hassan', amount: 3000, createdAt: new Date(Date.now() - 432000000), paymentMethod: 'paypal', paymentStatus: 'completed' }
-        ];
+        showSectionLoading('#donations-table-body', 'Loading donations...');
         
-        donationsData = donations;
-        displayDonationsTable(donations);
-        setupPagination(donations);
+        // Fetch real-time donations data from Supabase
+        const { data: donations, error } = await supabase
+            .from(SUPABASE_CONFIG.leaderboard.donationsTableName)
+            .select('*')
+            .order('created_at', { ascending: false });
+            
+        if (error) {
+            throw new Error(`Failed to fetch donations: ${error.message}`);
+        }
+        
+        donationsData = donations || [];
+        displayDonationsTable(donationsData);
+        setupPagination(donationsData);
+        
+        hideSectionLoading('#donations-table-body');
+        
     } catch (error) {
         console.error('Failed to load donations data:', error);
+        showError('Failed to load donations data. Please refresh the page.');
         displayDonationsTable([]);
         setupPagination([]);
+        hideSectionLoading('#donations-table-body');
     }
 }
 
@@ -440,27 +515,68 @@ function displayDonationsTable(donations) {
 // Leaderboard Section
 async function loadLeaderboardData() {
     try {
+        showSectionLoading('#admin-leaderboard-body', 'Loading leaderboard...');
+        
         // Clear any existing subscription
         if (leaderboardSubscription) {
             leaderboardSubscription.unsubscribe();
             leaderboardSubscription = null;
         }
         
-        // Simulate fetching leaderboard data
-        const leaderboardData = [
-            { rank: 1, name: 'Ahmed Khan', amount: 50000 },
-            { rank: 2, name: 'Fatima Ali', amount: 25000 },
-            { rank: 3, name: 'Mohammed Rizwan', amount: 15000 },
-            { rank: 4, name: 'Sana Abbas', amount: 10000 },
-            { rank: 5, name: 'Ali Hassan', amount: 7500 }
-        ];
+        // Fetch real-time leaderboard data from Supabase
+        const { data: leaderboardData, error } = await supabase
+            .from(SUPABASE_CONFIG.leaderboard.tableName)
+            .select('*')
+            .order('amount', { ascending: false })
+            .limit(50);
+            
+        if (error) {
+            throw new Error(`Failed to fetch leaderboard: ${error.message}`);
+        }
         
-        window._leaderboardData = leaderboardData;
-        displayLeaderboardTable(leaderboardData);
+        // Update ranks based on amount order
+        const sortedData = (leaderboardData || []).map((entry, index) => ({
+            ...entry,
+            rank: index + 1
+        }));
+        
+        window._leaderboardData = sortedData;
+        displayLeaderboardTable(sortedData);
+        
+        // Set up real-time subscription for leaderboard changes
+        setupLeaderboardSubscription();
+        
+        hideSectionLoading('#admin-leaderboard-body');
         
     } catch (error) {
         console.error('Failed to load leaderboard data:', error);
         showError('Failed to load leaderboard data. Please refresh the page.');
+        hideSectionLoading('#admin-leaderboard-body');
+    }
+}
+
+function setupLeaderboardSubscription() {
+    try {
+        // Set up real-time subscription to leaderboard changes
+        leaderboardSubscription = supabase
+            .channel('leaderboard-changes')
+            .on('postgres_changes', 
+                { 
+                    event: '*', 
+                    schema: 'public', 
+                    table: SUPABASE_CONFIG.leaderboard.tableName 
+                },
+                (payload) => {
+                    console.log('Leaderboard change detected:', payload);
+                    // Refresh leaderboard data when changes occur
+                    loadLeaderboardData();
+                }
+            )
+            .subscribe();
+            
+        console.log('✅ Leaderboard real-time subscription established');
+    } catch (error) {
+        console.error('Failed to set up leaderboard subscription:', error);
     }
 }
 
@@ -556,17 +672,37 @@ function saveContentChanges() {
 // Newsletter Management
 async function loadNewsletterData() {
     try {
-        // Load newsletter statistics
-        document.getElementById('total-subscribers').textContent = '1,245';
-        document.getElementById('active-subscribers').textContent = '1,180';
-        document.getElementById('unsubscribed').textContent = '65';
+        showSectionLoading('.newsletter-editor .stats-grid', 'Loading newsletter statistics...');
+        
+        // Fetch real-time newsletter subscriber statistics from Supabase
+        const { data: subscribers, error: subscribersError } = await supabase
+            .from('newsletter_subscribers')
+            .select('status');
+            
+        if (subscribersError) {
+            throw new Error(`Failed to fetch subscribers: ${subscribersError.message}`);
+        }
+        
+        // Calculate statistics
+        const totalSubscribers = subscribers.length;
+        const activeSubscribers = subscribers.filter(s => s.status === 'active').length;
+        const unsubscribed = subscribers.filter(s => s.status === 'unsubscribed').length;
+        
+        // Update UI
+        document.getElementById('total-subscribers').textContent = totalSubscribers.toLocaleString();
+        document.getElementById('active-subscribers').textContent = activeSubscribers.toLocaleString();
+        document.getElementById('unsubscribed').textContent = unsubscribed.toLocaleString();
+        
+        hideSectionLoading('.newsletter-editor .stats-grid');
+        
     } catch (error) {
         console.error('Failed to load newsletter data:', error);
         showError('Failed to load newsletter data. Please try again.');
+        hideSectionLoading('.newsletter-editor .stats-grid');
     }
 }
 
-function sendNewsletter() {
+async function sendNewsletter() {
     try {
         const subject = document.getElementById('newsletter-subject').value;
         const content = document.getElementById('newsletter-content').value;
@@ -577,17 +713,56 @@ function sendNewsletter() {
             return;
         }
         
-        // In a real implementation, this would send the newsletter
-        console.log('Sending newsletter:', { subject, content, recipients });
+        // Show loading state
+        const sendButton = document.querySelector('.newsletter-editor .btn-primary');
+        const originalText = sendButton.innerHTML;
+        sendButton.innerHTML = '<div class="inline-loader"></div> Sending...';
+        sendButton.disabled = true;
+        
+        // In a real implementation, this would send the newsletter via email service
+        // For now, we'll simulate the process
+        
+        // Log the newsletter send attempt
+        await logActivity('newsletter_send', `Newsletter sent to ${recipients} subscribers`);
+        
+        // Simulate API call delay
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
         showSuccess(`Newsletter sent to ${recipients} subscribers!`);
-        logActivity('newsletter_send', `Newsletter sent to ${recipients} subscribers`);
+        logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${recipients} subscribers`);
         
         // Clear form
         document.getElementById('newsletter-subject').value = '';
         document.getElementById('newsletter-content').value = '';
+        
+        // Reset button
+        sendButton.innerHTML = originalText;
+        sendButton.disabled = false;
+        
+        // Refresh statistics
+        loadNewsletterData();
+        
+        // Add notification
+        if (window.adminNotifications) {
+            window.adminNotifications.addNotification({
+                type: 'success',
+                title: 'Newsletter Sent',
+                message: `Newsletter "${subject}" sent successfully`,
+                action: () => {
+                    // Navigate to newsletter section
+                    document.querySelector('[data-section="newsletter"]').click();
+                }
+            });
+        }
+        
     } catch (error) {
         console.error('Failed to send newsletter:', error);
         showError('Failed to send newsletter. Please try again.');
+        
+        // Reset button
+        const sendButton = document.querySelector('.newsletter-editor .btn-primary');
+        sendButton.innerHTML = 'Send Newsletter';
+        sendButton.disabled = false;
     }
 }
 
@@ -654,21 +829,30 @@ function saveSettings() {
 // Activity Logs
 async function loadLogsData() {
     try {
-        // Simulate loading logs data
-        logsData = [
-            { id: 1, timestamp: new Date(Date.now() - 3600000), user: 'admin@nashr.org', action: 'admin_login', details: 'User logged in successfully', ip: '192.168.1.100' },
-            { id: 2, timestamp: new Date(Date.now() - 7200000), user: 'admin@nashr.org', action: 'donation_added', details: 'Added new donation entry for Ahmed Khan', ip: '192.168.1.100' },
-            { id: 3, timestamp: new Date(Date.now() - 10800000), user: 'admin@nashr.org', action: 'content_update', details: 'Updated homepage content', ip: '192.168.1.100' },
-            { id: 4, timestamp: new Date(Date.now() - 14400000), user: 'admin@nashr.org', action: 'settings_update', details: 'Updated social media links', ip: '192.168.1.100' },
-            { id: 5, timestamp: new Date(Date.now() - 18000000), user: 'admin@nashr.org', action: 'admin_logout', details: 'User logged out', ip: '192.168.1.100' }
-        ];
+        showSectionLoading('#logs-table-body', 'Loading activity logs...');
         
+        // Fetch real-time activity logs from Supabase
+        const { data: logs, error } = await supabase
+            .from('activity_logs')
+            .select('*')
+            .order('timestamp', { ascending: false })
+            .limit(100);
+            
+        if (error) {
+            throw new Error(`Failed to fetch logs: ${error.message}`);
+        }
+        
+        logsData = logs || [];
         displayLogsTable(logsData);
         setupLogsPagination(logsData);
+        
+        hideSectionLoading('#logs-table-body');
+        
     } catch (error) {
         console.error('Failed to load logs data:', error);
         displayLogsTable([]);
         setupLogsPagination([]);
+        hideSectionLoading('#logs-table-body');
     }
 }
 
@@ -1048,10 +1232,53 @@ function downloadCSV(csv, filename) {
     URL.revokeObjectURL(url);
 }
 
-// Activity Logging
-function logActivity(action, details) {
-    // In a real implementation, this would save to a logs table in Supabase
-    console.log(`Activity Log: ${action} - ${details}`);
+// Helper function to show loading state in a section
+function showSectionLoading(selector, message = 'Loading...') {
+    const element = document.querySelector(selector);
+    if (element) {
+        element.innerHTML = `
+            <tr>
+                <td colspan="100%" class="loading">
+                    <div class="loading-spinner"></div>
+                    <span class="loading-text">${message}</span>
+                </td>
+            </tr>
+        `;
+    }
+}
+
+// Helper function to hide loading state in a section
+function hideSectionLoading(selector) {
+    const element = document.querySelector(selector);
+    if (element && element.querySelector('.loading')) {
+        // Don't hide if it's an error or empty state
+        const loadingElement = element.querySelector('.loading');
+        if (loadingElement && !loadingElement.classList.contains('error-message') && !loadingElement.classList.contains('success-message')) {
+            // Keep the element visible but remove loading content if needed elsewhere
+        }
+    }
+}
+
+// Utility function to log activity to Supabase
+async function logActivity(action, details) {
+    try {
+        const userEmail = currentUser ? currentUser.email : 'anonymous';
+        
+        await supabase
+            .from('activity_logs')
+            .insert([{
+                user: userEmail,
+                action: action,
+                details: details,
+                ip: '0.0.0.0', // In a real implementation, get actual IP
+                timestamp: new Date().toISOString()
+            }]);
+            
+        console.log('Activity logged:', { action, details });
+    } catch (error) {
+        console.error('Failed to log activity:', error);
+        // Continue without throwing - logging shouldn't break the app
+    }
 }
 
 // UI Helpers

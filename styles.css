@@ -1795,11 +1795,31 @@ footer::before {
     
     .btn {
         min-height: 44px; /* Better touch targets */
+        padding: 0.75rem 1.25rem;
     }
     
     .form-control {
         min-height: 44px;
         font-size: 16px; /* Prevents zoom on iOS */
+        padding: 0.75rem;
+    }
+    
+    /* Ensure all interactive elements meet 44px minimum */
+    .amount-option {
+        min-height: 44px;
+        padding: 0.75rem;
+    }
+    
+    .payment-option {
+        min-height: 44px;
+        padding: 0.75rem;
+    }
+    
+    .checkbox-group label {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 0;
     }
     
     /* Improved mobile spacing */
@@ -1809,6 +1829,22 @@ footer::before {
     
     .hero {
         padding: 2rem 1rem;
+    }
+    
+    /* Larger touch targets for key actions */
+    .donate-button .btn,
+    .hero-content .btn {
+        min-height: 48px;
+        padding: 1rem 1.5rem;
+        font-size: 1.1rem;
+    }
+    
+    .amount-options {
+        gap: 0.75rem;
+    }
+    
+    .payment-options {
+        gap: 0.75rem;
     }
 }
 

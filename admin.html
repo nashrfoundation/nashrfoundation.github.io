@@ -15,11 +15,13 @@
     
     <!-- Admin Styles -->
     <link rel="stylesheet" href="admin-styles.css">
+    <link rel="stylesheet" href="notification-styles.css">
     
     <!-- Chart.js for analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
     <!-- Firebase SDKs will be dynamically imported by admin.js -->
+    <script src="admin-notifications.js" defer></script>
 </head>
 <body>
     <!-- Login Modal -->
@@ -242,7 +244,10 @@
                     <div class="recent-activity">
                         <h3>Recent Donations</h3>
                         <div class="activity-list" id="recent-activity-list">
-                            <div class="loading">Loading recent donations...</div>
+                            <div class="loading">
+                                <div class="loading-spinner"></div>
+                                <span class="loading-text">Loading recent donations...</span>
+                            </div>
                         </div>
                     </div>
                     
@@ -295,7 +300,10 @@
                         </thead>
                         <tbody id="donations-table-body">
                             <tr>
-                                <td colspan="6" class="loading">Loading donations...</td>
+                                <td colspan="6" class="loading">
+                                    <div class="loading-spinner"></div>
+                                    <span class="loading-text">Loading donations...</span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -345,7 +353,10 @@
                                 </thead>
                                 <tbody id="admin-leaderboard-body">
                                     <tr>
-                                        <td colspan="4" class="loading">Loading leaderboard...</td>
+                                        <td colspan="4" class="loading">
+                                            <div class="loading-spinner"></div>
+                                            <span class="loading-text">Loading leaderboard...</span>
+                                        </td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -607,11 +618,14 @@
                                 <th>IP Address</th>
                             </tr>
                         </thead>
-                        <tbody id="logs-table-body">
-                            <tr>
-                                <td colspan="5" class="loading">Loading activity logs...</td>
-                            </tr>
-                        </tbody>
+                                                        <tbody id="logs-table-body">
+                                    <tr>
+                                        <td colspan="5" class="loading">
+                                            <div class="loading-spinner"></div>
+                                            <span class="loading-text">Loading activity logs...</span>
+                                        </td>
+                                    </tr>
+                                </tbody>
                     </table>
                 </div>
                 
