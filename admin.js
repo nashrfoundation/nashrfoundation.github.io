@@ -329,8 +329,10 @@ async function loadOverviewData() {
         updateOverviewStats(overviewDonations, goalAmount);
         updateRecentActivity(overviewDonations);
         
-        // Fetch data for charts
-        await loadChartData();
+        // Charts disabled by default; enable by setting window.ENABLE_ADMIN_CHARTS = true
+        if (window.ENABLE_ADMIN_CHARTS) {
+            await loadChartData();
+        }
 
         // Fetch visitors from Umami if configured
         await updateVisitorsFromUmami();
@@ -1071,27 +1073,35 @@ async function sendNewsletter() {
         // Collect recipients: prefer active subscribers from DB; if input is provided, use it as CSV override
         let recipients = [];
         const csvOverride = (recipientsInput || '').trim();
+        console.log('Newsletter recipients input:', { csvOverride, hasInput: !!csvOverride });
+        
         if (csvOverride) {
             recipients = csvOverride
                 .split(/[\n,;]+/)
                 .map(s => s.trim())
                 .filter(Boolean);
+            console.log('Recipients from input:', recipients);
         } else {
+            console.log('Fetching active subscribers from database...');
             const { data: subs, error } = await supabase
                 .from('newsletter_subscribers')
-                .select('email')
+                .select('email, status')
                 .eq('status', 'active');
+            console.log('Database query result:', { subs, error, count: subs?.length });
             if (error) throw error;
             recipients = (subs || []).map(s => s.email).filter(Boolean);
+            console.log('Recipients from database:', recipients);
         }
 
         // Normalize emails: lowercase, trim, and deduplicate; basic validation
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const beforeValidation = recipients.length;
         recipients = Array.from(new Set(
             recipients
                 .map(e => (e || '').trim().toLowerCase())
                 .filter(e => emailPattern.test(e))
         ));
+        console.log('Recipients after validation:', { beforeValidation, afterValidation: recipients.length, recipients });
         
         if (!recipients.length) {
             showError('No recipients found. Add subscribers or provide emails.');
@@ -1122,6 +1132,7 @@ async function sendNewsletter() {
             let attempt = 0;
             while (true) {
                 try {
+                    console.log('Newsletter batch', { endpoint, start: i + 1, size: batch.length });
                     const res = await fetch(endpoint, {
                         method: 'POST',
                         mode: 'cors',
@@ -1136,6 +1147,7 @@ async function sendNewsletter() {
                     });
                     if (!res.ok) {
                         const errText = await res.text().catch(() => '');
+                        console.error('Newsletter send failed', { status: res.status, errText });
                         let message = `Send failed for batch starting ${i + 1}`;
                         if (errText) message += `: ${errText}`;
                         throw new Error(message);
@@ -1516,6 +1528,7 @@ function updateLogsPaginationInfo(totalPages) {
 // Subscribers Management
 async function loadSubscribersData() {
     try {
+        console.log('Loading subscribers data...');
         showSectionLoading('#subscribers-table-body', 'Loading subscribers...');
 
         const { data: subscribers, error } = await supabase
@@ -1523,11 +1536,14 @@ async function loadSubscribersData() {
             .select('*')
             .order('created_at', { ascending: false });
 
+        console.log('Subscribers query result:', { subscribers, error, count: subscribers?.length });
+
         if (error) {
             throw new Error(`Failed to fetch subscribers: ${error.message}`);
         }
 
         window._subscribers = subscribers || [];
+        console.log('Subscribers loaded:', window._subscribers);
         displaySubscribersTable(window._subscribers);
         setupSubscribersPagination(window._subscribers);
 
@@ -1535,6 +1551,8 @@ async function loadSubscribersData() {
         const total = window._subscribers.length;
         const active = window._subscribers.filter(s => s.status === 'active').length;
         const unsub = window._subscribers.filter(s => s.status === 'unsubscribed').length;
+        console.log('Subscriber stats:', { total, active, unsub });
+        
         const totalEl = document.querySelector('#subscribers #total-subscribers');
         const activeEl = document.querySelector('#subscribers #active-subscribers');
         const unsubEl = document.querySelector('#subscribers #unsubscribed-count');
@@ -1554,10 +1572,15 @@ async function loadSubscribersData() {
 
 function displaySubscribersTable(subscribers) {
     const tableBody = document.getElementById('subscribers-table-body');
-    if (!tableBody) return;
+    console.log('Displaying subscribers table:', { tableBody, subscribers, count: subscribers?.length });
+    if (!tableBody) {
+        console.error('Subscribers table body not found!');
+        return;
+    }
     tableBody.innerHTML = '';
 
     if (!subscribers || subscribers.length === 0) {
+        console.log('No subscribers to display');
         tableBody.innerHTML = '<tr><td colspan="5" class="loading">No subscribers found</td></tr>';
         return;
     }

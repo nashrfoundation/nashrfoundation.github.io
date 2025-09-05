@@ -214,7 +214,7 @@ header .container {
 }
 
 .logo img {
-    height: clamp(48px, 10vw, 80px);
+    height: clamp(32px, 6vw, 48px);
     width: auto;
 }
 
@@ -631,7 +631,7 @@ footer {
 }
 
 .footer-logo img {
-    height: clamp(44px, 9vw, 72px);
+    height: clamp(28px, 5vw, 40px);
     width: auto;
 }
 
@@ -989,7 +989,7 @@ footer {
 
 @media (max-width: 768px) {
     .logo img {
-        height: clamp(44px, 12vw, 64px);
+        height: clamp(28px, 8vw, 40px);
     }
 
     .mobile-menu-toggle {
@@ -1134,7 +1134,7 @@ footer {
     }
 
     .footer-logo img {
-        height: 336px;
+        height: clamp(24px, 6vw, 32px);
     }
 
     .footer-social img {
@@ -1390,7 +1390,7 @@ footer {
     }
 
     .logo img {
-        height: 312px !important;
+        height: clamp(24px, 6vw, 32px) !important;
         transform: none;
     }
 
