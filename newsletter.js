@@ -13,12 +13,14 @@ async function handleNewsletterSignup(e) {
     
     const form = e.target;
     const emailInput = form.querySelector('#newsletter-email');
+    const nameInput = form.querySelector('#newsletter-name');
     const consentCheckbox = form.querySelector('#newsletter-consent');
     const submitButton = form.querySelector('button[type="submit"]');
     const newsletterMessage = form.parentNode.querySelector('.newsletter-message') || document.getElementById('newsletter-message');
     
     // Get form values
     const email = emailInput.value.trim();
+    const name = nameInput ? nameInput.value.trim() : '';
     const consent = consentCheckbox.checked;
     
     // Validate form
@@ -84,7 +86,8 @@ async function handleNewsletterSignup(e) {
                         status: 'active',
                         consent_given: true,
                         consent_timestamp: new Date().toISOString(),
-                        updated_at: new Date().toISOString()
+                        updated_at: new Date().toISOString(),
+                        name: name || existingSubscriber.name || null
                     })
                     .eq('email', email);
                     
@@ -103,6 +106,7 @@ async function handleNewsletterSignup(e) {
             .from('newsletter_subscribers')
             .insert([{
                 email: email,
+                name: name || null,
                 status: 'active',
                 consent_given: true,
                 consent_timestamp: new Date().toISOString(),
@@ -118,7 +122,7 @@ async function handleNewsletterSignup(e) {
         
         // Attempt to send welcome email (no-blocker) and notify admin portal if open
         try {
-            await sendWelcomeEmail(email);
+            await sendWelcomeEmail(email, name);
             if (window.adminNotifications) {
                 window.adminNotifications.addNotification({
                     type: 'success',
@@ -187,7 +191,7 @@ function isValidEmail(email) {
 }
 
 // Lightweight welcome email via EmailJS if configured
-async function sendWelcomeEmail(email) {
+async function sendWelcomeEmail(email, name) {
     // If EmailJS is not available, skip gracefully
     if (typeof emailjs === 'undefined') {
         return;
@@ -202,6 +206,7 @@ async function sendWelcomeEmail(email) {
         emailjs.init({ publicKey });
         const params = {
             to_email: email,
+            to_name: name || 'Friend',
             subject: 'Welcome to Nashr Foundation Newsletter',
             message: 'Thank you for subscribing to the Nashr Foundation newsletter. We appreciate your support and will keep you informed about our impact and initiatives.'
         };

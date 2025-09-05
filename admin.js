@@ -460,20 +460,27 @@ async function loadDonationsData() {
     try {
         showSectionLoading('#donations-table-body', 'Loading donations...');
         
-        // Fetch real-time donations data from Supabase
-        const { data: donations, error } = await supabase
-            .from(supabaseConfig.leaderboard.donationsTableName)
+        // Mirror donations from leaderboard entries per current requirement
+        const { data: leaderboardRows, error } = await supabase
+            .from(supabaseConfig.leaderboard.tableName)
             .select('*')
-            .order('created_at', { ascending: false });
+            .order('total_amount', { ascending: false });
             
-        console.log('Donations data fetched:', donations);
+        console.log('Donations data fetched:', leaderboardRows);
         console.log('Donations fetch error:', error);
             
         if (error) {
             throw new Error(`Failed to fetch donations: ${error.message}`);
         }
         
-        donationsData = donations || [];
+        // Map leaderboard entries to donation-like objects for UI
+        donationsData = (leaderboardRows || []).map(row => ({
+            id: row.id || row.rank,
+            name: row.name || 'Anonymous',
+            amount: row.last_donation_amount != null ? row.last_donation_amount : (row.total_amount || 0),
+            payment_method: row.payment_method || 'Unknown',
+            created_at: row.last_donation_date || row.updated_at || row.created_at || new Date().toISOString()
+        }));
         displayDonationsTable(donationsData);
         setupPagination(donationsData);
         
@@ -560,33 +567,30 @@ async function loadLeaderboardData() {
             leaderboardSubscription = null;
         }
         
-        // For now, leaderboard should mirror donations data directly
-        let { data: donations, error } = await supabase
-            .from(supabaseConfig.leaderboard.donationsTableName)
-            .select('name, amount, created_at')
-            .order('amount', { ascending: false })
+        // Fetch leaderboard entries directly
+        let { data: leaderboardData, error } = await supabase
+            .from(supabaseConfig.leaderboard.tableName)
+            .select('*')
+            .order('total_amount', { ascending: false })
             .limit(50);
         
-        console.log('Leaderboard (from donations) fetched:', donations);
-        console.log('Leaderboard (from donations) fetch error:', error);
+        console.log('Leaderboard data fetched:', leaderboardData);
+        console.log('Leaderboard fetch error:', error);
         
         if (error) {
-            throw new Error(`Failed to fetch donations for leaderboard: ${error.message}`);
+            throw new Error(`Failed to fetch leaderboard: ${error.message}`);
         }
         
-        // Map donations to leaderboard-style entries and assign ranks
-        const sortedData = (donations || []).map((d, index) => ({
-            name: d.name || 'Anonymous',
-            total_amount: d.amount || 0,
-            amount: d.amount || 0,
-            created_at: d.created_at,
+        // Assign ranks
+        const sortedData = (leaderboardData || []).map((entry, index) => ({
+            ...entry,
             rank: index + 1
         }));
         
         window._leaderboardData = sortedData;
         displayLeaderboardTable(sortedData);
         
-        // Set up real-time subscription based on donations changes
+        // Set up real-time subscription for leaderboard changes
         setupLeaderboardSubscription();
         
         hideSectionLoading('#admin-leaderboard-body');
@@ -714,15 +718,15 @@ function setupLeaderboardSubscription() {
     try {
         // Set up real-time subscription to leaderboard changes
         leaderboardSubscription = supabase
-            .channel('leaderboard-from-donations')
+            .channel('leaderboard-changes')
             .on('postgres_changes', 
                 { 
                     event: '*', 
                     schema: 'public', 
-                    table: supabaseConfig.leaderboard.donationsTableName 
+                    table: supabaseConfig.leaderboard.tableName 
                 },
                 (payload) => {
-                    console.log('Donations change detected (leaderboard mirror):', payload);
+                    console.log('Leaderboard change detected:', payload);
                     // Refresh leaderboard data when changes occur
                     loadLeaderboardData();
                 }
@@ -860,12 +864,14 @@ function displayLeaderboardTable(leaderboardData) {
 // Content Management
 async function loadContentData() {
     try {
-        // Load content from Supabase if available
+        // Load content from Supabase if available; skip silently if table missing
         const { data: contentRows, error } = await supabase
             .from('content')
             .select('*')
             .limit(1);
-        if (error) throw error;
+        if (error) {
+            console.warn('Content table not available or fetch failed:', error);
+        }
         const content = Array.isArray(contentRows) ? contentRows[0] : null;
         if (content) {
             if (document.getElementById('homepage-title')) document.getElementById('homepage-title').value = content.homepage_title || '';

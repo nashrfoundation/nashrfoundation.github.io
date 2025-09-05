@@ -1134,9 +1134,7 @@ footer {
     }
 
     .footer-logo img {
-        height: 100px;
-        filter: brightness(1.2) contrast(1.2) saturate(1.2);
-        box-shadow: 0 0 15px rgba(255, 181, 46, 0.5);
+        height: 48px;
     }
 
     .footer-social img {
@@ -1147,15 +1145,11 @@ footer {
 
 @media (min-width: 1024px) {
     .logo img {
-        height: 100px;
-        filter: brightness(1.2) contrast(1.2) saturate(1.2);
-        box-shadow: 0 0 20px rgba(255, 181, 46, 0.6);
+        height: 48px;
     }
     /* Enlarge footer logo significantly on desktop */
     .footer-logo img {
-        height: 160px;
-        filter: brightness(1.2) contrast(1.2) saturate(1.2);
-        box-shadow: 0 0 20px rgba(255, 181, 46, 0.6);
+        height: 48px;
     }
 }
 
@@ -1358,9 +1352,7 @@ footer {
 
     /* Smaller logo */
     .logo img {
-        height: 120px !important;
-        filter: brightness(1.2) contrast(1.2) saturate(1.2) !important;
-        box-shadow: 0 0 15px rgba(255, 181, 46, 0.5) !important;
+        height: 40px !important;
     }
 
     /* Better mobile menu toggle positioning */
@@ -1398,10 +1390,8 @@ footer {
     }
 
     .logo img {
-        height: 110px !important;
-        transform: scale(1.0);
-        filter: brightness(1.2) contrast(1.2) saturate(1.2) !important;
-        box-shadow: 0 0 15px rgba(255, 181, 46, 0.5) !important;
+        height: 36px !important;
+        transform: none;
     }
 
     .mobile-menu-toggle {

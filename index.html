@@ -241,6 +241,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 <p>Subscribe to our newsletter for updates on our work and impact.</p>
                 <form id="newsletter-form" class="newsletter-form">
                     <div class="form-group">
+                        <input type="text" id="newsletter-name" class="form-control" placeholder="Your name (optional)">
                         <input type="email" id="newsletter-email" class="form-control" placeholder="Enter your email address" required>
                         <button type="submit" class="btn btn-primary">Subscribe</button>
                     </div>
@@ -493,8 +494,51 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script src="performance.js" defer></script>
     <script src="error-check.js" defer></script>
     
+    <!-- EmailJS (optional). Fill window.EMAILJS_* below to enable welcome emails. -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js" defer></script>
+    <script>
+      window.EMAILJS_SERVICE_ID = window.EMAILJS_SERVICE_ID || '';
+      window.EMAILJS_TEMPLATE_ID = window.EMAILJS_TEMPLATE_ID || '';
+      window.EMAILJS_PUBLIC_KEY = window.EMAILJS_PUBLIC_KEY || '';
+    </script>
     <!-- Newsletter Script -->
     <script src="newsletter.js" defer></script>
+    
+    <!-- Dynamic front page content/settings from Supabase -->
+    <script defer>
+      (async function(){
+        try {
+          const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+          const supabase = createClient('https://jtuhnndwhotxjjolwcuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc');
+          // Load settings for SEO/meta
+          const { data: settingsRows } = await supabase.from('settings').select('*').limit(1);
+          const s = Array.isArray(settingsRows) ? settingsRows[0] : null;
+          if (s) {
+            if (s.title) document.title = s.title;
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc && s.description) metaDesc.setAttribute('content', s.description);
+            const metaKeywords = document.querySelector('meta[name="keywords"]');
+            if (metaKeywords && s.keywords) metaKeywords.setAttribute('content', s.keywords);
+            // Social links
+            const ig = document.querySelector('a[href*="instagram.com"]'); if (ig && s.instagram) ig.href = s.instagram;
+            const fb = document.querySelector('a[href*="facebook.com"]'); if (fb && s.facebook) fb.href = s.facebook;
+            const tw = document.querySelector('a[href*="x.com"], a[href*="twitter.com"]'); if (tw && s.twitter) tw.href = s.twitter;
+            const yt = document.querySelector('a[href*="youtube.com"]'); if (yt && s.youtube) yt.href = s.youtube;
+          }
+          // Load content for hero texts
+          const { data: contentRows } = await supabase.from('content').select('*').limit(1);
+          const c = Array.isArray(contentRows) ? contentRows[0] : null;
+          if (c) {
+            const h1 = document.querySelector('.hero-content h1');
+            const p = document.querySelector('.hero-content p');
+            if (h1 && c.homepage_hero_title) h1.textContent = c.homepage_hero_title;
+            if (p && c.homepage_hero_description) p.textContent = c.homepage_hero_description;
+          }
+        } catch (e) {
+          // Silent fail to avoid blocking rendering
+        }
+      })();
+    </script>
 </body>
 </html>
 
