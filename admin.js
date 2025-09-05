@@ -25,6 +25,7 @@ let currentPage = 1;
 let logsCurrentPage = 1;
 let subscribersCurrentPage = 1;
 const itemsPerPage = 10;
+let hasLoggedLoginEvent = false;
 
 // Using Supabase Auth (email/password). Create admins in Supabase Console.
 
@@ -60,9 +61,13 @@ async function initializeSupabase() {
                 currentUser = { email: session.user.email, uid: session.user.id };
                 showDashboard();
                 loadDashboardData();
-                logActivity('admin_login', `User ${session.user.email} logged in`);
+                if (!hasLoggedLoginEvent) {
+                    logActivity('admin_login', `User ${session.user.email} logged in`);
+                    hasLoggedLoginEvent = true;
+                }
             } else if (event === 'SIGNED_OUT') {
                 currentUser = null;
+                hasLoggedLoginEvent = false;
                 showLogin();
                 logActivity('admin_logout', `User logged out`);
             }
@@ -1079,6 +1084,14 @@ async function sendNewsletter() {
             if (error) throw error;
             recipients = (subs || []).map(s => s.email).filter(Boolean);
         }
+
+        // Normalize emails: lowercase, trim, and deduplicate; basic validation
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        recipients = Array.from(new Set(
+            recipients
+                .map(e => (e || '').trim().toLowerCase())
+                .filter(e => emailPattern.test(e))
+        ));
         
         if (!recipients.length) {
             showError('No recipients found. Add subscribers or provide emails.');
@@ -1116,7 +1129,10 @@ async function sendNewsletter() {
                 })
             });
             if (!res.ok) {
-                throw new Error(`Send failed for batch starting ${i + 1}`);
+                const errText = await res.text().catch(() => '');
+                let message = `Send failed for batch starting ${i + 1}`;
+                if (errText) message += `: ${errText}`;
+                throw new Error(message);
             }
             sentCount += batch.length;
         }
@@ -1793,7 +1809,8 @@ async function updateVisitorsFromUmami() {
             type: 'metrics',
             unit: 'day'
         });
-        const res = await fetch(`https://cloud.umami.is/api/websites/${websiteId}/metrics?${params.toString()}`, { credentials: 'omit' });
+        const metricsUrl = `https://cloud.umami.is/api/websites/${websiteId}/metrics?${params.toString()}`;
+        const res = await fetch(metricsUrl, { credentials: 'omit' });
         if (!res.ok) throw new Error('Umami fetch failed');
         const data = await res.json();
         // Attempt to sum visitors from the series; structure can vary by endpoint version
