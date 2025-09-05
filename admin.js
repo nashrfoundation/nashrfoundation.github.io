@@ -1088,7 +1088,19 @@ async function sendNewsletter() {
                 .select('email, status')
                 .eq('status', 'active');
             console.log('Database query result:', { subs, error, count: subs?.length });
-            if (error) throw error;
+            if (error) {
+                console.error('Newsletter subscribers query error:', error);
+                // If table doesn't exist, show helpful message
+                if (error.code === 'PGRST116' || error.message.includes('relation') || error.message.includes('does not exist')) {
+                    showError('Newsletter subscribers table not found. Please add emails manually or create the table in Supabase.');
+                    if (sendButton) {
+                        sendButton.innerHTML = originalText;
+                        sendButton.disabled = false;
+                    }
+                    return;
+                }
+                throw error;
+            }
             recipients = (subs || []).map(s => s.email).filter(Boolean);
             console.log('Recipients from database:', recipients);
         }
@@ -1539,6 +1551,16 @@ async function loadSubscribersData() {
         console.log('Subscribers query result:', { subscribers, error, count: subscribers?.length });
 
         if (error) {
+            console.error('Subscribers query error:', error);
+            // If table doesn't exist, show empty state instead of throwing
+            if (error.code === 'PGRST116' || error.message.includes('relation') || error.message.includes('does not exist')) {
+                console.log('Newsletter subscribers table does not exist, showing empty state');
+                window._subscribers = [];
+                displaySubscribersTable([]);
+                setupSubscribersPagination([]);
+                hideSectionLoading('#subscribers-table-body');
+                return;
+            }
             throw new Error(`Failed to fetch subscribers: ${error.message}`);
         }
 
