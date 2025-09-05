@@ -136,10 +136,11 @@ async function handleNewsletterSignup(e) {
             }
         } catch (e) {
             console.warn('Welcome email failed:', e);
+            // Do not block subscription on email failure
         }
 
         // Show success message
-        showNewsletterMessage('Thank you for subscribing! A welcome email has been sent.', 'success', newsletterMessage);
+        showNewsletterMessage('Thank you for subscribing! If configured, a welcome email will arrive shortly.', 'success', newsletterMessage);
         
         // Reset form
         form.reset();
@@ -204,7 +205,10 @@ async function sendWelcomeEmail(email, name) {
                     name: name || 'Friend'
                 })
             });
-            if (!res.ok) throw new Error('Resend welcome email failed');
+            if (!res.ok) {
+                const text = await res.text().catch(() => '');
+                throw new Error(`Resend welcome email failed: ${res.status} ${text}`);
+            }
             return;
         }
         // Optional fallback to EmailJS if configured on window
@@ -224,7 +228,7 @@ async function sendWelcomeEmail(email, name) {
             }
         }
     } catch (err) {
-        console.warn('EmailJS send failed', err);
+        throw err;
     }
 }
 
