@@ -2,7 +2,6 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     const newsletterForm = document.getElementById('newsletter-form');
-    const newsletterMessage = document.getElementById('newsletter-message');
     
     if (newsletterForm) {
         newsletterForm.addEventListener('submit', handleNewsletterSignup);
@@ -16,6 +15,7 @@ async function handleNewsletterSignup(e) {
     const emailInput = form.querySelector('#newsletter-email');
     const consentCheckbox = form.querySelector('#newsletter-consent');
     const submitButton = form.querySelector('button[type="submit"]');
+    const newsletterMessage = form.parentNode.querySelector('.newsletter-message') || document.getElementById('newsletter-message');
     
     // Get form values
     const email = emailInput.value.trim();
@@ -23,34 +23,112 @@ async function handleNewsletterSignup(e) {
     
     // Validate form
     if (!email) {
-        showNewsletterMessage('Please enter your email address.', 'error');
+        showNewsletterMessage('Please enter your email address.', 'error', newsletterMessage);
         return;
     }
     
     if (!isValidEmail(email)) {
-        showNewsletterMessage('Please enter a valid email address.', 'error');
+        showNewsletterMessage('Please enter a valid email address.', 'error', newsletterMessage);
         return;
     }
     
     if (!consent) {
-        showNewsletterMessage('Please agree to receive emails from us.', 'error');
+        showNewsletterMessage('Please agree to receive emails from us.', 'error', newsletterMessage);
         return;
     }
     
     // Disable submit button and show loading state
-    const originalButtonText = submitButton.textContent;
-    submitButton.textContent = 'Subscribing...';
+    const originalButtonText = submitButton.innerHTML;
+    submitButton.innerHTML = '<div class="inline-loader"></div> Subscribing...';
     submitButton.disabled = true;
     
     try {
-        // In a real implementation, this would send to your email service
-        // For now, we'll simulate the process
+        // Initialize Supabase
+        const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        const supabaseConfig = {
+            url: 'https://jtuhnndwhotxjjolwcuz.supabase.io',
+            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
+        };
         
+        const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+        
+        // Check if subscriber already exists
+        const { data: existingSubscriber, error: checkError } = await supabase
+            .from('newsletter_subscribers')
+            .select('*')
+            .eq('email', email)
+            .single();
+            
+        if (checkError && checkError.code !== 'PGRST116') {
+            throw new Error(`Failed to check subscriber: ${checkError.message}`);
+        }
+        
+        if (existingSubscriber) {
+            if (existingSubscriber.status === 'active') {
+                showNewsletterMessage('You are already subscribed to our newsletter!', 'success', newsletterMessage);
+                form.reset();
+                return;
+            } else {
+                // Reactivate unsubscribed user
+                const { error: updateError } = await supabase
+                    .from('newsletter_subscribers')
+                    .update({
+                        status: 'active',
+                        consent_given: true,
+                        consent_timestamp: new Date().toISOString(),
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('email', email);
+                    
+                if (updateError) {
+                    throw new Error(`Failed to reactivate subscription: ${updateError.message}`);
+                }
+                
+                showNewsletterMessage('Welcome back! Your subscription has been reactivated.', 'success', newsletterMessage);
+                form.reset();
+                return;
+            }
+        }
+        
+        // Add new subscriber to Supabase
+        const { data, error } = await supabase
+            .from('newsletter_subscribers')
+            .insert([{
+                email: email,
+                status: 'active',
+                consent_given: true,
+                consent_timestamp: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString(),
+                source: window.location.pathname,
+                ip_address: '0.0.0.0' // In a real implementation, you would get the actual IP
+            }]);
+            
+        if (error) {
+            throw new Error(`Failed to subscribe: ${error.message}`);
+        }
+        
+        // Attempt to send welcome email (no-blocker) and notify admin portal if open
+        try {
+            await sendWelcomeEmail(email);
+            if (window.adminNotifications) {
+                window.adminNotifications.addNotification({
+                    type: 'success',
+                    title: 'New Subscriber',
+                    message: `${email} subscribed to the newsletter`,
+                    action: () => {
+                        const link = document.querySelector('[data-section="subscribers"]');
+                        if (link) link.click();
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('Welcome email failed:', e);
+        }
+
         // Show success message
-        showNewsletterMessage('Thank you for subscribing! Please check your email to confirm your subscription.', 'success');
+        showNewsletterMessage('Thank you for subscribing! A welcome email has been sent.', 'success', newsletterMessage);
         
         // Reset form
         form.reset();
@@ -65,25 +143,33 @@ async function handleNewsletterSignup(e) {
         
     } catch (error) {
         console.error('Newsletter signup error:', error);
-        showNewsletterMessage('Sorry, there was an error subscribing. Please try again.', 'error');
+        showNewsletterMessage('Sorry, there was an error subscribing. Please try again.', 'error', newsletterMessage);
     } finally {
         // Re-enable submit button
-        submitButton.textContent = originalButtonText;
+        submitButton.innerHTML = originalButtonText;
         submitButton.disabled = false;
     }
 }
 
-function showNewsletterMessage(message, type) {
-    const newsletterMessage = document.getElementById('newsletter-message');
+function showNewsletterMessage(message, type, container) {
+    if (!container) return;
     
-    if (newsletterMessage) {
-        newsletterMessage.textContent = message;
-        newsletterMessage.className = `newsletter-message ${type}`;
-        newsletterMessage.style.display = 'block';
-        
-        // Hide message after 5 seconds
+    // Remove existing messages
+    const existingMessages = container.querySelectorAll('.newsletter-message');
+    existingMessages.forEach(msg => msg.remove());
+    
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `newsletter-message ${type}`;
+    messageDiv.textContent = message;
+    
+    container.appendChild(messageDiv);
+    
+    // Auto-remove after 5 seconds for success messages
+    if (type === 'success') {
         setTimeout(() => {
-            newsletterMessage.style.display = 'none';
+            if (messageDiv.parentNode) {
+                messageDiv.remove();
+            }
         }, 5000);
     }
 }
@@ -91,6 +177,31 @@ function showNewsletterMessage(message, type) {
 function isValidEmail(email) {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email);
+}
+
+// Lightweight welcome email via EmailJS if configured
+async function sendWelcomeEmail(email) {
+    // If EmailJS is not available, skip gracefully
+    if (typeof emailjs === 'undefined') {
+        return;
+    }
+    const serviceId = window.EMAILJS_SERVICE_ID || '';
+    const templateId = window.EMAILJS_TEMPLATE_ID || '';
+    const publicKey = window.EMAILJS_PUBLIC_KEY || '';
+    if (!serviceId || !templateId || !publicKey) {
+        return;
+    }
+    try {
+        emailjs.init({ publicKey });
+        const params = {
+            to_email: email,
+            subject: 'Welcome to Nashr Foundation Newsletter',
+            message: 'Thank you for subscribing to the Nashr Foundation newsletter. We appreciate your support and will keep you informed about our impact and initiatives.'
+        };
+        await emailjs.send(serviceId, templateId, params);
+    } catch (err) {
+        console.warn('EmailJS send failed', err);
+    }
 }
 
 // Export for use in other files

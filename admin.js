@@ -3,7 +3,11 @@
 // Supabase Configuration
 const supabaseConfig = {
     url: 'https://jtuhnndwhotxjjolwcuz.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc',
+    leaderboard: {
+        tableName: 'leaderboard',
+        donationsTableName: 'donations'
+    }
 };
 
 // Initialize Supabase
@@ -12,10 +16,12 @@ let currentUser = null;
 let charts = {};
 let realtimeData = {};
 let leaderboardSubscription = null;
+let subscribersSubscription = null;
 let donationsData = [];
 let logsData = [];
 let currentPage = 1;
 let logsCurrentPage = 1;
+let subscribersCurrentPage = 1;
 const itemsPerPage = 10;
 
 // Using Supabase Auth (email/password). Create admins in Supabase Console.
@@ -65,6 +71,9 @@ async function initializeSupabase() {
         }
         
         console.log('Supabase initialized successfully');
+        // Initialize realtime subscriptions
+        setupSubscribersSubscription();
+        setupDonationsSubscription();
     } catch (error) {
         console.error('Supabase initialization failed:', error);
         showError('Failed to initialize Supabase. Please refresh the page.');
@@ -245,6 +254,9 @@ async function loadSectionData(section) {
         case 'logs':
             await loadLogsData();
             break;
+        case 'subscribers':
+            await loadSubscribersData();
+            break;
         default:
             await loadDashboardData();
             break;
@@ -259,7 +271,7 @@ async function loadOverviewData() {
         
         // Fetch real-time donations data from Supabase
         const { data: donations, error: donationsError } = await supabase
-            .from(SUPABASE_CONFIG.leaderboard.donationsTableName)
+            .from(supabaseConfig.leaderboard.donationsTableName)
             .select('*')
             .order('created_at', { ascending: false })
             .limit(50);
@@ -303,7 +315,7 @@ async function loadChartData() {
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
         
         const { data: donations, error: donationsError } = await supabase
-            .from(SUPABASE_CONFIG.leaderboard.donationsTableName)
+            .from(supabaseConfig.leaderboard.donationsTableName)
             .select('amount, created_at, payment_method')
             .gte('created_at', thirtyDaysAgo.toISOString())
             .order('created_at', { ascending: true });
@@ -354,24 +366,25 @@ async function loadChartData() {
     }
 }
 
-function updateOverviewStats(donations) {
+function updateOverviewStats(donations, goalAmount) {
     const totalRaised = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
+    const today = new Date().toISOString().split('T')[0];
     const todayDonations = donations.filter(donation => {
-        const today = new Date();
-        const donationDate = donation.createdAt || new Date();
-        return donationDate.toDateString() === today.toDateString();
+        const d = donation.created_at ? new Date(donation.created_at) : new Date();
+        return d.toISOString().split('T')[0] === today;
     });
     const todayAmount = todayDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
     const totalDonors = donations.length;
-    const goalAmount = 200000; // This should come from settings
-    const goalProgress = Math.round((totalRaised / goalAmount) * 100);
+    const goal = goalAmount || 200000;
+    const goalProgress = Math.max(0, Math.min(100, Math.round((totalRaised / goal) * 100)));
     
     // Update stats
     document.getElementById('total-donations').textContent = `₨${totalRaised.toLocaleString()}`;
     document.getElementById('fundraising-goal').textContent = `${goalProgress}%`;
     document.getElementById('goal-progress-fill').style.width = `${goalProgress}%`;
     document.getElementById('total-donors').textContent = totalDonors;
-    document.getElementById('website-visitors').textContent = '1,245'; // Placeholder
+    // If you later add analytics, update website visitors dynamically; keep placeholder for now
+    document.getElementById('website-visitors').textContent = '1,245';
     
     // Update change indicators
     document.getElementById('donations-change').textContent = `+₨${todayAmount.toLocaleString()} today`;
@@ -381,8 +394,8 @@ function updateOverviewStats(donations) {
 function updateRecentActivity(donations) {
     const recentDonations = donations
         .sort((a, b) => {
-            const bd = b.createdAt || new Date();
-            const ad = a.createdAt || new Date();
+            const bd = b.created_at ? new Date(b.created_at) : new Date();
+            const ad = a.created_at ? new Date(a.created_at) : new Date();
             return bd - ad;
         })
         .slice(0, 5);
@@ -412,7 +425,7 @@ function updateRecentActivity(donations) {
         
         const time = document.createElement('div');
         time.className = 'activity-time';
-        time.textContent = formatTimeAgo(donation.createdAt || new Date());
+        time.textContent = formatTimeAgo(donation.created_at ? new Date(donation.created_at) : new Date());
         
         content.appendChild(title);
         content.appendChild(time);
@@ -429,7 +442,7 @@ async function loadDonationsData() {
         
         // Fetch real-time donations data from Supabase
         const { data: donations, error } = await supabase
-            .from(SUPABASE_CONFIG.leaderboard.donationsTableName)
+            .from(supabaseConfig.leaderboard.donationsTableName)
             .select('*')
             .order('created_at', { ascending: false });
             
@@ -470,7 +483,7 @@ function displayDonationsTable(donations) {
         const row = document.createElement('tr');
         
         const dateCell = document.createElement('td');
-        dateCell.textContent = formatDate(donation.createdAt || new Date());
+        dateCell.textContent = formatDate(donation.created_at ? new Date(donation.created_at) : new Date());
         
         const nameCell = document.createElement('td');
         nameCell.textContent = donation.name || 'Anonymous';
@@ -479,7 +492,7 @@ function displayDonationsTable(donations) {
         amountCell.textContent = `₨${(donation.amount != null ? donation.amount.toLocaleString() : '0')}`;
         
         const methodCell = document.createElement('td');
-        methodCell.textContent = donation.paymentMethod || 'Unknown';
+        methodCell.textContent = donation.payment_method || 'Unknown';
         
         const statusCell = document.createElement('td');
         const statusSpan = document.createElement('span');
@@ -525,7 +538,7 @@ async function loadLeaderboardData() {
         
         // Fetch real-time leaderboard data from Supabase
         const { data: leaderboardData, error } = await supabase
-            .from(SUPABASE_CONFIG.leaderboard.tableName)
+            .from(supabaseConfig.leaderboard.tableName)
             .select('*')
             .order('amount', { ascending: false })
             .limit(50);
@@ -564,7 +577,7 @@ function setupLeaderboardSubscription() {
                 { 
                     event: '*', 
                     schema: 'public', 
-                    table: SUPABASE_CONFIG.leaderboard.tableName 
+                    table: supabaseConfig.leaderboard.tableName 
                 },
                 (payload) => {
                     console.log('Leaderboard change detected:', payload);
@@ -577,6 +590,83 @@ function setupLeaderboardSubscription() {
         console.log('✅ Leaderboard real-time subscription established');
     } catch (error) {
         console.error('Failed to set up leaderboard subscription:', error);
+    }
+}
+
+function setupSubscribersSubscription() {
+    try {
+        // Clear existing subscription
+        if (subscribersSubscription) {
+            subscribersSubscription.unsubscribe();
+            subscribersSubscription = null;
+        }
+
+        subscribersSubscription = supabase
+            .channel('newsletter-subscribers-changes')
+            .on('postgres_changes',
+                {
+                    event: 'INSERT',
+                    schema: 'public',
+                    table: 'newsletter_subscribers'
+                },
+                (payload) => {
+                    const newSub = payload.new || {};
+                    // Show admin notification
+                    if (window.adminNotifications) {
+                        window.adminNotifications.addNotification({
+                            type: 'success',
+                            title: 'New Subscriber',
+                            message: `${newSub.email || 'Unknown'} subscribed to the newsletter`,
+                            action: () => {
+                                const link = document.querySelector('[data-section="subscribers"]');
+                                if (link) link.click();
+                            }
+                        });
+                    }
+                    // If subscribers section open, refresh data
+                    if (document.getElementById('subscribers')?.classList.contains('active')) {
+                        loadSubscribersData();
+                    }
+                }
+            )
+            .subscribe();
+
+        console.log('✅ Subscribers real-time subscription established');
+    } catch (error) {
+        console.error('Failed to set up subscribers subscription:', error);
+    }
+}
+
+function setupDonationsSubscription() {
+    try {
+        if (realtimeData.donationsChannel) {
+            realtimeData.donationsChannel.unsubscribe();
+            realtimeData.donationsChannel = null;
+        }
+
+        realtimeData.donationsChannel = supabase
+            .channel('donations-changes')
+            .on('postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: supabaseConfig.leaderboard.donationsTableName
+                },
+                (payload) => {
+                    // Refresh relevant sections
+                    if (document.getElementById('dashboard')?.classList.contains('active')) {
+                        loadDashboardData();
+                    }
+                    if (document.getElementById('donations')?.classList.contains('active')) {
+                        loadDonationsData();
+                    }
+                }
+            )
+            .subscribe();
+
+        console.log('✅ Donations real-time subscription established');
+    } catch (error) {
+        console.error('Failed to set up donations subscription:', error);
     }
 }
 
@@ -1051,6 +1141,160 @@ function updateLogsPaginationInfo(totalPages) {
 }
 
 // Chart Functions
+// Subscribers Management
+async function loadSubscribersData() {
+    try {
+        showSectionLoading('#subscribers-table-body', 'Loading subscribers...');
+
+        const { data: subscribers, error } = await supabase
+            .from('newsletter_subscribers')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            throw new Error(`Failed to fetch subscribers: ${error.message}`);
+        }
+
+        window._subscribers = subscribers || [];
+        displaySubscribersTable(window._subscribers);
+        setupSubscribersPagination(window._subscribers);
+
+        // Update top stats in subscribers section if present
+        const total = window._subscribers.length;
+        const active = window._subscribers.filter(s => s.status === 'active').length;
+        const unsub = window._subscribers.filter(s => s.status === 'unsubscribed').length;
+        const totalEl = document.querySelector('#subscribers #total-subscribers');
+        const activeEl = document.querySelector('#subscribers #active-subscribers');
+        const unsubEl = document.querySelector('#subscribers #unsubscribed-count');
+        if (totalEl) totalEl.textContent = total.toLocaleString();
+        if (activeEl) activeEl.textContent = active.toLocaleString();
+        if (unsubEl) unsubEl.textContent = unsub.toLocaleString();
+
+        hideSectionLoading('#subscribers-table-body');
+    } catch (error) {
+        console.error('Failed to load subscribers data:', error);
+        showError('Failed to load subscribers data. Please refresh the page.');
+        displaySubscribersTable([]);
+        setupSubscribersPagination([]);
+        hideSectionLoading('#subscribers-table-body');
+    }
+}
+
+function displaySubscribersTable(subscribers) {
+    const tableBody = document.getElementById('subscribers-table-body');
+    if (!tableBody) return;
+    tableBody.innerHTML = '';
+
+    if (!subscribers || subscribers.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="loading">No subscribers found</td></tr>';
+        return;
+    }
+
+    const startIndex = (subscribersCurrentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const pageItems = subscribers.slice(startIndex, endIndex);
+
+    pageItems.forEach(sub => {
+        const tr = document.createElement('tr');
+
+        const emailTd = document.createElement('td');
+        emailTd.textContent = sub.email;
+
+        const statusTd = document.createElement('td');
+        const badge = document.createElement('span');
+        badge.className = `status-badge ${sub.status === 'active' ? 'confirmed' : 'error'}`;
+        badge.textContent = sub.status || 'unknown';
+        statusTd.appendChild(badge);
+
+        const dateTd = document.createElement('td');
+        dateTd.textContent = sub.created_at ? new Date(sub.created_at).toLocaleDateString() : '-';
+
+        const sourceTd = document.createElement('td');
+        sourceTd.textContent = sub.source || '-';
+
+        const actionsTd = document.createElement('td');
+        const deactivateBtn = document.createElement('button');
+        deactivateBtn.className = 'btn btn-outline btn-sm';
+        deactivateBtn.textContent = sub.status === 'active' ? 'Deactivate' : 'Activate';
+        deactivateBtn.onclick = () => toggleSubscriberStatus(sub);
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'btn btn-danger btn-sm';
+        deleteBtn.textContent = 'Delete';
+        deleteBtn.onclick = () => deleteSubscriber(sub.email);
+
+        actionsTd.appendChild(deactivateBtn);
+        actionsTd.appendChild(deleteBtn);
+
+        tr.appendChild(emailTd);
+        tr.appendChild(statusTd);
+        tr.appendChild(dateTd);
+        tr.appendChild(sourceTd);
+        tr.appendChild(actionsTd);
+
+        tableBody.appendChild(tr);
+    });
+}
+
+function setupSubscribersPagination(data) {
+    const totalPages = Math.ceil((data?.length || 0) / itemsPerPage) || 1;
+    const info = document.getElementById('subscriber-page-info');
+    if (info) info.textContent = `Page ${subscribersCurrentPage} of ${totalPages}`;
+    const prev = document.getElementById('prev-subscriber-page');
+    const next = document.getElementById('next-subscriber-page');
+    if (prev) prev.disabled = subscribersCurrentPage === 1;
+    if (next) next.disabled = subscribersCurrentPage === totalPages;
+}
+
+function changeSubscriberPage(direction) {
+    subscribersCurrentPage += direction;
+    if (subscribersCurrentPage < 1) subscribersCurrentPage = 1;
+    displaySubscribersTable(window._subscribers || []);
+    setupSubscribersPagination(window._subscribers || []);
+}
+
+function searchSubscribers(e) {
+    const term = (e.target.value || '').toLowerCase();
+    const base = window._subscribers || [];
+    const filtered = base.filter(s => (s.email || '').toLowerCase().includes(term));
+    subscribersCurrentPage = 1;
+    displaySubscribersTable(filtered);
+    setupSubscribersPagination(filtered);
+}
+
+async function toggleSubscriberStatus(subscriber) {
+    try {
+        const newStatus = subscriber.status === 'active' ? 'unsubscribed' : 'active';
+        const { error } = await supabase
+            .from('newsletter_subscribers')
+            .update({ status: newStatus, updated_at: new Date().toISOString() })
+            .eq('email', subscriber.email);
+        if (error) throw error;
+        showSuccess(`Subscriber ${newStatus === 'active' ? 'activated' : 'deactivated'}.`);
+        await loadSubscribersData();
+        logActivity('subscriber_status_change', `${subscriber.email} -> ${newStatus}`);
+    } catch (err) {
+        console.error(err);
+        showError('Failed to update subscriber status.');
+    }
+}
+
+async function deleteSubscriber(email) {
+    if (!confirm(`Delete subscriber ${email}?`)) return;
+    try {
+        const { error } = await supabase
+            .from('newsletter_subscribers')
+            .delete()
+            .eq('email', email);
+        if (error) throw error;
+        showSuccess('Subscriber deleted.');
+        await loadSubscribersData();
+        logActivity('subscriber_deleted', email);
+    } catch (err) {
+        console.error(err);
+        showError('Failed to delete subscriber.');
+    }
+}
 function createDonationsChart(data) {
     const canvas = document.getElementById('donations-chart');
     if (!canvas) {

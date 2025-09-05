@@ -246,13 +246,29 @@ class PaymentProcessor {
 }
 
 // Initialize payment processor when page loads
-document.addEventListener('DOMContentLoaded', () => {
+if (document.readyState === 'loading') {
+    // Document is still loading
+    document.addEventListener('DOMContentLoaded', () => {
+        window.stripePaymentProcessor = new PaymentProcessor();
+        
+        // Check for payment return
+        window.stripePaymentProcessor.checkPaymentReturn();
+        
+        // Add event listeners for donation buttons
+        setupDonationEventListeners();
+    });
+} else {
+    // Document is already loaded
     window.stripePaymentProcessor = new PaymentProcessor();
     
     // Check for payment return
     window.stripePaymentProcessor.checkPaymentReturn();
     
     // Add event listeners for donation buttons
+    setupDonationEventListeners();
+}
+
+function setupDonationEventListeners() {
     const amountOptions = document.querySelectorAll('.amount-option');
     amountOptions.forEach(option => {
         option.addEventListener('click', function() {
@@ -264,6 +280,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 // Update hidden input
                 document.getElementById('donation-amount-input').value = amount;
+            }
+        });
+    });
+}
             }
         });
     });

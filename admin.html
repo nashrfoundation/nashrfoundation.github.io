@@ -146,6 +146,13 @@
                     </svg>
                     Newsletter
                 </a></li>
+                <li><a href="#subscribers" class="nav-link" data-section="subscribers">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    Subscribers
+                </a></li>
                 <li><a href="#settings" class="nav-link" data-section="settings">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <circle cx="12" cy="12" r="3"></circle>
@@ -618,14 +625,14 @@
                                 <th>IP Address</th>
                             </tr>
                         </thead>
-                                                        <tbody id="logs-table-body">
-                                    <tr>
-                                        <td colspan="5" class="loading">
-                                            <div class="loading-spinner"></div>
-                                            <span class="loading-text">Loading activity logs...</span>
-                                        </td>
-                                    </tr>
-                                </tbody>
+                        <tbody id="logs-table-body">
+                            <tr>
+                                <td colspan="5" class="loading">
+                                    <div class="loading-spinner"></div>
+                                    <span class="loading-text">Loading activity logs...</span>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
                 
@@ -633,6 +640,114 @@
                     <button class="btn btn-outline" id="prev-log-page" onclick="changeLogPage(-1)">Previous</button>
                     <span id="log-page-info">Page 1 of 1</span>
                     <button class="btn btn-outline" id="next-log-page" onclick="changeLogPage(1)">Next</button>
+                </div>
+            </section>
+            
+            <!-- Newsletter Subscribers Section -->
+            <section id="subscribers" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Newsletter Subscribers</h2>
+                    <div class="header-actions">
+                        <input type="text" class="search-input" placeholder="Search subscribers..." oninput="searchSubscribers(event)">
+                        <button class="btn btn-secondary" onclick="exportSubscribers()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Subscribers
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="subscriber-stats">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                    <polyline points="22,6 12,13 2,6"></polyline>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Total Subscribers</h3>
+                                <div class="stat-value" id="total-subscribers">0</div>
+                                <div class="stat-change" id="subscribers-change">+0 today</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="8.5" cy="7" r="4"></circle>
+                                    <polyline points="17 11 19 13 23 9"></polyline>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Active Subscribers</h3>
+                                <div class="stat-value" id="active-subscribers">0</div>
+                                <div class="stat-change" id="active-change">+0 today</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="15" y1="9" x2="9" y2="15"></line>
+                                    <line x1="9" y1="9" x2="15" y2="15"></line>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Unsubscribed</h3>
+                                <div class="stat-value" id="unsubscribed-count">0</div>
+                                <div class="stat-change" id="unsubscribe-change">+0 today</div>
+                            </div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                                    <polyline points="17 6 23 6 23 12"></polyline>
+                                </svg>
+                            </div>
+                            <div class="stat-content">
+                                <h3>Growth Rate</h3>
+                                <div class="stat-value" id="growth-rate">0%</div>
+                                <div class="stat-change" id="growth-change">0% this month</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="subscribers-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Status</th>
+                                <th>Subscribed Date</th>
+                                <th>Source</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="subscribers-table-body">
+                            <tr>
+                                <td colspan="5" class="loading">
+                                    <div class="loading-spinner"></div>
+                                    <span class="loading-text">Loading subscribers...</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button class="btn btn-outline" id="prev-subscriber-page" onclick="changeSubscriberPage(-1)">Previous</button>
+                    <span id="subscriber-page-info">Page 1 of 1</span>
+                    <button class="btn btn-outline" id="next-subscriber-page" onclick="changeSubscriberPage(1)">Next</button>
                 </div>
             </section>
         </main>
