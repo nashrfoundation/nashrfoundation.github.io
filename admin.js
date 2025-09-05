@@ -1042,6 +1042,22 @@ async function loadNewsletterData() {
         if (activeEl) activeEl.textContent = activeSubscribers.toLocaleString();
         if (unsubEl) unsubEl.textContent = unsubscribed.toLocaleString();
         
+        // Add test subscribers button if no subscribers exist
+        if (totalSubscribers === 0) {
+            const newsletterSection = document.getElementById('newsletter');
+            if (newsletterSection && !newsletterSection.querySelector('.add-test-subscribers-btn')) {
+                const buttonDiv = document.createElement('div');
+                buttonDiv.className = 'add-test-subscribers-btn';
+                buttonDiv.style.marginTop = '10px';
+                buttonDiv.innerHTML = `
+                    <button onclick="addTestSubscribers()" class="btn btn-outline btn-sm">
+                        Add Test Subscribers
+                    </button>
+                `;
+                newsletterSection.appendChild(buttonDiv);
+            }
+        }
+        
         hideSectionLoading('.newsletter-editor .stats-grid');
         
     } catch (error) {
@@ -1143,6 +1159,16 @@ async function sendNewsletter() {
         
         if (!recipients.length) {
             showError('No recipients found. Add subscribers in the Subscribers section or provide emails in the Recipients field.');
+            // Add a button to quickly add test subscribers
+            const errorDiv = document.createElement('div');
+            errorDiv.innerHTML = `
+                <div style="margin-top: 10px;">
+                    <button onclick="addTestSubscribers()" class="btn btn-outline btn-sm">
+                        Add Test Subscribers
+                    </button>
+                </div>
+            `;
+            document.querySelector('#newsletter .error-message')?.appendChild(errorDiv);
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
