@@ -697,25 +697,7 @@ async function populateLeaderboardFromDonations() {
 
 // Function to load leaderboard from CSV as fallback
 async function loadLeaderboardFromCSV() {
-    try {
-        const response = await fetch('leaderboard.csv');
-        if (!response.ok) {
-            throw new Error('Failed to fetch leaderboard CSV');
-        }
-        
-        const csvText = await response.text();
-        const rows = csvText.trim().split('
-');
-        const data = [];
-        
-        // Parse CSV data (skip header row)
-        for (let i = 1; i < rows.length; i++) {
-            const line = rows[i];
-            if (!line) continue;
-            
-            const cells = line.split(',');
-            if (cells.length >= 3) {
-                data.push({
+        const response = await fetch(leaderboard.csv);n        if (!response.ok) {n            throw new Error(Failed to fetch leaderboard CSV);n        }n        n        const csvText = await response.text();n        const rows = csvText.trim().split(\n);n        const data = [];n        n        // Parse CSV data (skip header row)n        for (let i = 1; i < rows.length; i++) {n            const line = rows[i];n            if (!line) continue;n            n            const cells = line.split(,);n            if (cells.length >= 3) {n                data.push({n                    rank: parseInt(cells[0].trim()) || i,n                    name: cells[1].trim(),n                    total_amount: parseFloat(cells[2].trim().replace(/[^0-9.]/g, )) || 0n                });n            }n        }                data.push({
                     rank: parseInt(cells[0].trim()) || i,
                     name: cells[1].trim(),
                     total_amount: parseFloat(cells[2].trim().replace(/[^0-9.]/g, '')) || 0
@@ -1077,19 +1059,7 @@ async function sendNewsletter() {
         }
         
         // Collect recipients: prefer active subscribers from DB; if input is provided, use it as CSV override
-        let recipients = [];
-        const csvOverride = (recipientsInput || '').trim();
-        if (csvOverride) {
-            recipients = csvOverride.split(/[,
-;]/).map(s => s.trim()).filter(Boolean);
-        } else {
-            const { data: subs, error } = await supabase
-                .from('newsletter_subscribers')
-                .select('email')
-                .eq('status', 'active');
-            if (error) throw error;
-            recipients = (subs || []).map(s => s.email).filter(Boolean);
-        }
+        // Collect recipients: prefer active subscribers from DB; if input is provided, use it as CSV overriden        let recipients = [];n        const csvOverride = (recipientsInput || ).trim();n        if (csvOverride) {n            recipients = csvOverride.split(/[\n;]/).map(s => s.trim()).filter(Boolean);n        } else {n            const { data: subs, error } = await supabasen                .from(newsletter_subscribers)n                .select(email)n                .eq(status, active);n            if (error) throw error;n            recipients = (subs || []).map(s => s.email).filter(Boolean);n        }        }
         
         if (!recipients.length) {
             showError('No recipients found. Add subscribers or provide emails.');
