@@ -989,7 +989,7 @@ footer {
 
 @media (max-width: 768px) {
     .logo img {
-        height: clamp(28px, 8vw, 40px);
+        height: clamp(40px, 10vw, 56px);
     }
 
     .mobile-menu-toggle {
@@ -1002,7 +1002,7 @@ footer {
 
     nav {
         position: fixed;
-        top: 80px;
+        top: 70px;
         left: 0;
         width: 100%;
         background-color: rgba(44, 44, 44, 0.95);
@@ -1378,7 +1378,7 @@ footer {
     }
 
     .hero {
-        margin-top: 110px !important;
+        margin-top: 80px !important;
     }
 }
 
@@ -1390,7 +1390,7 @@ footer {
     }
 
     .logo img {
-        height: clamp(24px, 6vw, 32px) !important;
+        height: clamp(36px, 8vw, 48px) !important;
         transform: none;
     }
 
@@ -1410,7 +1410,7 @@ footer {
     }
 
     .hero {
-        margin-top: 105px !important;
+        margin-top: 70px !important;
     }
 }
 

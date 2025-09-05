@@ -1017,12 +1017,15 @@ function saveContentChanges() {
 // Newsletter Management
 async function loadNewsletterData() {
     try {
+        console.log('Loading newsletter data...');
         showSectionLoading('.newsletter-editor .stats-grid', 'Loading newsletter statistics...');
         
         // Fetch real-time newsletter subscriber statistics from Supabase
         const { data: subscribers, error: subscribersError } = await supabase
             .from('newsletter_subscribers')
             .select('status');
+            
+        console.log('Newsletter subscribers query result:', { subscribers, error: subscribersError, count: subscribers?.length });
             
         if (subscribersError) {
             throw new Error(`Failed to fetch subscribers: ${subscribersError.message}`);
@@ -1091,25 +1094,13 @@ async function sendNewsletter() {
         const csvOverride = (recipientsInput || '').trim();
         console.log('Newsletter recipients input:', { csvOverride, hasInput: !!csvOverride });
         
-        if (csvOverride) {
-            // Handle special case: "all" means send to all active subscribers
-            if (csvOverride.toLowerCase() === 'all') {
-                console.log('Using "all" - fetching all active subscribers from database...');
-                const { data: subs, error } = await supabase
-                    .from('newsletter_subscribers')
-                    .select('email, status')
-                    .eq('status', 'active');
-                console.log('All subscribers query result:', { subs, error, count: subs?.length });
-                if (error) throw error;
-                recipients = (subs || []).map(s => s.email).filter(Boolean);
-                console.log('All subscribers from database:', recipients);
-            } else {
-                recipients = csvOverride
-                    .split(/[\n,;]+/)
-                    .map(s => s.trim())
-                    .filter(Boolean);
-                console.log('Recipients from input:', recipients);
-            }
+        if (csvOverride && csvOverride !== 'all') {
+            // Handle manual email input (comma or line separated)
+            recipients = csvOverride
+                .split(/[\n,;]+/)
+                .map(s => s.trim())
+                .filter(Boolean);
+            console.log('Recipients from input:', recipients);
         } else {
             console.log('Fetching active subscribers from database...');
             const { data: subs, error } = await supabase
