@@ -1076,11 +1076,24 @@ async function sendNewsletter() {
         console.log('Newsletter recipients input:', { csvOverride, hasInput: !!csvOverride });
         
         if (csvOverride) {
-            recipients = csvOverride
-                .split(/[\n,;]+/)
-                .map(s => s.trim())
-                .filter(Boolean);
-            console.log('Recipients from input:', recipients);
+            // Handle special case: "all" means send to all active subscribers
+            if (csvOverride.toLowerCase() === 'all') {
+                console.log('Using "all" - fetching all active subscribers from database...');
+                const { data: subs, error } = await supabase
+                    .from('newsletter_subscribers')
+                    .select('email, status')
+                    .eq('status', 'active');
+                console.log('All subscribers query result:', { subs, error, count: subs?.length });
+                if (error) throw error;
+                recipients = (subs || []).map(s => s.email).filter(Boolean);
+                console.log('All subscribers from database:', recipients);
+            } else {
+                recipients = csvOverride
+                    .split(/[\n,;]+/)
+                    .map(s => s.trim())
+                    .filter(Boolean);
+                console.log('Recipients from input:', recipients);
+            }
         } else {
             console.log('Fetching active subscribers from database...');
             const { data: subs, error } = await supabase
@@ -1108,12 +1121,25 @@ async function sendNewsletter() {
         // Normalize emails: lowercase, trim, and deduplicate; basic validation
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const beforeValidation = recipients.length;
+        const invalidEmails = [];
         recipients = Array.from(new Set(
             recipients
                 .map(e => (e || '').trim().toLowerCase())
-                .filter(e => emailPattern.test(e))
+                .filter(e => {
+                    if (emailPattern.test(e)) {
+                        return true;
+                    } else {
+                        invalidEmails.push(e);
+                        return false;
+                    }
+                })
         ));
-        console.log('Recipients after validation:', { beforeValidation, afterValidation: recipients.length, recipients });
+        console.log('Recipients after validation:', { beforeValidation, afterValidation: recipients.length, recipients, invalidEmails });
+        
+        // Show warning for invalid emails
+        if (invalidEmails.length > 0) {
+            showError(`Invalid email addresses found: ${invalidEmails.join(', ')}. Please use valid email addresses.`);
+        }
         
         if (!recipients.length) {
             showError('No recipients found. Add subscribers in the Subscribers section or provide emails in the Recipients field.');
@@ -1640,7 +1666,7 @@ function displaySubscribersTable(subscribers) {
         console.log('No subscribers to display');
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6" class="loading">
+                <td colspan="5" class="loading">
                     <div>No subscribers found</div>
                     <button onclick="addTestSubscribers()" class="btn btn-outline btn-sm" style="margin-top: 10px;">
                         Add Test Subscribers
@@ -1654,8 +1680,10 @@ function displaySubscribersTable(subscribers) {
     const startIndex = (subscribersCurrentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     const pageItems = subscribers.slice(startIndex, endIndex);
+    console.log('Pagination info:', { startIndex, endIndex, pageItems, totalSubscribers: subscribers.length });
 
-    pageItems.forEach(sub => {
+    pageItems.forEach((sub, index) => {
+        console.log(`Creating row ${index + 1} for subscriber:`, sub);
         const tr = document.createElement('tr');
 
         const emailTd = document.createElement('td');
