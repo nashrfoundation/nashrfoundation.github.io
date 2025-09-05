@@ -1113,26 +1113,39 @@ async function sendNewsletter() {
             return;
         }
         
-        // Batch sending to avoid large payloads
-        const batchSize = 100;
+        // Batch sending to avoid large payloads; retry with backoff
+        const batchSize = 50;
         let sentCount = 0;
+        const maxRetries = 2;
         for (let i = 0; i < recipients.length; i += batchSize) {
             const batch = recipients.slice(i, i + batchSize);
-            const res = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    type: 'newsletter',
-                    subject,
-                    content,
-                    to: batch
-                })
-            });
-            if (!res.ok) {
-                const errText = await res.text().catch(() => '');
-                let message = `Send failed for batch starting ${i + 1}`;
-                if (errText) message += `: ${errText}`;
-                throw new Error(message);
+            let attempt = 0;
+            while (true) {
+                try {
+                    const res = await fetch(endpoint, {
+                        method: 'POST',
+                        mode: 'cors',
+                        credentials: 'omit',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            type: 'newsletter',
+                            subject,
+                            content,
+                            to: batch
+                        })
+                    });
+                    if (!res.ok) {
+                        const errText = await res.text().catch(() => '');
+                        let message = `Send failed for batch starting ${i + 1}`;
+                        if (errText) message += `: ${errText}`;
+                        throw new Error(message);
+                    }
+                    break;
+                } catch (err) {
+                    if (attempt >= maxRetries) throw err;
+                    await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+                    attempt++;
+                }
             }
             sentCount += batch.length;
         }
@@ -1188,6 +1201,10 @@ async function loadSettingsData() {
             if (document.getElementById('goal-description')) document.getElementById('goal-description').value = s.goal_description || '';
             if (document.getElementById('admin-email-notifications')) document.getElementById('admin-email-notifications').value = s.admin_email_notifications || 'all';
             if (document.getElementById('backup-frequency')) document.getElementById('backup-frequency').value = s.backup_frequency || 'daily';
+            // Auto-configure newsletter endpoint if provided in settings and not already set
+            if (!window.RESEND_FUNCTION_URL && s.email_function_url) {
+                window.RESEND_FUNCTION_URL = String(s.email_function_url || '').trim();
+            }
         }
     } catch (error) {
         console.error('Failed to load settings data:', error);
@@ -1797,6 +1814,12 @@ function updateLastUpdatedTime() {
 // Visitors (Umami) integration
 async function updateVisitorsFromUmami() {
     try {
+        // Feature flag: avoid content-blocker errors unless explicitly enabled
+        if (!window.ENABLE_UMAMI_METRICS) {
+            const el = document.getElementById('website-visitors');
+            if (el && (!el.textContent || el.textContent === '—')) el.textContent = '0';
+            return;
+        }
         const websiteId = '499e6d89-95ee-459e-a467-b4e37f63281c';
         // Public aggregate endpoint via Cloud Umami embed (no token); sums unique visitors last 30 days
         const end = new Date();

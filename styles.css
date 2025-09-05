@@ -214,7 +214,7 @@ header .container {
 }
 
 .logo img {
-    height: 192px;
+    height: clamp(48px, 10vw, 80px);
     width: auto;
 }
 
@@ -631,7 +631,7 @@ footer {
 }
 
 .footer-logo img {
-    height: 384px;
+    height: clamp(44px, 9vw, 72px);
     width: auto;
 }
 
@@ -989,7 +989,7 @@ footer {
 
 @media (max-width: 768px) {
     .logo img {
-        height: 336px;
+        height: clamp(44px, 12vw, 64px);
     }
 
     .mobile-menu-toggle {
