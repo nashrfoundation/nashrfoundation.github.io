@@ -284,7 +284,4 @@ function setupDonationEventListeners() {
         });
     });
 }
-            }
-        });
-    });
-});
+

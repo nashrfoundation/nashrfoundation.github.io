@@ -10,17 +10,31 @@ function checkMissingImages() {
     const missingImages = [];
     
     images.forEach(img => {
-        if (!img.complete || img.naturalWidth === 0) {
+        // Count only images that have finished attempting to load and failed
+        if (img.complete && img.naturalWidth === 0) {
             missingImages.push({
                 src: img.src,
                 alt: img.alt,
                 element: img
             });
+        } else {
+            // Attach one-time error logger for late-loading images
+            img.addEventListener('error', () => {
+                console.warn('❌ Image failed to load:', { src: img.src, alt: img.alt });
+            }, { once: true });
         }
     });
     
     if (missingImages.length > 0) {
         console.warn('⚠️ Missing or broken images:', missingImages);
+        // Attempt graceful fallback to logo for broken images
+        missingImages.forEach(item => {
+            try {
+                if (item.element && item.element.src !== location.origin + '/logo.webp') {
+                    item.element.src = 'logo.webp';
+                }
+            } catch (e) {}
+        });
         return false;
     } else {
         console.log('✅ All images loaded successfully');
@@ -32,14 +46,28 @@ function checkMissingImages() {
 function checkJavaScriptErrors() {
     console.log('⚡ Checking for JavaScript errors...');
     
-    // Check if required functions exist
-    const requiredFunctions = [
-        'gtag',
-        'AOS',
-        'Chart'
-    ];
+    // Feature-aware checks per page content
+    const requiredFunctions = [];
+    // Require Chart only if charts are present
+    if (document.getElementById('donations-chart') || document.getElementById('payment-methods-chart')) {
+        requiredFunctions.push('Chart');
+    }
+    // Require AOS only if elements declare data-aos
+    if (document.querySelector('[data-aos]')) {
+        requiredFunctions.push('AOS');
+    }
+    // Require gtag only if GTM is included
+    if (document.querySelector('script[src*="googletagmanager.com"]')) {
+        // Treat presence of GTM script or dataLayer as sufficient
+        if (!(window.dataLayer && Array.isArray(window.dataLayer))) {
+            requiredFunctions.push('gtag');
+        }
+    }
     
-    const missingFunctions = requiredFunctions.filter(func => typeof window[func] === 'undefined');
+    const missingFunctions = requiredFunctions.filter(func => {
+        if (func === 'gtag') return typeof window.gtag === 'undefined';
+        return typeof window[func] === 'undefined';
+    });
     
     if (missingFunctions.length > 0) {
         console.warn('⚠️ Missing JavaScript functions:', missingFunctions);
@@ -148,28 +176,20 @@ function checkPerformance() {
 function checkMobileResponsiveness() {
     console.log('📱 Checking mobile responsiveness...');
     
-    // Simulate mobile viewport
-    const originalWidth = window.innerWidth;
-    const originalHeight = window.innerHeight;
-    
-    // Test mobile breakpoint
-    window.innerWidth = 375;
-    window.innerHeight = 667;
-    window.dispatchEvent(new Event('resize'));
+    // Use matchMedia to respect CSS media queries
+    const isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
     
     // Check if mobile menu toggle is visible
     const mobileToggle = document.querySelector('.mobile-menu-toggle');
-    if (mobileToggle) {
+    if (mobileToggle && isMobile) {
         const computedStyle = window.getComputedStyle(mobileToggle);
-        if (computedStyle.display === 'none') {
-            console.warn('⚠️ Mobile menu toggle not visible on mobile viewport');
+        // Reduce false positives: consider it an issue only if it's not displayed AND not interactable in layout
+        const notDisplayed = computedStyle.display === 'none';
+        const notInLayout = mobileToggle.offsetParent === null;
+        if (notDisplayed && notInLayout) {
+            console.info('ℹ️ Mobile menu toggle appears hidden; verify CSS @media for .mobile-menu-toggle');
         }
     }
-    
-    // Restore original viewport
-    window.innerWidth = originalWidth;
-    window.innerHeight = originalHeight;
-    window.dispatchEvent(new Event('resize'));
     
     console.log('✅ Mobile responsiveness check completed');
     return true;

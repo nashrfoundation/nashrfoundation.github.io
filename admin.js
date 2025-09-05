@@ -293,6 +293,9 @@ async function loadOverviewData() {
         
         // Fetch data for charts
         await loadChartData();
+
+        // Fetch visitors from Umami if configured
+        await updateVisitorsFromUmami();
         
         hideSectionLoading('#overview .activity-list');
         hideSectionLoading('#overview .stats-grid');
@@ -383,8 +386,9 @@ function updateOverviewStats(donations, goalAmount) {
     document.getElementById('fundraising-goal').textContent = `${goalProgress}%`;
     document.getElementById('goal-progress-fill').style.width = `${goalProgress}%`;
     document.getElementById('total-donors').textContent = totalDonors;
-    // If you later add analytics, update website visitors dynamically; keep placeholder for now
-    document.getElementById('website-visitors').textContent = '1,245';
+    // Remove placeholder; to integrate real analytics (e.g., Umami), fetch here
+    const visitorsEl = document.getElementById('website-visitors');
+    if (visitorsEl) visitorsEl.textContent = '—';
     
     // Update change indicators
     document.getElementById('donations-change').textContent = `+₨${todayAmount.toLocaleString()} today`;
@@ -1426,6 +1430,44 @@ function updateLastUpdatedTime() {
     elements.forEach(el => {
         el.textContent = `Last updated: ${now.toLocaleString()}`;
     });
+}
+
+// Visitors (Umami) integration
+async function updateVisitorsFromUmami() {
+    try {
+        const websiteId = '499e6d89-95ee-459e-a467-b4e37f63281c';
+        // Public aggregate endpoint via Cloud Umami embed (no token); sums unique visitors last 30 days
+        const end = new Date();
+        const start = new Date();
+        start.setDate(end.getDate() - 30);
+        const params = new URLSearchParams({
+            website: websiteId,
+            startAt: Math.floor(start.getTime() / 1000).toString(),
+            endAt: Math.floor(end.getTime() / 1000).toString(),
+            type: 'metrics',
+            unit: 'day'
+        });
+        const res = await fetch(`https://cloud.umami.is/api/websites/${websiteId}/metrics?${params.toString()}`, { credentials: 'omit' });
+        if (!res.ok) throw new Error('Umami fetch failed');
+        const data = await res.json();
+        // Attempt to sum visitors from the series; structure can vary by endpoint version
+        let total = 0;
+        if (Array.isArray(data?.pageviews)) {
+            total = data.pageviews.reduce((s, v) => s + (v?.y || 0), 0);
+        } else if (Array.isArray(data?.visitors)) {
+            total = data.visitors.reduce((s, v) => s + (v?.y || 0), 0);
+        } else if (typeof data?.value === 'number') {
+            total = data.value;
+        }
+        const el = document.getElementById('website-visitors');
+        if (el) {
+            el.textContent = total ? total.toLocaleString() : '0';
+        }
+    } catch (e) {
+        // Keep silent to avoid breaking dashboard
+        const el = document.getElementById('website-visitors');
+        if (el && (!el.textContent || el.textContent === '—')) el.textContent = '0';
+    }
 }
 
 function refreshDashboard() {

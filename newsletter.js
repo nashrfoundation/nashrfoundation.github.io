@@ -46,12 +46,19 @@ async function handleNewsletterSignup(e) {
         // Initialize Supabase
         const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
         
+        const globalCfg = (typeof window !== 'undefined' && window.SUPABASE_CONFIG) ? window.SUPABASE_CONFIG : null;
         const supabaseConfig = {
-            url: 'https://jtuhnndwhotxjjolwcuz.supabase.io',
-            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
+            url: globalCfg?.url || 'https://jtuhnndwhotxjjolwcuz.supabase.co',
+            anonKey: globalCfg?.anonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
         };
         
-        const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+        const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey, {
+            auth: {
+                storageKey: 'nf_newsletter',
+                persistSession: false,
+                autoRefreshToken: false
+            }
+        });
         
         // Check if subscriber already exists
         const { data: existingSubscriber, error: checkError } = await supabase
