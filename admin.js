@@ -201,13 +201,22 @@ function handleNavigation(e) {
     document.querySelectorAll('.nav-link').forEach(link => {
         link.classList.remove('active');
     });
-    e.target.classList.add('active');
+    
+    // Check if target element exists before accessing classList
+    if (e.target && e.target.classList) {
+        e.target.classList.add('active');
+    }
     
     // Show target section
     document.querySelectorAll('.dashboard-section').forEach(section => {
         section.classList.remove('active');
     });
-    document.getElementById(targetSection).classList.add('active');
+    
+    // Check if target section element exists before accessing classList
+    const targetSectionElement = document.getElementById(targetSection);
+    if (targetSectionElement) {
+        targetSectionElement.classList.add('active');
+    }
     
     // Load section-specific data
     loadSectionData(targetSection);
@@ -276,6 +285,9 @@ async function loadOverviewData() {
             .order('created_at', { ascending: false })
             .limit(50);
             
+        console.log('Overview donations data fetched:', donations);
+        console.log('Overview donations fetch error:', donationsError);
+            
         if (donationsError) {
             throw new Error(`Failed to fetch donations: ${donationsError.message}`);
         }
@@ -285,6 +297,9 @@ async function loadOverviewData() {
             .from('settings')
             .select('fundraising_goal')
             .single();
+            
+        console.log('Settings data fetched:', settings);
+        console.log('Settings fetch error:', settingsError);
             
         const goalAmount = settings?.fundraising_goal || 200000;
         
@@ -450,6 +465,9 @@ async function loadDonationsData() {
             .select('*')
             .order('created_at', { ascending: false });
             
+        console.log('Donations data fetched:', donations);
+        console.log('Donations fetch error:', error);
+            
         if (error) {
             throw new Error(`Failed to fetch donations: ${error.message}`);
         }
@@ -530,6 +548,7 @@ function displayDonationsTable(donations) {
 }
 
 // Leaderboard Section
+// Leaderboard Section
 async function loadLeaderboardData() {
     try {
         showSectionLoading('#admin-leaderboard-body', 'Loading leaderboard...');
@@ -540,15 +559,37 @@ async function loadLeaderboardData() {
             leaderboardSubscription = null;
         }
         
-        // Fetch real-time leaderboard data from Supabase
-        const { data: leaderboardData, error } = await supabase
+        // First, try to fetch from leaderboard table
+        let { data: leaderboardData, error } = await supabase
             .from(supabaseConfig.leaderboard.tableName)
             .select('*')
             .order('total_amount', { ascending: false })
             .limit(50);
             
+        console.log('Leaderboard data fetched:', leaderboardData);
+        console.log('Leaderboard fetch error:', error);
+        
+        // If leaderboard table is empty, try to populate it from donations
+        if ((!leaderboardData || leaderboardData.length === 0) && !error) {
+            console.log('Leaderboard table is empty, attempting to populate from donations...');
+            await populateLeaderboardFromDonations();
+            
+            // Try fetching again after population
+            ({ data: leaderboardData, error } = await supabase
+                .from(supabaseConfig.leaderboard.tableName)
+                .select('*')
+                .order('total_amount', { ascending: false })
+                .limit(50));
+        }
+            
         if (error) {
             throw new Error(`Failed to fetch leaderboard: ${error.message}`);
+        }
+        
+        // If still no data, try to load from CSV as fallback
+        if (!leaderboardData || leaderboardData.length === 0) {
+            console.log('Attempting CSV fallback for leaderboard...');
+            leaderboardData = await loadLeaderboardFromCSV();
         }
         
         // Update ranks based on amount order
@@ -569,6 +610,118 @@ async function loadLeaderboardData() {
         console.error('Failed to load leaderboard data:', error);
         showError('Failed to load leaderboard data. Please refresh the page.');
         hideSectionLoading('#admin-leaderboard-body');
+    }
+}
+
+// Function to populate leaderboard from donations data
+async function populateLeaderboardFromDonations() {
+    try {
+        // Fetch all donations
+        const { data: donations, error: donationsError } = await supabase
+            .from(supabaseConfig.leaderboard.donationsTableName)
+            .select('*');
+            
+        if (donationsError) {
+            throw new Error(`Failed to fetch donations: ${donationsError.message}`);
+        }
+        
+        if (!donations || donations.length === 0) {
+            console.log('No donations found to populate leaderboard');
+            return;
+        }
+        
+        // Group donations by name and calculate totals
+        const donorMap = {};
+        donations.forEach(donation => {
+            // Skip anonymous or ineligible donations
+            if (!donation.name || donation.name === 'Anonymous' || !donation.leaderboard_eligible) {
+                return;
+            }
+            
+            if (!donorMap[donation.name]) {
+                donorMap[donation.name] = {
+                    name: donation.name,
+                    total_amount: 0,
+                    donation_count: 0,
+                    first_donation_date: donation.created_at,
+                    last_donation_date: donation.created_at,
+                    last_donation_amount: 0
+                };
+            }
+            
+            donorMap[donation.name].total_amount += donation.amount;
+            donorMap[donation.name].donation_count += 1;
+            if (new Date(donation.created_at) > new Date(donorMap[donation.name].last_donation_date)) {
+                donorMap[donation.name].last_donation_date = donation.created_at;
+                donorMap[donation.name].last_donation_amount = donation.amount;
+            }
+        });
+        
+        // Convert to array and filter out donors below minimum amount
+        const leaderboardEntries = Object.values(donorMap)
+            .filter(donor => donor.total_amount >= 500) // Minimum amount from config
+            .sort((a, b) => b.total_amount - a.total_amount);
+        
+        if (leaderboardEntries.length === 0) {
+            console.log('No eligible donors found for leaderboard');
+            return;
+        }
+        
+        // Insert entries into leaderboard table
+        const { error: insertError } = await supabase
+            .from(supabaseConfig.leaderboard.tableName)
+            .insert(leaderboardEntries.map(donor => ({
+                ...donor,
+                created_at: donor.first_donation_date,
+                updated_at: new Date().toISOString()
+            })));
+            
+        if (insertError) {
+            console.error('Failed to populate leaderboard:', insertError);
+            throw new Error(`Failed to populate leaderboard: ${insertError.message}`);
+        }
+        
+        console.log(`✅ Successfully populated leaderboard with ${leaderboardEntries.length} entries`);
+        
+    } catch (error) {
+        console.error('Error populating leaderboard from donations:', error);
+        // Don't throw error to allow CSV fallback to work
+    }
+}
+
+// Function to load leaderboard from CSV as fallback
+async function loadLeaderboardFromCSV() {
+    try {
+        const response = await fetch('leaderboard.csv');
+        if (!response.ok) {
+            throw new Error('Failed to fetch leaderboard CSV');
+        }
+        
+        const csvText = await response.text();
+        const rows = csvText.trim().split('\n');
+        const data = [];
+        
+        // Parse CSV data (skip header row)
+        for (let i = 1; i < rows.length; i++) {
+            const line = rows[i];
+            if (!line) continue;
+            
+            const cells = line.split(',');
+            if (cells.length >= 3) {
+                data.push({
+                    rank: parseInt(cells[0].trim()) || i,
+                    name: cells[1].trim(),
+                    total_amount: parseFloat(cells[2].trim().replace(/[^0-9.]/g, '')) || 0
+                });
+            }
+        }
+        
+        console.log('Leaderboard data loaded from CSV:', data);
+        return data;
+        
+    } catch (error) {
+        console.error('Failed to load leaderboard from CSV:', error);
+        return [];
     }
 }
 
@@ -783,10 +936,14 @@ async function loadNewsletterData() {
         const activeSubscribers = subscribers.filter(s => s.status === 'active').length;
         const unsubscribed = subscribers.filter(s => s.status === 'unsubscribed').length;
         
-        // Update UI
-        document.getElementById('total-subscribers').textContent = totalSubscribers.toLocaleString();
-        document.getElementById('active-subscribers').textContent = activeSubscribers.toLocaleString();
-        document.getElementById('unsubscribed').textContent = unsubscribed.toLocaleString();
+        // Update UI - check if elements exist before updating
+        const totalEl = document.getElementById('total-subscribers');
+        const activeEl = document.getElementById('active-subscribers');
+        const unsubEl = document.getElementById('unsubscribed');
+        
+        if (totalEl) totalEl.textContent = totalSubscribers.toLocaleString();
+        if (activeEl) activeEl.textContent = activeSubscribers.toLocaleString();
+        if (unsubEl) unsubEl.textContent = unsubscribed.toLocaleString();
         
         hideSectionLoading('.newsletter-editor .stats-grid');
         

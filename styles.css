@@ -218,10 +218,11 @@ header .container {
     max-height: 100px;
     width: auto;
     border-radius: var(--border-radius-md);
-    filter: brightness(1.1) contrast(1.1);
+    filter: brightness(1.2) contrast(1.2) saturate(1.2);
     transition: height 0.3s ease, transform 0.3s ease;
     transform: scale(1.35);
     transform-origin: left center;
+    box-shadow: 0 0 15px rgba(255, 181, 46, 0.5);
 }
 
 nav ul {
@@ -637,9 +638,11 @@ footer {
 }
 
 .footer-logo img {
-    height: 64px;
+    height: 80px;
     width: auto;
     border-radius: var(--border-radius-md);
+    filter: brightness(1.2) contrast(1.2) saturate(1.2);
+    box-shadow: 0 0 15px rgba(255, 181, 46, 0.5);
 }
 
 .footer-info p {
@@ -998,6 +1001,8 @@ footer {
     .logo img {
         height: 100px;
         transform: scale(1.12);
+        filter: brightness(1.2) contrast(1.2) saturate(1.2);
+        box-shadow: 0 0 15px rgba(255, 181, 46, 0.5);
     }
 
     .mobile-menu-toggle {
@@ -1151,6 +1156,8 @@ footer {
 
     .footer-logo img {
         height: 100px;
+        filter: brightness(1.2) contrast(1.2) saturate(1.2);
+        box-shadow: 0 0 15px rgba(255, 181, 46, 0.5);
     }
 
     .footer-social img {
@@ -1162,10 +1169,14 @@ footer {
 @media (min-width: 1024px) {
     .logo img {
         height: 100px;
+        filter: brightness(1.2) contrast(1.2) saturate(1.2);
+        box-shadow: 0 0 20px rgba(255, 181, 46, 0.6);
     }
     /* Enlarge footer logo significantly on desktop */
     .footer-logo img {
         height: 160px;
+        filter: brightness(1.2) contrast(1.2) saturate(1.2);
+        box-shadow: 0 0 20px rgba(255, 181, 46, 0.6);
     }
 }
 
@@ -1369,6 +1380,8 @@ footer {
     /* Smaller logo */
     .logo img {
         height: 120px !important;
+        filter: brightness(1.2) contrast(1.2) saturate(1.2) !important;
+        box-shadow: 0 0 15px rgba(255, 181, 46, 0.5) !important;
     }
 
     /* Better mobile menu toggle positioning */
@@ -1408,6 +1421,8 @@ footer {
     .logo img {
         height: 110px !important;
         transform: scale(1.0);
+        filter: brightness(1.2) contrast(1.2) saturate(1.2) !important;
+        box-shadow: 0 0 15px rgba(255, 181, 46, 0.5) !important;
     }
 
     .mobile-menu-toggle {
