@@ -214,8 +214,7 @@ header .container {
 }
 
 .logo img {
-    height: 88px;
-    max-height: 100px;
+    height: 48px;
     width: auto;
 }
 
@@ -281,8 +280,8 @@ nav ul li a.active::after {
 .social-icons img {
     width: 24px;
     height: 24px;
-    transition: transform var(--transition-fast), opacity var(--transition-fast);
-    opacity: 0.8;
+    transition: transform var(--transition-fast);
+    opacity: 1;
     border-radius: 4px;
 }
 
@@ -632,7 +631,7 @@ footer {
 }
 
 .footer-logo img {
-    height: 80px;
+    height: 48px;
     width: auto;
 }
 
@@ -674,8 +673,8 @@ footer {
 .footer-social img {
     width: 32px;
     height: 32px;
-    opacity: 0.8;
-    transition: transform var(--transition-fast), opacity var(--transition-fast);
+    opacity: 1;
+    transition: transform var(--transition-fast);
     border-radius: 4px;
 }
 

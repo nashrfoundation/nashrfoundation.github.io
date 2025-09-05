@@ -293,15 +293,16 @@ async function loadOverviewData() {
         }
         
         // Fetch fundraising goal from settings (if available)
-        const { data: settings, error: settingsError } = await supabase
+        // Some deployments may have multiple rows in `settings`; pick the most recent/first
+        const { data: settingsRows, error: settingsError } = await supabase
             .from('settings')
             .select('fundraising_goal')
-            .single();
+            .limit(1);
             
-        console.log('Settings data fetched:', settings);
+        console.log('Settings data fetched:', settingsRows);
         console.log('Settings fetch error:', settingsError);
             
-        const goalAmount = settings?.fundraising_goal || 200000;
+        const goalAmount = (Array.isArray(settingsRows) && settingsRows[0]?.fundraising_goal) || 200000;
         
         updateOverviewStats(donations, goalAmount);
         updateRecentActivity(donations);
@@ -559,49 +560,33 @@ async function loadLeaderboardData() {
             leaderboardSubscription = null;
         }
         
-        // First, try to fetch from leaderboard table
-        let { data: leaderboardData, error } = await supabase
-            .from(supabaseConfig.leaderboard.tableName)
-            .select('*')
-            .order('total_amount', { ascending: false })
+        // For now, leaderboard should mirror donations data directly
+        let { data: donations, error } = await supabase
+            .from(supabaseConfig.leaderboard.donationsTableName)
+            .select('name, amount, created_at')
+            .order('amount', { ascending: false })
             .limit(50);
-            
-        console.log('Leaderboard data fetched:', leaderboardData);
-        console.log('Leaderboard fetch error:', error);
         
-        // If leaderboard table is empty, try to populate it from donations
-        if ((!leaderboardData || leaderboardData.length === 0) && !error) {
-            console.log('Leaderboard table is empty, attempting to populate from donations...');
-            await populateLeaderboardFromDonations();
-            
-            // Try fetching again after population
-            ({ data: leaderboardData, error } = await supabase
-                .from(supabaseConfig.leaderboard.tableName)
-                .select('*')
-                .order('total_amount', { ascending: false })
-                .limit(50));
-        }
-            
+        console.log('Leaderboard (from donations) fetched:', donations);
+        console.log('Leaderboard (from donations) fetch error:', error);
+        
         if (error) {
-            throw new Error(`Failed to fetch leaderboard: ${error.message}`);
+            throw new Error(`Failed to fetch donations for leaderboard: ${error.message}`);
         }
         
-        // If still no data, try to load from CSV as fallback
-        if (!leaderboardData || leaderboardData.length === 0) {
-            console.log('Attempting CSV fallback for leaderboard...');
-            leaderboardData = await loadLeaderboardFromCSV();
-        }
-        
-        // Update ranks based on amount order
-        const sortedData = (leaderboardData || []).map((entry, index) => ({
-            ...entry,
+        // Map donations to leaderboard-style entries and assign ranks
+        const sortedData = (donations || []).map((d, index) => ({
+            name: d.name || 'Anonymous',
+            total_amount: d.amount || 0,
+            amount: d.amount || 0,
+            created_at: d.created_at,
             rank: index + 1
         }));
         
         window._leaderboardData = sortedData;
         displayLeaderboardTable(sortedData);
         
-        // Set up real-time subscription for leaderboard changes
+        // Set up real-time subscription based on donations changes
         setupLeaderboardSubscription();
         
         hideSectionLoading('#admin-leaderboard-body');
@@ -729,15 +714,15 @@ function setupLeaderboardSubscription() {
     try {
         // Set up real-time subscription to leaderboard changes
         leaderboardSubscription = supabase
-            .channel('leaderboard-changes')
+            .channel('leaderboard-from-donations')
             .on('postgres_changes', 
                 { 
                     event: '*', 
                     schema: 'public', 
-                    table: supabaseConfig.leaderboard.tableName 
+                    table: supabaseConfig.leaderboard.donationsTableName 
                 },
                 (payload) => {
-                    console.log('Leaderboard change detected:', payload);
+                    console.log('Donations change detected (leaderboard mirror):', payload);
                     // Refresh leaderboard data when changes occur
                     loadLeaderboardData();
                 }
@@ -875,15 +860,22 @@ function displayLeaderboardTable(leaderboardData) {
 // Content Management
 async function loadContentData() {
     try {
-        // Load current content settings
-        document.getElementById('homepage-title').value = 'Nashr Foundation - Empowering Communities Through Essential Support';
-        document.getElementById('homepage-description').value = 'Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.';
-        document.getElementById('homepage-hero-title').value = 'Empowering Communities Through Essential Support';
-        document.getElementById('homepage-hero-description').value = 'Providing education, food, water, and basic necessities to those in need';
-        
-        document.getElementById('donation-title').value = 'Make a Difference Today';
-        document.getElementById('donation-description').value = 'Every contribution, no matter the size, helps us provide essential services to communities in need. Choose your preferred donation method below.';
-        document.getElementById('donation-impact-title').value = 'Your Donation\'s Impact';
+        // Load content from Supabase if available
+        const { data: contentRows, error } = await supabase
+            .from('content')
+            .select('*')
+            .limit(1);
+        if (error) throw error;
+        const content = Array.isArray(contentRows) ? contentRows[0] : null;
+        if (content) {
+            if (document.getElementById('homepage-title')) document.getElementById('homepage-title').value = content.homepage_title || '';
+            if (document.getElementById('homepage-description')) document.getElementById('homepage-description').value = content.homepage_description || '';
+            if (document.getElementById('homepage-hero-title')) document.getElementById('homepage-hero-title').value = content.homepage_hero_title || '';
+            if (document.getElementById('homepage-hero-description')) document.getElementById('homepage-hero-description').value = content.homepage_hero_description || '';
+            if (document.getElementById('donation-title')) document.getElementById('donation-title').value = content.donation_title || '';
+            if (document.getElementById('donation-description')) document.getElementById('donation-description').value = content.donation_description || '';
+            if (document.getElementById('donation-impact-title')) document.getElementById('donation-impact-title').value = content.donation_impact_title || '';
+        }
         
     } catch (error) {
         console.error('Failed to load content data:', error);
@@ -907,10 +899,43 @@ function saveContentChanges() {
             impactTitle: document.getElementById('donation-impact-title').value
         };
         
-        // In a real implementation, this would save to a database
-        console.log('Saving content:', { homepageContent, donationContent });
-        showSuccess('Content changes saved successfully!');
-        logActivity('content_update', 'Website content updated');
+        (async () => {
+            try {
+                // Upsert into content table as single row
+                const payload = {
+                    homepage_title: homepageContent.title,
+                    homepage_description: homepageContent.description,
+                    homepage_hero_title: homepageContent.heroTitle,
+                    homepage_hero_description: homepageContent.heroDescription,
+                    donation_title: donationContent.title,
+                    donation_description: donationContent.description,
+                    donation_impact_title: donationContent.impactTitle,
+                    updated_at: new Date().toISOString()
+                };
+                const { data: existing, error: fetchErr } = await supabase
+                    .from('content')
+                    .select('id')
+                    .limit(1);
+                if (fetchErr) throw fetchErr;
+                if (Array.isArray(existing) && existing[0]?.id) {
+                    const { error: updateErr } = await supabase
+                        .from('content')
+                        .update(payload)
+                        .eq('id', existing[0].id);
+                    if (updateErr) throw updateErr;
+                } else {
+                    const { error: insertErr } = await supabase
+                        .from('content')
+                        .insert([payload]);
+                    if (insertErr) throw insertErr;
+                }
+                showSuccess('Content changes saved successfully!');
+                logActivity('content_update', 'Website content updated');
+            } catch (err) {
+                console.error('Failed to save content:', err);
+                showError('Failed to save content changes. Please try again.');
+            }
+        })();
     } catch (error) {
         console.error('Failed to save content:', error);
         showError('Failed to save content changes. Please try again.');
@@ -1021,21 +1046,26 @@ async function sendNewsletter() {
 // Settings Management
 async function loadSettingsData() {
     try {
-        // Load current settings
-        document.getElementById('site-title').value = 'Nashr Foundation - Empowering Communities Through Essential Support';
-        document.getElementById('site-description').value = 'Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.';
-        document.getElementById('keywords').value = 'charity, foundation, Pakistan, education, food, clean water, donations, nonprofit, community support';
-        
-        document.getElementById('facebook-url').value = 'https://www.facebook.com/nashrfoundation';
-        document.getElementById('instagram-url').value = 'https://www.instagram.com/nashrfoundation';
-        document.getElementById('twitter-url').value = 'https://x.com/nashrfoundation';
-        document.getElementById('youtube-url').value = 'https://www.youtube.com/@nashrfoundation';
-        
-        document.getElementById('fundraising-goal-amount').value = '200000';
-        document.getElementById('goal-description').value = 'Help us reach our goal to support more communities in need.';
-        
-        document.getElementById('admin-email-notifications').value = 'all';
-        document.getElementById('backup-frequency').value = 'daily';
+        // Load current settings from Supabase
+        const { data: settingsRows, error } = await supabase
+            .from('settings')
+            .select('*')
+            .limit(1);
+        if (error) throw error;
+        const s = Array.isArray(settingsRows) ? settingsRows[0] : null;
+        if (s) {
+            if (document.getElementById('site-title')) document.getElementById('site-title').value = s.title || '';
+            if (document.getElementById('site-description')) document.getElementById('site-description').value = s.description || '';
+            if (document.getElementById('keywords')) document.getElementById('keywords').value = s.keywords || '';
+            if (document.getElementById('facebook-url')) document.getElementById('facebook-url').value = s.facebook || '';
+            if (document.getElementById('instagram-url')) document.getElementById('instagram-url').value = s.instagram || '';
+            if (document.getElementById('twitter-url')) document.getElementById('twitter-url').value = s.twitter || '';
+            if (document.getElementById('youtube-url')) document.getElementById('youtube-url').value = s.youtube || '';
+            if (document.getElementById('fundraising-goal-amount')) document.getElementById('fundraising-goal-amount').value = (s.fundraising_goal != null ? s.fundraising_goal : '');
+            if (document.getElementById('goal-description')) document.getElementById('goal-description').value = s.goal_description || '';
+            if (document.getElementById('admin-email-notifications')) document.getElementById('admin-email-notifications').value = s.admin_email_notifications || 'all';
+            if (document.getElementById('backup-frequency')) document.getElementById('backup-frequency').value = s.backup_frequency || 'daily';
+        }
     } catch (error) {
         console.error('Failed to load settings data:', error);
         showError('Failed to load settings data. Please try again.');
@@ -1068,10 +1098,46 @@ function saveSettings() {
             backup: document.getElementById('backup-frequency').value
         };
         
-        // In a real implementation, this would save to a database
-        console.log('Saving settings:', { seoSettings, socialSettings, fundraisingSettings, securitySettings });
-        showSuccess('Settings saved successfully!');
-        logActivity('settings_update', 'System settings updated');
+        (async () => {
+            try {
+                const payload = {
+                    title: seoSettings.title,
+                    description: seoSettings.description,
+                    keywords: seoSettings.keywords,
+                    facebook: socialSettings.facebook,
+                    instagram: socialSettings.instagram,
+                    twitter: socialSettings.twitter,
+                    youtube: socialSettings.youtube,
+                    fundraising_goal: parseInt(fundraisingSettings.goal, 10) || 0,
+                    goal_description: fundraisingSettings.description,
+                    admin_email_notifications: securitySettings.notifications,
+                    backup_frequency: securitySettings.backup,
+                    updated_at: new Date().toISOString()
+                };
+                const { data: existing, error: fetchErr } = await supabase
+                    .from('settings')
+                    .select('id')
+                    .limit(1);
+                if (fetchErr) throw fetchErr;
+                if (Array.isArray(existing) && existing[0]?.id) {
+                    const { error: updateErr } = await supabase
+                        .from('settings')
+                        .update(payload)
+                        .eq('id', existing[0].id);
+                    if (updateErr) throw updateErr;
+                } else {
+                    const { error: insertErr } = await supabase
+                        .from('settings')
+                        .insert([payload]);
+                    if (insertErr) throw insertErr;
+                }
+                showSuccess('Settings saved successfully!');
+                logActivity('settings_update', 'System settings updated');
+            } catch (err) {
+                console.error('Failed to save settings:', err);
+                showError('Failed to save settings. Please try again.');
+            }
+        })();
     } catch (error) {
         console.error('Failed to save settings:', error);
         showError('Failed to save settings. Please try again.');
@@ -1233,7 +1299,7 @@ function viewDonation(donation) {
     // In a real implementation, this would show donation details
     alert(`Viewing donation details for ${donation.name || 'Anonymous'}:
 Amount: ₨${donation.amount}
-Date: ${formatDate(donation.createdAt)}`);
+Date: ${formatDate(donation.created_at || donation.createdAt || null)}`);
 }
 
 function refundDonation(donationId) {
@@ -1362,6 +1428,9 @@ function displaySubscribersTable(subscribers) {
         const emailTd = document.createElement('td');
         emailTd.textContent = sub.email;
 
+        const nameTd = document.createElement('td');
+        nameTd.textContent = sub.name || '-';
+
         const statusTd = document.createElement('td');
         const badge = document.createElement('span');
         badge.className = `status-badge ${sub.status === 'active' ? 'confirmed' : 'error'}`;
@@ -1389,6 +1458,7 @@ function displaySubscribersTable(subscribers) {
         actionsTd.appendChild(deleteBtn);
 
         tr.appendChild(emailTd);
+        tr.appendChild(nameTd);
         tr.appendChild(statusTd);
         tr.appendChild(dateTd);
         tr.appendChild(sourceTd);
@@ -1553,7 +1623,10 @@ function createPaymentMethodsChart(data) {
 }
 
 // Utility Functions
-function formatDate(date) {
+function formatDate(input) {
+    if (!input) return '-';
+    const date = input instanceof Date ? input : new Date(input);
+    if (isNaN(date.getTime())) return '-';
     return date.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -1561,7 +1634,10 @@ function formatDate(date) {
     });
 }
 
-function formatDateTime(date) {
+function formatDateTime(input) {
+    if (!input) return '-';
+    const date = input instanceof Date ? input : new Date(input);
+    if (isNaN(date.getTime())) return '-';
     return date.toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
@@ -1571,9 +1647,11 @@ function formatDateTime(date) {
     });
 }
 
-function formatTimeAgo(date) {
+function formatTimeAgo(input) {
+    const date = input instanceof Date ? input : new Date(input);
+    if (isNaN(date.getTime())) return '-';
     const now = new Date();
-    const diffInSeconds = Math.floor((now - date) / 1000);
+    const diffInSeconds = Math.floor((now.getTime() - date.getTime()) / 1000);
     
     if (diffInSeconds < 60) return 'Just now';
     if (diffInSeconds < 3600) return `${Math.floor(diffInSeconds / 60)}m ago`;
@@ -1633,9 +1711,23 @@ function refreshDashboard() {
 }
 
 function exportDonations() {
-    // In a real implementation, this would export donation data
-    showSuccess('Donations data exported successfully!');
-    logActivity('data_export', 'Donations data exported');
+    try {
+        const rows = donationsData && donationsData.length ? donationsData : [];
+        let csv = 'Date,Name,Amount,Payment Method\n';
+        rows.forEach(d => {
+            const date = formatDate(d.created_at || d.createdAt || '-');
+            const name = (d.name || 'Anonymous').replace(/,/g, '');
+            const amount = Number(d.amount || 0);
+            const method = (d.payment_method || 'Unknown').replace(/,/g, '');
+            csv += `${date},${name},${amount},${method}\n`;
+        });
+        downloadCSV(csv, 'donations.csv');
+        showSuccess('Donations data exported successfully!');
+        logActivity('data_export', 'Donations data exported');
+    } catch (e) {
+        console.error(e);
+        showError('Failed to export donations.');
+    }
 }
 
 function exportLeaderboardCsv() {
@@ -1659,9 +1751,24 @@ function exportLeaderboardCsv() {
 }
 
 function exportLogs() {
-    // In a real implementation, this would export logs data
-    showSuccess('Activity logs exported successfully!');
-    logActivity('logs_export', 'Activity logs exported');
+    try {
+        const rows = logsData && logsData.length ? logsData : [];
+        let csv = 'Timestamp,User,Action,Details,IP\n';
+        rows.forEach(l => {
+            const ts = formatDateTime(l.timestamp || '-');
+            const user = (l.user || 'Unknown').replace(/,/g, '');
+            const action = (l.action || 'Unknown').replace(/,/g, '');
+            const details = (l.details || '').replace(/\n/g, ' ').replace(/,/g, '');
+            const ip = (l.ip || '').replace(/,/g, '');
+            csv += `${ts},${user},${action},${details},${ip}\n`;
+        });
+        downloadCSV(csv, 'activity_logs.csv');
+        showSuccess('Activity logs exported successfully!');
+        logActivity('logs_export', 'Activity logs exported');
+    } catch (e) {
+        console.error(e);
+        showError('Failed to export logs.');
+    }
 }
 
 function downloadCSV(csv, filename) {
@@ -1735,21 +1842,17 @@ function showError(message) {
 }
 
 function showNotification(message, type) {
-    // Remove existing notifications of the same type
-    const existingNotifications = document.querySelectorAll(`.notification.${type}`);
-    existingNotifications.forEach(notification => notification.remove());
-    
-    const notification = document.createElement('div');
-    notification.className = `notification ${type}`;
-    notification.textContent = message;
-    
-    document.body.appendChild(notification);
-    
-    setTimeout(() => {
-        if (notification.parentNode) {
-            notification.remove();
-        }
-    }, 5000);
+    try {
+        // Minimal, non-intrusive notification; no mock/demo messages
+        const el = document.createElement('div');
+        el.className = `notification ${type}`;
+        el.textContent = message;
+        document.body.appendChild(el);
+        setTimeout(() => { if (el.parentNode) el.remove(); }, 4000);
+    } catch (_) {
+        // Fallback to console
+        if (type === 'error') console.error(message); else console.log(message);
+    }
 }
 
 // Initialize on page load
