@@ -697,42 +697,47 @@ async function populateLeaderboardFromDonations() {
 
 // Function to load leaderboard from CSV as fallback
 async function loadLeaderboardFromCSV() {
-        const response = await fetch(leaderboard.csv);n        if (!response.ok) {n            throw new Error(Failed to fetch leaderboard CSV);n        }n        n        const csvText = await response.text();n        const rows = csvText.trim().split(\n);n        const data = [];n        n        // Parse CSV data (skip header row)n        for (let i = 1; i < rows.length; i++) {n            const line = rows[i];n            if (!line) continue;n            n            const cells = line.split(,);n            if (cells.length >= 3) {n                data.push({n                    rank: parseInt(cells[0].trim()) || i,n                    name: cells[1].trim(),n                    total_amount: parseFloat(cells[2].trim().replace(/[^0-9.]/g, )) || 0n                });n            }n        }                data.push({
-                    rank: parseInt(cells[0].trim()) || i,
-                    name: cells[1].trim(),
-                    total_amount: parseFloat(cells[2].trim().replace(/[^0-9.]/g, '')) || 0
-                });
-            }
-        }
-        
-        console.log('Leaderboard data loaded from CSV:', data);
-        return data;
-        
+    try {
+        const res = await fetch('leaderboard.csv', { credentials: 'omit' });
+        if (!res.ok) throw new Error('Failed to fetch leaderboard.csv');
+        const text = await res.text();
+        const lines = text.split(/\r?\n/).filter(Boolean);
+        // Expect header: Rank,Name,Amount
+        const data = lines.slice(1).map((line, index) => {
+            const [rankStr, name, amountStr] = line.split(',');
+            const rank = parseInt(rankStr, 10) || index + 1;
+            const amount = parseInt((amountStr || '').replace(/[^0-9]/g, ''), 10) || 0;
+            return { rank, name: name || 'Anonymous', total_amount: amount };
+        });
+        window._leaderboardData = data;
+        displayLeaderboardTable(data);
     } catch (error) {
         console.error('Failed to load leaderboard from CSV:', error);
-        return [];
+        displayLeaderboardTable([]);
     }
 }
 
+// Real-time subscription for leaderboard changes
 function setupLeaderboardSubscription() {
     try {
-        // Set up real-time subscription to leaderboard changes
+        if (leaderboardSubscription) {
+            leaderboardSubscription.unsubscribe();
+            leaderboardSubscription = null;
+        }
         leaderboardSubscription = supabase
             .channel('leaderboard-changes')
-            .on('postgres_changes', 
-                { 
-                    event: '*', 
-                    schema: 'public', 
-                    table: supabaseConfig.leaderboard.tableName 
+            .on('postgres_changes',
+                {
+                    event: '*',
+                    schema: 'public',
+                    table: supabaseConfig.leaderboard.tableName
                 },
                 (payload) => {
                     console.log('Leaderboard change detected:', payload);
-                    // Refresh leaderboard data when changes occur
                     loadLeaderboardData();
                 }
             )
             .subscribe();
-            
         console.log('✅ Leaderboard real-time subscription established');
     } catch (error) {
         console.error('Failed to set up leaderboard subscription:', error);
@@ -1059,7 +1064,21 @@ async function sendNewsletter() {
         }
         
         // Collect recipients: prefer active subscribers from DB; if input is provided, use it as CSV override
-        // Collect recipients: prefer active subscribers from DB; if input is provided, use it as CSV overriden        let recipients = [];n        const csvOverride = (recipientsInput || ).trim();n        if (csvOverride) {n            recipients = csvOverride.split(/[\n;]/).map(s => s.trim()).filter(Boolean);n        } else {n            const { data: subs, error } = await supabasen                .from(newsletter_subscribers)n                .select(email)n                .eq(status, active);n            if (error) throw error;n            recipients = (subs || []).map(s => s.email).filter(Boolean);n        }        }
+        let recipients = [];
+        const csvOverride = (recipientsInput || '').trim();
+        if (csvOverride) {
+            recipients = csvOverride
+                .split(/[\n,;]+/)
+                .map(s => s.trim())
+                .filter(Boolean);
+        } else {
+            const { data: subs, error } = await supabase
+                .from('newsletter_subscribers')
+                .select('email')
+                .eq('status', 'active');
+            if (error) throw error;
+            recipients = (subs || []).map(s => s.email).filter(Boolean);
+        }
         
         if (!recipients.length) {
             showError('No recipients found. Add subscribers or provide emails.');
@@ -1850,7 +1869,8 @@ function exportLogs() {
             const ts = formatDateTime(l.timestamp || '-');
             const user = (l.user || 'Unknown').replace(/,/g, '');
             const action = (l.action || 'Unknown').replace(/,/g, '');
-            const details = (l.details || ).replace(/n/g,  ).replace(/,/g, );            const ip = (l.ip || '').replace(/,/g, '');
+            const details = ((l.details ?? '') + '').replace(/\n/g, ' ').replace(/,/g, '');
+            const ip = (l.ip || '').replace(/,/g, '');
             csv += `${ts},${user},${action},${details},${ip}
 `;
         });
