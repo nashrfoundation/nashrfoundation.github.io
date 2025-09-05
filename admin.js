@@ -1068,10 +1068,12 @@ async function sendNewsletter() {
         }
         
         // Show loading state
-        const sendButton = document.querySelector('.newsletter-editor .btn-primary');
-        const originalText = sendButton.innerHTML;
-        sendButton.innerHTML = '<div class="inline-loader"></div> Sending...';
-        sendButton.disabled = true;
+        const sendButton = document.querySelector('#newsletter .btn-primary');
+        const originalText = sendButton ? sendButton.innerHTML : 'Send Newsletter';
+        if (sendButton) {
+            sendButton.innerHTML = '<div class="inline-loader"></div> Sending...';
+            sendButton.disabled = true;
+        }
         
         // Collect recipients: prefer active subscribers from DB; if input is provided, use it as CSV override
         let recipients = [];
@@ -1132,8 +1134,10 @@ async function sendNewsletter() {
         document.getElementById('newsletter-content').value = '';
         
         // Reset button
-        sendButton.innerHTML = originalText;
-        sendButton.disabled = false;
+        if (sendButton) {
+            sendButton.innerHTML = originalText;
+            sendButton.disabled = false;
+        }
         
         // Refresh statistics
         loadNewsletterData();
@@ -1143,9 +1147,11 @@ async function sendNewsletter() {
         showError('Failed to send newsletter. Please try again.');
         
         // Reset button
-        const sendButton = document.querySelector('.newsletter-editor .btn-primary');
-        sendButton.innerHTML = 'Send Newsletter';
-        sendButton.disabled = false;
+        const sendButton = document.querySelector('#newsletter .btn-primary');
+        if (sendButton) {
+            sendButton.innerHTML = 'Send Newsletter';
+            sendButton.disabled = false;
+        }
     }
 }
 
@@ -1860,26 +1866,7 @@ function exportLeaderboardCsv() {
     downloadCSV(csv, 'leaderboard.csv');
 }
 
-function exportLogs() {
-    try {
-        const rows = logsData && logsData.length ? logsData : [];
-        let csv = 'Timestamp,User,Action,Details,IP\n';
-        rows.forEach(l => {
-            const ts = formatDateTime(l.timestamp || '-');
-            const user = (l.user || 'Unknown').replace(/,/g, '');
-            const action = (l.action || 'Unknown').replace(/,/g, '');
-            const details = (l.details || '').replace(/\n/g, ' ').replace(/,/g, '');
-            const ip = (l.ip || '').replace(/,/g, '');
-            csv += `${ts},${user},${action},${details},${ip}\n`;
-        });
-        downloadCSV(csv, 'activity_logs.csv');
-        showSuccess('Activity logs exported successfully!');
-        logActivity('logs_export', 'Activity logs exported');
-    } catch (e) {
-        console.error(e);
-        showError('Failed to export logs.');
-    }
-}
+function exportLogs() {\n    try {\n        const rows = logsData && logsData.length ? logsData : [];\n        let csv = 'Timestamp,User,Action,Details,IP\\n';\n        rows.forEach(l => {\n            const ts = formatDateTime(l.timestamp || '-');\n            const user = (l.user || 'Unknown').replace(/,/g, '');\n            const action = (l.action || 'Unknown').replace(/,/g, '');\n            const details = (l.details || '').replace(/\\n/g, ' ').replace(/,/g, '');\n            const ip = (l.ip || '').replace(/,/g, '');\n            csv += `${ts},${user},${action},${details},${ip}\\n`;\n        });\n        downloadCSV(csv, 'activity_logs.csv');\n        showSuccess('Activity logs exported successfully!');\n        logActivity('logs_export', 'Activity logs exported');\n    } catch (e) {\n        console.error(e);\n        showError('Failed to export logs.');\n    }\n}\n\nfunction exportSubscribers() {\n    try {\n        const subscribers = window._subscribers && window._subscribers.length ? window._subscribers : [];\n        let csv = 'Email,Name,Status,Subscribed Date,Source\\n';\n        subscribers.forEach(s => {\n            const email = (s.email || '').replace(/,/g, '');\n            const name = (s.name || '').replace(/,/g, '');\n            const status = (s.status || '').replace(/,/g, '');\n            const date = s.created_at ? new Date(s.created_at).toLocaleDateString() : '';\n            const source = (s.source || '').replace(/,/g, '');\n            csv += `${email},${name},${status},${date},${source}\\n`;\n        });\n        downloadCSV(csv, 'newsletter_subscribers.csv');\n        showSuccess('Newsletter subscribers exported successfully!');\n        logActivity('subscribers_export', 'Newsletter subscribers exported');\n    } catch (e) {\n        console.error(e);\n        showError('Failed to export subscribers.');\n    }\n}
 
 function downloadCSV(csv, filename) {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });

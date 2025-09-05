@@ -631,7 +631,7 @@ footer {
 }
 
 .footer-logo img {
-    height: 192px;
+    height: 384px;
     width: auto;
 }
 
@@ -989,7 +989,7 @@ footer {
 
 @media (max-width: 768px) {
     .logo img {
-        height: 168px;
+        height: 336px;
     }
 
     .mobile-menu-toggle {
@@ -1134,7 +1134,7 @@ footer {
     }
 
     .footer-logo img {
-        height: 168px;
+        height: 336px;
     }
 
     .footer-social img {
@@ -1145,11 +1145,11 @@ footer {
 
 @media (min-width: 1024px) {
     .logo img {
-        height: 64px;
+        height: 128px;
     }
     /* Enlarge footer logo significantly on desktop */
     .footer-logo img {
-        height: 64px;
+        height: 128px;
     }
 }
 
@@ -1352,7 +1352,7 @@ footer {
 
     /* Smaller logo */
     .logo img {
-        height: 56px !important;
+        height: 112px !important;
     }
 
     /* Better mobile menu toggle positioning */
@@ -1390,7 +1390,7 @@ footer {
     }
 
     .logo img {
-        height: 156px !important;
+        height: 312px !important;
         transform: none;
     }
 

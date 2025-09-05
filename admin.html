@@ -30,7 +30,7 @@
         <div class="modal-content login-card" role="dialog" aria-labelledby="admin-login-title" aria-describedby="admin-login-desc">
             <div class="login-header">
                 <div class="logo-container">
-                    <img src="logo.webp" alt="Nashr Foundation" class="admin-logo" width="80" height="80">
+                    <img src="logo.webp" alt="Nashr Foundation" class="admin-logo" width="160" height="160">
                 </div>
                 <h2 id="admin-login-title">Welcome to Admin Portal</h2>
                 <p id="admin-login-desc" class="modal-subtitle">Sign in to manage your Nashr Foundation dashboard</p>
@@ -765,6 +765,11 @@
         </div>
     </div>
 
+    <!-- Configure your Resend HTTP function URL (Supabase Edge Function) -->
+    <script>
+      window.RESEND_FUNCTION_URL = 'https://jtuhnndwhotxjjolwcuz.supabase.co/functions/v1/super-function';
+    </script>
+    
     <!-- Scripts -->
     <script src="admin.js" defer></script>
     
