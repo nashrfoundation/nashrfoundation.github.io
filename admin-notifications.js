@@ -307,25 +307,8 @@ class AdminNotificationSystem {
     
     async checkForNewNotifications() {
         // In a real implementation, this would check with your backend
-        // For now, we'll simulate occasional notifications
-        
-        // Simulate a new donation notification (10% chance every 30 seconds)
-        if (Math.random() < 0.1) {
-            const donors = ['Ahmed Khan', 'Fatima Ali', 'Mohammed Rizwan', 'Sana Abbas', 'Ali Hassan'];
-            const donor = donors[Math.floor(Math.random() * donors.length)];
-            const amounts = [1000, 2500, 5000, 7500, 10000];
-            const amount = amounts[Math.floor(Math.random() * amounts.length)];
-            
-            this.addNotification({
-                type: 'donation',
-                title: 'New Donation Received',
-                message: `${donor} donated ₨${amount.toLocaleString()}`,
-                action: () => {
-                    // Navigate to donations section
-                    document.querySelector('[data-section="donations"]').click();
-                }
-            });
-        }
+        // For now, we'll just return without generating fake notifications
+        return;
     }
     
     saveNotifications() {

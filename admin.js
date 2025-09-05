@@ -704,7 +704,8 @@ async function loadLeaderboardFromCSV() {
         }
         
         const csvText = await response.text();
-        const rows = csvText.trim().split('\n');
+        const rows = csvText.trim().split('
+');
         const data = [];
         
         // Parse CSV data (skip header row)
@@ -1079,7 +1080,8 @@ async function sendNewsletter() {
         let recipients = [];
         const csvOverride = (recipientsInput || '').trim();
         if (csvOverride) {
-            recipients = csvOverride.split(/[,\n;]/).map(s => s.trim()).filter(Boolean);
+            recipients = csvOverride.split(/[,
+;]/).map(s => s.trim()).filter(Boolean);
         } else {
             const { data: subs, error } = await supabase
                 .from('newsletter_subscribers')
@@ -1829,13 +1831,15 @@ function refreshDashboard() {
 function exportDonations() {
     try {
         const rows = donationsData && donationsData.length ? donationsData : [];
-        let csv = 'Date,Name,Amount,Payment Method\n';
+        let csv = 'Date,Name,Amount,Payment Method
+';
         rows.forEach(d => {
             const date = formatDate(d.created_at || d.createdAt || '-');
             const name = (d.name || 'Anonymous').replace(/,/g, '');
             const amount = Number(d.amount || 0);
             const method = (d.payment_method || 'Unknown').replace(/,/g, '');
-            csv += `${date},${name},${amount},${method}\n`;
+            csv += `${date},${name},${amount},${method}
+`;
         });
         downloadCSV(csv, 'donations.csv');
         showSuccess('Donations data exported successfully!');
@@ -1850,7 +1854,8 @@ function exportLeaderboardCsv() {
     const table = document.querySelector('#leaderboard .admin-table');
     if (!table) return;
     
-    let csv = 'Rank,Name,Amount\n';
+    let csv = 'Rank,Name,Amount
+';
     const rows = Array.from(table.querySelectorAll('tbody tr'));
     rows.forEach(tr => {
         const tds = tr.querySelectorAll('td');
@@ -1866,7 +1871,50 @@ function exportLeaderboardCsv() {
     downloadCSV(csv, 'leaderboard.csv');
 }
 
-function exportLogs() {\n    try {\n        const rows = logsData && logsData.length ? logsData : [];\n        let csv = 'Timestamp,User,Action,Details,IP\\n';\n        rows.forEach(l => {\n            const ts = formatDateTime(l.timestamp || '-');\n            const user = (l.user || 'Unknown').replace(/,/g, '');\n            const action = (l.action || 'Unknown').replace(/,/g, '');\n            const details = (l.details || '').replace(/\\n/g, ' ').replace(/,/g, '');\n            const ip = (l.ip || '').replace(/,/g, '');\n            csv += `${ts},${user},${action},${details},${ip}\\n`;\n        });\n        downloadCSV(csv, 'activity_logs.csv');\n        showSuccess('Activity logs exported successfully!');\n        logActivity('logs_export', 'Activity logs exported');\n    } catch (e) {\n        console.error(e);\n        showError('Failed to export logs.');\n    }\n}\n\nfunction exportSubscribers() {\n    try {\n        const subscribers = window._subscribers && window._subscribers.length ? window._subscribers : [];\n        let csv = 'Email,Name,Status,Subscribed Date,Source\\n';\n        subscribers.forEach(s => {\n            const email = (s.email || '').replace(/,/g, '');\n            const name = (s.name || '').replace(/,/g, '');\n            const status = (s.status || '').replace(/,/g, '');\n            const date = s.created_at ? new Date(s.created_at).toLocaleDateString() : '';\n            const source = (s.source || '').replace(/,/g, '');\n            csv += `${email},${name},${status},${date},${source}\\n`;\n        });\n        downloadCSV(csv, 'newsletter_subscribers.csv');\n        showSuccess('Newsletter subscribers exported successfully!');\n        logActivity('subscribers_export', 'Newsletter subscribers exported');\n    } catch (e) {\n        console.error(e);\n        showError('Failed to export subscribers.');\n    }\n}
+function exportLogs() {
+    try {
+        const rows = logsData && logsData.length ? logsData : [];
+        let csv = 'Timestamp,User,Action,Details,IP
+';
+        rows.forEach(l => {
+            const ts = formatDateTime(l.timestamp || '-');
+            const user = (l.user || 'Unknown').replace(/,/g, '');
+            const action = (l.action || 'Unknown').replace(/,/g, '');
+            const details = (l.details || ).replace(/n/g,  ).replace(/,/g, );            const ip = (l.ip || '').replace(/,/g, '');
+            csv += `${ts},${user},${action},${details},${ip}
+`;
+        });
+        downloadCSV(csv, 'activity_logs.csv');
+        showSuccess('Activity logs exported successfully!');
+        logActivity('logs_export', 'Activity logs exported');
+    } catch (e) {
+        console.error(e);
+        showError('Failed to export logs.');
+    }
+}
+
+function exportSubscribers() {
+    try {
+        const subscribers = window._subscribers && window._subscribers.length ? window._subscribers : [];
+        let csv = 'Email,Name,Status,Subscribed Date,Source
+';
+        subscribers.forEach(s => {
+            const email = (s.email || '').replace(/,/g, '');
+            const name = (s.name || '').replace(/,/g, '');
+            const status = (s.status || '').replace(/,/g, '');
+            const date = s.created_at ? new Date(s.created_at).toLocaleDateString() : '';
+            const source = (s.source || '').replace(/,/g, '');
+            csv += `${email},${name},${status},${date},${source}
+`;
+        });
+        downloadCSV(csv, 'newsletter_subscribers.csv');
+        showSuccess('Newsletter subscribers exported successfully!');
+        logActivity('subscribers_export', 'Newsletter subscribers exported');
+    } catch (e) {
+        console.error(e);
+        showError('Failed to export subscribers.');
+    }
+}
 
 function downloadCSV(csv, filename) {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
