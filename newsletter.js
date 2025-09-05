@@ -12,9 +12,10 @@ document.addEventListener('DOMContentLoaded', function() {
 async function handleNewsletterSignup(e) {
     e.preventDefault();
     
-    const emailInput = document.getElementById('newsletter-email');
-    const consentCheckbox = document.getElementById('newsletter-consent');
-    const submitButton = newsletterForm.querySelector('button[type="submit"]');
+    const form = e.target;
+    const emailInput = form.querySelector('#newsletter-email');
+    const consentCheckbox = form.querySelector('#newsletter-consent');
+    const submitButton = form.querySelector('button[type="submit"]');
     
     // Get form values
     const email = emailInput.value.trim();
@@ -52,7 +53,7 @@ async function handleNewsletterSignup(e) {
         showNewsletterMessage('Thank you for subscribing! Please check your email to confirm your subscription.', 'success');
         
         // Reset form
-        newsletterForm.reset();
+        form.reset();
         
         // Log subscription (in a real implementation, this would go to your backend)
         console.log('Newsletter subscription:', { email, consent });
