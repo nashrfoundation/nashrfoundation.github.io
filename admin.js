@@ -278,18 +278,18 @@ async function loadOverviewData() {
         showSectionLoading('#overview .activity-list', 'Loading recent donations...');
         showSectionLoading('#overview .stats-grid', 'Loading statistics...');
         
-        // Fetch real-time donations data from Supabase
-        const { data: donations, error: donationsError } = await supabase
-            .from(supabaseConfig.leaderboard.donationsTableName)
+        // Overview should mirror leaderboard for now
+        const { data: leaderboardRows, error: donationsError } = await supabase
+            .from(supabaseConfig.leaderboard.tableName)
             .select('*')
-            .order('created_at', { ascending: false })
+            .order('total_amount', { ascending: false })
             .limit(50);
             
-        console.log('Overview donations data fetched:', donations);
+        console.log('Overview donations data fetched:', leaderboardRows);
         console.log('Overview donations fetch error:', donationsError);
             
         if (donationsError) {
-            throw new Error(`Failed to fetch donations: ${donationsError.message}`);
+            throw new Error(`Failed to fetch leaderboard for overview: ${donationsError.message}`);
         }
         
         // Fetch fundraising goal from settings (if available)
@@ -304,8 +304,15 @@ async function loadOverviewData() {
             
         const goalAmount = (Array.isArray(settingsRows) && settingsRows[0]?.fundraising_goal) || 200000;
         
-        updateOverviewStats(donations, goalAmount);
-        updateRecentActivity(donations);
+        const overviewDonations = (leaderboardRows || []).map(row => ({
+            name: row.name || 'Anonymous',
+            amount: row.last_donation_amount != null ? row.last_donation_amount : (row.total_amount || 0),
+            created_at: row.last_donation_date || row.updated_at || row.created_at || new Date().toISOString(),
+            payment_method: row.payment_method || 'Unknown'
+        }));
+
+        updateOverviewStats(overviewDonations, goalAmount);
+        updateRecentActivity(overviewDonations);
         
         // Fetch data for charts
         await loadChartData();
@@ -989,7 +996,7 @@ async function sendNewsletter() {
     try {
         const subject = document.getElementById('newsletter-subject').value;
         const content = document.getElementById('newsletter-content').value;
-        const recipients = document.getElementById('newsletter-recipients').value;
+        const recipientsInput = document.getElementById('newsletter-recipients').value;
         
         if (!subject || !content) {
             showError('Please enter both subject and content for the newsletter.');
@@ -1002,17 +1009,59 @@ async function sendNewsletter() {
         sendButton.innerHTML = '<div class="inline-loader"></div> Sending...';
         sendButton.disabled = true;
         
-        // In a real implementation, this would send the newsletter via email service
-        // For now, we'll simulate the process
+        // Collect recipients: prefer active subscribers from DB; if input is provided, use it as CSV override
+        let recipients = [];
+        const csvOverride = (recipientsInput || '').trim();
+        if (csvOverride) {
+            recipients = csvOverride.split(/[,\n;]/).map(s => s.trim()).filter(Boolean);
+        } else {
+            const { data: subs, error } = await supabase
+                .from('newsletter_subscribers')
+                .select('email')
+                .eq('status', 'active');
+            if (error) throw error;
+            recipients = (subs || []).map(s => s.email).filter(Boolean);
+        }
         
-        // Log the newsletter send attempt
-        await logActivity('newsletter_send', `Newsletter sent to ${recipients} subscribers`);
+        if (!recipients.length) {
+            showError('No recipients found. Add subscribers or provide emails.');
+            sendButton.innerHTML = originalText;
+            sendButton.disabled = false;
+            return;
+        }
         
-        // Simulate API call delay
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        // Send via Resend-backed HTTP function
+        const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
+        if (!endpoint) {
+            showError('Email service not configured. Set window.RESEND_FUNCTION_URL.');
+            sendButton.innerHTML = originalText;
+            sendButton.disabled = false;
+            return;
+        }
         
-        showSuccess(`Newsletter sent to ${recipients} subscribers!`);
-        logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${recipients} subscribers`);
+        // Batch sending to avoid large payloads
+        const batchSize = 100;
+        let sentCount = 0;
+        for (let i = 0; i < recipients.length; i += batchSize) {
+            const batch = recipients.slice(i, i + batchSize);
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'newsletter',
+                    subject,
+                    content,
+                    to: batch
+                })
+            });
+            if (!res.ok) {
+                throw new Error(`Send failed for batch starting ${i + 1}`);
+            }
+            sentCount += batch.length;
+        }
+        
+        showSuccess(`Newsletter sent to ${sentCount} recipients!`);
+        await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${sentCount} recipients`);
         
         // Clear form
         document.getElementById('newsletter-subject').value = '';
@@ -1024,19 +1073,6 @@ async function sendNewsletter() {
         
         // Refresh statistics
         loadNewsletterData();
-        
-        // Add notification
-        if (window.adminNotifications) {
-            window.adminNotifications.addNotification({
-                type: 'success',
-                title: 'Newsletter Sent',
-                message: `Newsletter "${subject}" sent successfully`,
-                action: () => {
-                    // Navigate to newsletter section
-                    document.querySelector('[data-section="newsletter"]').click();
-                }
-            });
-        }
         
     } catch (error) {
         console.error('Failed to send newsletter:', error);
@@ -1163,7 +1199,11 @@ async function loadLogsData() {
             .limit(100);
             
         if (error) {
-            throw new Error(`Failed to fetch logs: ${error.message}`);
+            console.warn('Logs table not available or fetch failed:', error);
+            displayLogsTable([]);
+            setupLogsPagination([]);
+            hideSectionLoading('#logs-table-body');
+            return;
         }
         
         logsData = logs || [];

@@ -120,7 +120,7 @@ async function handleNewsletterSignup(e) {
             throw new Error(`Failed to subscribe: ${error.message}`);
         }
         
-        // Attempt to send welcome email (no-blocker) and notify admin portal if open
+        // Attempt to send welcome email via Resend-backed function and notify admin portal if open
         try {
             await sendWelcomeEmail(email, name);
             if (window.adminNotifications) {
@@ -190,27 +190,39 @@ function isValidEmail(email) {
     return emailRegex.test(email);
 }
 
-// Lightweight welcome email via EmailJS if configured
+// Lightweight welcome email via Resend HTTP function if configured; falls back to EmailJS if present
 async function sendWelcomeEmail(email, name) {
-    // If EmailJS is not available, skip gracefully
-    if (typeof emailjs === 'undefined') {
-        return;
-    }
-    const serviceId = window.EMAILJS_SERVICE_ID || '';
-    const templateId = window.EMAILJS_TEMPLATE_ID || '';
-    const publicKey = window.EMAILJS_PUBLIC_KEY || '';
-    if (!serviceId || !templateId || !publicKey) {
-        return;
-    }
     try {
-        emailjs.init({ publicKey });
-        const params = {
-            to_email: email,
-            to_name: name || 'Friend',
-            subject: 'Welcome to Nashr Foundation Newsletter',
-            message: 'Thank you for subscribing to the Nashr Foundation newsletter. We appreciate your support and will keep you informed about our impact and initiatives.'
-        };
-        await emailjs.send(serviceId, templateId, params);
+        const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
+        if (endpoint) {
+            const res = await fetch(endpoint, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    type: 'welcome',
+                    to: email,
+                    name: name || 'Friend'
+                })
+            });
+            if (!res.ok) throw new Error('Resend welcome email failed');
+            return;
+        }
+        // Optional fallback to EmailJS if configured on window
+        if (typeof emailjs !== 'undefined') {
+            const serviceId = window.EMAILJS_SERVICE_ID || '';
+            const templateId = window.EMAILJS_TEMPLATE_ID || '';
+            const publicKey = window.EMAILJS_PUBLIC_KEY || '';
+            if (serviceId && templateId && publicKey) {
+                emailjs.init({ publicKey });
+                const params = {
+                    to_email: email,
+                    to_name: name || 'Friend',
+                    subject: 'Welcome to Nashr Foundation Newsletter',
+                    message: 'Thank you for subscribing to the Nashr Foundation newsletter. We appreciate your support and will keep you informed about our impact and initiatives.'
+                };
+                await emailjs.send(serviceId, templateId, params);
+            }
+        }
     } catch (err) {
         console.warn('EmailJS send failed', err);
     }

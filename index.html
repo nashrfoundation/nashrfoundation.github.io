@@ -103,7 +103,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .btn-large{padding:.85rem 1.75rem;font-size:1.1rem}
         header{position:fixed;top:0;left:0;width:100%;background-color:rgba(44,44,44,.95);backdrop-filter:blur(10px);z-index:1000;padding:.9rem 0}
         header .container{display:flex;align-items:center;justify-content:space-between}
-        .logo img{height:48px;width:auto;}
+        .logo img{height:480px;width:auto;}
         nav ul{display:flex;list-style:none}
         nav ul li{margin-left:var(--spacing-md)}
         nav ul li a{font-weight:500;padding:.5rem;position:relative;color:var(--text-primary)}
@@ -121,7 +121,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         .hero-content h1{font-size:3.5rem;margin-bottom:var(--spacing-md);color:var(--white);min-height:4.2rem}
         .hero-content p{font-size:1.4rem;margin-bottom:var(--spacing-md);color:var(--text-secondary);min-height:2.8rem}
         main{flex:1}
-        @media (max-width:768px){.logo img{height:40px}.mobile-menu-toggle{display:flex}.donate-button{display:none}nav{position:fixed;top:80px;left:0;width:100%;background-color:rgba(44,44,44,.95);max-height:0;overflow:hidden;transition:max-height .5s ease}nav.active{max-height:300px}nav ul{flex-direction:column;padding:1.5rem}nav ul li{margin:0 0 1rem}.hero-content h1{font-size:2.2rem;min-height:2.6rem}.hero-content p{font-size:1.1rem;min-height:2.2rem}}
+        @media (max-width:768px){.logo img{height:400px}.mobile-menu-toggle{display:flex}.donate-button{display:none}nav{position:fixed;top:80px;left:0;width:100%;background-color:rgba(44,44,44,.95);max-height:0;overflow:hidden;transition:max-height .5s ease}nav.active{max-height:300px}nav ul{flex-direction:column;padding:1.5rem}nav ul li{margin:0 0 1rem}.hero-content h1{font-size:2.2rem;min-height:2.6rem}.hero-content p{font-size:1.1rem;min-height:2.2rem}}
     </style>
     
     <!-- Asynchronously load the full stylesheet. -->
@@ -506,6 +506,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     
     <!-- Dynamic front page content/settings from Supabase -->
     <script defer>
+      // Configure your Resend HTTP function URL (Supabase Edge Function)
+      window.RESEND_FUNCTION_URL = 'https://jtuhnndwhotxjjolwcuz.supabase.co/functions/v1/super-function';
       (async function(){
         try {
           const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
@@ -519,6 +521,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             if (metaDesc && s.description) metaDesc.setAttribute('content', s.description);
             const metaKeywords = document.querySelector('meta[name="keywords"]');
             if (metaKeywords && s.keywords) metaKeywords.setAttribute('content', s.keywords);
+            // Open Graph / Twitter
+            const ogTitle = document.querySelector('meta[property="og:title"]');
+            if (ogTitle && s.title) ogTitle.setAttribute('content', s.title);
+            const ogDesc = document.querySelector('meta[property="og:description"]');
+            if (ogDesc && s.description) ogDesc.setAttribute('content', s.description);
+            const twTitle = document.querySelector('meta[name="twitter:title"]');
+            if (twTitle && s.title) twTitle.setAttribute('content', s.title);
+            const twDesc = document.querySelector('meta[name="twitter:description"]');
+            if (twDesc && s.description) twDesc.setAttribute('content', s.description);
             // Social links
             const ig = document.querySelector('a[href*="instagram.com"]'); if (ig && s.instagram) ig.href = s.instagram;
             const fb = document.querySelector('a[href*="facebook.com"]'); if (fb && s.facebook) fb.href = s.facebook;

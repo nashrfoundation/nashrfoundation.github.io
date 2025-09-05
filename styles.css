@@ -214,7 +214,7 @@ header .container {
 }
 
 .logo img {
-    height: 48px;
+    height: 480px;
     width: auto;
 }
 
@@ -631,7 +631,7 @@ footer {
 }
 
 .footer-logo img {
-    height: 48px;
+    height: 480px;
     width: auto;
 }
 
@@ -989,7 +989,7 @@ footer {
 
 @media (max-width: 768px) {
     .logo img {
-        height: 72px;
+        height: 400px;
     }
 
     .mobile-menu-toggle {
@@ -1134,7 +1134,7 @@ footer {
     }
 
     .footer-logo img {
-        height: 48px;
+        height: 400px;
     }
 
     .footer-social img {
