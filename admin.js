@@ -540,7 +540,7 @@ async function loadLeaderboardData() {
         const { data: leaderboardData, error } = await supabase
             .from(supabaseConfig.leaderboard.tableName)
             .select('*')
-            .order('amount', { ascending: false })
+            .order('total_amount', { ascending: false })
             .limit(50);
             
         if (error) {
@@ -689,7 +689,8 @@ function displayLeaderboardTable(leaderboardData) {
         nameCell.textContent = entry.name;
         
         const amountCell = document.createElement('td');
-        amountCell.textContent = `₨${entry.amount.toLocaleString()}`;
+        const displayAmount = (entry.total_amount != null ? entry.total_amount : entry.amount) || 0;
+        amountCell.textContent = `₨${Number(displayAmount).toLocaleString()}`;
         
         const actionsCell = document.createElement('td');
         const editBtn = document.createElement('button');

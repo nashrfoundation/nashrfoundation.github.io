@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 row.innerHTML = `
                     <td>${String(entry.rank || 9999).padStart(2, '0')}</td>
                     <td>${entry.name || 'Anonymous'}</td>
-                    <td>₨ ${Number(entry.amount || 0).toLocaleString()}</td>
+                    <td>₨ ${Number((entry.total_amount != null ? entry.total_amount : entry.amount) || 0).toLocaleString()}</td>
                 `;
                 fragment.appendChild(row);
             });
@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const { data, error } = await supabase
                 .from('leaderboard')
                 .select('*')
-                .order('amount', { ascending: false })
+                .order('total_amount', { ascending: false })
                 .limit(50);
 
             if (error) {
@@ -106,7 +106,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const { data: newData, error } = await supabase
                         .from('leaderboard')
                         .select('*')
-                        .order('amount', { ascending: false })
+                        .order('total_amount', { ascending: false })
                         .limit(50);
 
                     if (error) {
