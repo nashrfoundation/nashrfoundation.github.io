@@ -1151,15 +1151,22 @@ async function sendNewsletter() {
         if (!recipients.length) {
             showError('No recipients found. Add subscribers in the Subscribers section or provide emails in the Recipients field.');
             // Add a button to quickly add test subscribers
-            const errorDiv = document.createElement('div');
-            errorDiv.innerHTML = `
-                <div style="margin-top: 10px;">
-                    <button onclick="addTestSubscribers()" class="btn btn-outline btn-sm">
-                        Add Test Subscribers
-                    </button>
-                </div>
-            `;
-            document.querySelector('#newsletter .error-message')?.appendChild(errorDiv);
+            try {
+                const errorDiv = document.createElement('div');
+                errorDiv.innerHTML = `
+                    <div style="margin-top: 10px;">
+                        <button onclick="addTestSubscribers()" class="btn btn-outline btn-sm">
+                            Add Test Subscribers
+                        </button>
+                    </div>
+                `;
+                const errorContainer = document.querySelector('#newsletter .error-message');
+                if (errorContainer) {
+                    errorContainer.appendChild(errorDiv);
+                }
+            } catch (e) {
+                console.warn('Could not add test subscribers button:', e);
+            }
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -1170,7 +1177,19 @@ async function sendNewsletter() {
         // Send via Resend-backed HTTP function
         const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
         if (!endpoint) {
-            showError('Email service not configured. Set window.RESEND_FUNCTION_URL.');
+            showError('Email service not configured. Set window.RESEND_FUNCTION_URL in settings or as a global variable.');
+            if (sendButton) {
+                sendButton.innerHTML = originalText;
+                sendButton.disabled = false;
+            }
+            return;
+        }
+        
+        // Validate endpoint URL
+        try {
+            new URL(endpoint);
+        } catch (e) {
+            showError('Invalid email service URL. Please check window.RESEND_FUNCTION_URL.');
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -2171,3 +2190,47 @@ function initializeApp() {
     // Check if user is already logged in
     // Auth state listener handles showing dashboard; nothing else to do here.
 }
+
+// Cleanup function to prevent memory leaks
+function cleanup() {
+    try {
+        // Unsubscribe from all real-time subscriptions
+        if (leaderboardSubscription) {
+            leaderboardSubscription.unsubscribe();
+            leaderboardSubscription = null;
+        }
+        if (subscribersSubscription) {
+            subscribersSubscription.unsubscribe();
+            subscribersSubscription = null;
+        }
+        if (contentSubscription) {
+            contentSubscription.unsubscribe();
+            contentSubscription = null;
+        }
+        if (settingsSubscription) {
+            settingsSubscription.unsubscribe();
+            settingsSubscription = null;
+        }
+        if (realtimeData.donationsChannel) {
+            realtimeData.donationsChannel.unsubscribe();
+            realtimeData.donationsChannel = null;
+        }
+        
+        // Destroy charts
+        if (charts.donations) {
+            charts.donations.destroy();
+            charts.donations = null;
+        }
+        if (charts.paymentMethods) {
+            charts.paymentMethods.destroy();
+            charts.paymentMethods = null;
+        }
+        
+        console.log('Cleanup completed');
+    } catch (error) {
+        console.error('Error during cleanup:', error);
+    }
+}
+
+// Cleanup on page unload
+window.addEventListener('beforeunload', cleanup);
