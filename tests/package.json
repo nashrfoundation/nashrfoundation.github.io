@@ -1,0 +1,17 @@
+{
+  "name": "nashr-foundation-tests",
+  "version": "1.0.0",
+  "description": "Test suite for Nashr Foundation website",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "devDependencies": {
+    "jest": "^29.0.0",
+    "puppeteer": "^21.0.0"
+  },
+  "dependencies": {
+    "axios": "^1.0.0"
+  }
+}

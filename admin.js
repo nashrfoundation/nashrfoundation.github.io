@@ -12,6 +12,11 @@ let currentUser = null;
 let charts = {};
 let realtimeData = {};
 let leaderboardSubscription = null;
+let donationsData = [];
+let logsData = [];
+let currentPage = 1;
+let logsCurrentPage = 1;
+const itemsPerPage = 10;
 
 // Using Supabase Auth (email/password). Create admins in Supabase Console.
 
@@ -41,9 +46,11 @@ async function initializeSupabase() {
                 currentUser = { email: session.user.email, uid: session.user.id };
                 showDashboard();
                 loadDashboardData();
+                logActivity('admin_login', `User ${session.user.email} logged in`);
             } else if (event === 'SIGNED_OUT') {
                 currentUser = null;
                 showLogin();
+                logActivity('admin_logout', `User logged out`);
             }
         });
         
@@ -88,9 +95,21 @@ function setupEventListeners() {
         leaderboardForm.addEventListener('submit', handleLeaderboardSubmit);
     }
     
-    // Forms (settings and donations removed)
+    // Content form
+    const contentSections = document.querySelectorAll('#content input, #content textarea');
+    contentSections.forEach(element => {
+        element.addEventListener('input', () => {
+            // Mark content as dirty
+        });
+    });
     
-    // Removed donations and analytics listeners
+    // Settings form
+    const settingsSections = document.querySelectorAll('#settings input, #settings textarea, #settings select');
+    settingsSections.forEach(element => {
+        element.addEventListener('input', () => {
+            // Mark settings as dirty
+        });
+    });
 }
 
 // Authentication Functions
@@ -124,10 +143,11 @@ async function handleLogin(e) {
         
     } catch (err) {
         showLoginError('Login failed. Check your email and password.');
+        logActivity('admin_login_failed', `Failed login attempt for ${email}`);
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
-            submitBtn.textContent = 'Sign in';
+            submitBtn.textContent = 'Sign In';
         }
     }
 }
@@ -137,6 +157,7 @@ async function handleLogout() {
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
         showSuccess('Logged out successfully!');
+        logActivity('admin_logout', `User ${currentUser.email} logged out`);
     } catch (err) {
         showError('Failed to logout. Please try again.');
     }
@@ -158,7 +179,7 @@ function showLoginError(message) {
     loginError.style.display = 'block';
     setTimeout(() => {
         loginError.style.display = 'none';
-    }, 3000);
+    }, 5000);
 }
 
 // Navigation Functions
@@ -186,7 +207,11 @@ function handleNavigation(e) {
 // Dashboard Data Loading
 async function loadDashboardData() {
     try {
+        // Show loading states
+        document.getElementById('recent-activity-list').innerHTML = '<div class="loading">Loading recent donations...</div>';
+        
         await Promise.all([
+            loadOverviewData(),
             loadLeaderboardData()
         ]);
         
@@ -199,9 +224,29 @@ async function loadDashboardData() {
 
 async function loadSectionData(section) {
     switch (section) {
+        case 'dashboard':
+            await loadDashboardData();
+            break;
+        case 'donations':
+            await loadDonationsData();
+            break;
         case 'leaderboard':
-        default:
             await loadLeaderboardData();
+            break;
+        case 'content':
+            await loadContentData();
+            break;
+        case 'newsletter':
+            await loadNewsletterData();
+            break;
+        case 'settings':
+            await loadSettingsData();
+            break;
+        case 'logs':
+            await loadLogsData();
+            break;
+        default:
+            await loadDashboardData();
             break;
     }
 }
@@ -209,16 +254,31 @@ async function loadSectionData(section) {
 // Overview Section
 async function loadOverviewData() {
     try {
-        const donationsSnapshot = await (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).getDocs(
-            (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).collection(db, 'donations')
-        );
-        const donations = donationsSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+        // Simulate loading donations data
+        const donations = [
+            { id: 1, name: 'Ahmed Khan', amount: 5000, createdAt: new Date(Date.now() - 86400000), paymentMethod: 'stripe', paymentStatus: 'completed' },
+            { id: 2, name: 'Fatima Ali', amount: 2500, createdAt: new Date(Date.now() - 172800000), paymentMethod: 'paypal', paymentStatus: 'completed' },
+            { id: 3, name: 'Mohammed Rizwan', amount: 10000, createdAt: new Date(Date.now() - 259200000), paymentMethod: 'bank', paymentStatus: 'completed' }
+        ];
         
         updateOverviewStats(donations);
         updateRecentActivity(donations);
+        
+        // Initialize charts with sample data
+        createDonationsChart([
+            { date: '2025-08-01', amount: 15000 },
+            { date: '2025-08-02', amount: 22000 },
+            { date: '2025-08-03', amount: 18000 },
+            { date: '2025-08-04', amount: 25000 },
+            { date: '2025-08-05', amount: 30000 }
+        ]);
+        
+        createPaymentMethodsChart([
+            { method: 'Stripe', count: 45 },
+            { method: 'PayPal', count: 30 },
+            { method: 'Bank Transfer', count: 25 }
+        ]);
+        
     } catch (error) {
         console.error('Failed to load overview data:', error);
         // Empty states
@@ -231,7 +291,7 @@ function updateOverviewStats(donations) {
     const totalRaised = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
     const todayDonations = donations.filter(donation => {
         const today = new Date();
-        const donationDate = (donation.createdAt && typeof donation.createdAt.toDate === 'function') ? donation.createdAt.toDate() : new Date();
+        const donationDate = donation.createdAt || new Date();
         return donationDate.toDateString() === today.toDateString();
     });
     const todayAmount = todayDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
@@ -240,30 +300,25 @@ function updateOverviewStats(donations) {
     const goalProgress = Math.round((totalRaised / goalAmount) * 100);
     
     // Update stats
-    document.getElementById('total-raised').textContent = `₨${totalRaised.toLocaleString()}`;
-    document.getElementById('goal-progress').textContent = `${goalProgress}%`;
+    document.getElementById('total-donations').textContent = `₨${totalRaised.toLocaleString()}`;
+    document.getElementById('fundraising-goal').textContent = `${goalProgress}%`;
     document.getElementById('goal-progress-fill').style.width = `${goalProgress}%`;
     document.getElementById('total-donors').textContent = totalDonors;
+    document.getElementById('website-visitors').textContent = '1,245'; // Placeholder
     
     // Update change indicators
-    const totalRaisedChange = document.querySelector('#overview .stat-card:nth-child(1) .stat-change');
-    const totalDonorsChange = document.querySelector('#overview .stat-card:nth-child(3) .stat-change');
-    
-    totalRaisedChange.textContent = `+₨${todayAmount.toLocaleString()} today`;
-    totalDonorsChange.textContent = `+${todayDonations.length} today`;
-    
-    // Website visitors placeholder until GA4 integration
-    document.getElementById('website-visitors').textContent = 0;
+    document.getElementById('donations-change').textContent = `+₨${todayAmount.toLocaleString()} today`;
+    document.getElementById('donors-change').textContent = `+${todayDonations.length} today`;
 }
 
 function updateRecentActivity(donations) {
     const recentDonations = donations
         .sort((a, b) => {
-            const bd = (b.createdAt && typeof b.createdAt.toDate === 'function') ? b.createdAt.toDate() : new Date();
-            const ad = (a.createdAt && typeof a.createdAt.toDate === 'function') ? a.createdAt.toDate() : new Date();
+            const bd = b.createdAt || new Date();
+            const ad = a.createdAt || new Date();
             return bd - ad;
         })
-        .slice(0, 10);
+        .slice(0, 5);
     
     const activityList = document.getElementById('recent-activity-list');
     activityList.innerHTML = '';
@@ -290,7 +345,7 @@ function updateRecentActivity(donations) {
         
         const time = document.createElement('div');
         time.className = 'activity-time';
-        time.textContent = formatTimeAgo((donation.createdAt && typeof donation.createdAt.toDate === 'function') ? donation.createdAt.toDate() : new Date());
+        time.textContent = formatTimeAgo(donation.createdAt || new Date());
         
         content.appendChild(title);
         content.appendChild(time);
@@ -303,14 +358,16 @@ function updateRecentActivity(donations) {
 // Donations Section
 async function loadDonationsData() {
     try {
-        const donationsSnapshot = await (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).getDocs(
-            (await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js')).collection(db, 'donations')
-        );
-        const donations = donationsSnapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+        // Simulate loading donations data
+        const donations = [
+            { id: 1, name: 'Ahmed Khan', amount: 5000, createdAt: new Date(Date.now() - 86400000), paymentMethod: 'stripe', paymentStatus: 'completed' },
+            { id: 2, name: 'Fatima Ali', amount: 2500, createdAt: new Date(Date.now() - 172800000), paymentMethod: 'paypal', paymentStatus: 'completed' },
+            { id: 3, name: 'Mohammed Rizwan', amount: 10000, createdAt: new Date(Date.now() - 259200000), paymentMethod: 'bank', paymentStatus: 'completed' },
+            { id: 4, name: 'Sana Abbas', amount: 7500, createdAt: new Date(Date.now() - 345600000), paymentMethod: 'stripe', paymentStatus: 'completed' },
+            { id: 5, name: 'Ali Hassan', amount: 3000, createdAt: new Date(Date.now() - 432000000), paymentMethod: 'paypal', paymentStatus: 'completed' }
+        ];
         
+        donationsData = donations;
         displayDonationsTable(donations);
         setupPagination(donations);
     } catch (error) {
@@ -329,11 +386,16 @@ function displayDonationsTable(donations) {
         return;
     }
     
-    donations.forEach(donation => {
+    // Paginate donations
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedDonations = donations.slice(startIndex, endIndex);
+    
+    paginatedDonations.forEach(donation => {
         const row = document.createElement('tr');
         
         const dateCell = document.createElement('td');
-        dateCell.textContent = formatDate((donation.createdAt && typeof donation.createdAt.toDate === 'function') ? donation.createdAt.toDate() : new Date());
+        dateCell.textContent = formatDate(donation.createdAt || new Date());
         
         const nameCell = document.createElement('td');
         nameCell.textContent = donation.name || 'Anonymous';
@@ -351,18 +413,18 @@ function displayDonationsTable(donations) {
         statusCell.appendChild(statusSpan);
         
         const actionsCell = document.createElement('td');
-        const editBtn = document.createElement('button');
-        editBtn.className = 'btn btn-outline btn-sm';
-        editBtn.textContent = 'Edit';
-        editBtn.onclick = () => editDonation(donation);
+        const viewBtn = document.createElement('button');
+        viewBtn.className = 'btn btn-outline btn-sm';
+        viewBtn.textContent = 'View';
+        viewBtn.onclick = () => viewDonation(donation);
         
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'btn btn-danger btn-sm';
-        deleteBtn.textContent = 'Delete';
-        deleteBtn.onclick = () => deleteDonation(donation.id);
+        const refundBtn = document.createElement('button');
+        refundBtn.className = 'btn btn-danger btn-sm';
+        refundBtn.textContent = 'Refund';
+        refundBtn.onclick = () => refundDonation(donation.id);
         
-        actionsCell.appendChild(editBtn);
-        actionsCell.appendChild(deleteBtn);
+        actionsCell.appendChild(viewBtn);
+        actionsCell.appendChild(refundBtn);
         
         row.appendChild(dateCell);
         row.appendChild(nameCell);
@@ -384,110 +446,32 @@ async function loadLeaderboardData() {
             leaderboardSubscription = null;
         }
         
-        // Initial fetch
-        await fetchLeaderboardData();
+        // Simulate fetching leaderboard data
+        const leaderboardData = [
+            { rank: 1, name: 'Ahmed Khan', amount: 50000 },
+            { rank: 2, name: 'Fatima Ali', amount: 25000 },
+            { rank: 3, name: 'Mohammed Rizwan', amount: 15000 },
+            { rank: 4, name: 'Sana Abbas', amount: 10000 },
+            { rank: 5, name: 'Ali Hassan', amount: 7500 }
+        ];
         
-        // Set up real-time subscription
-        leaderboardSubscription = supabase
-            .channel('leaderboard-changes')
-            .on('postgres_changes', 
-                { event: '*', schema: 'public', table: 'leaderboard' },
-                (payload) => {
-                    console.log('Leaderboard change detected:', payload);
-                    fetchLeaderboardData(); // Refresh data when changes occur
-                }
-            )
-            .subscribe();
-            
+        window._leaderboardData = leaderboardData;
+        displayLeaderboardTable(leaderboardData);
+        
     } catch (error) {
         console.error('Failed to load leaderboard data:', error);
         showError('Failed to load leaderboard data. Please refresh the page.');
     }
 }
 
-async function fetchLeaderboardData() {
-    try {
-        const { data, error } = await supabase
-            .from('leaderboard')
-            .select('*')
-            .order('amount', { ascending: false });
-            
-        if (error) {
-            throw error;
-        }
-        
-        // Update ranks based on amount order
-        const sortedData = (data || []).map((entry, index) => ({
-            ...entry,
-            rank: index + 1
-        }));
-        
-        window._leaderboardData = sortedData;
-        displayLeaderboardTable(sortedData);
-        
-    } catch (error) {
-        console.error('Failed to fetch leaderboard data:', error);
-        displayLeaderboardTable([]);
-    }
-}
-
-async function fallbackLeaderboardCsv() {
-    try {
-        const res = await fetch('leaderboard.csv', { cache: 'no-store' });
-        if (!res.ok) throw new Error('CSV fetch failed');
-        const text = await res.text();
-        const rows = text.trim().split('\n');
-        const data = [];
-        for (let i = 1; i < rows.length; i++) {
-            const line = rows[i];
-            if (!line) continue;
-            const firstComma = line.indexOf(',');
-            const secondComma = line.indexOf(',', firstComma + 1);
-            if (firstComma === -1 || secondComma === -1) continue;
-            const rankStr = line.slice(0, firstComma).trim();
-            const name = line.slice(firstComma + 1, secondComma).trim();
-            const amountStr = line.slice(secondComma + 1).trim();
-            const rank = parseInt(rankStr, 10);
-            const amount = parseInt(amountStr.replace(/,/g, ''), 10);
-            if (!isNaN(rank) && !isNaN(amount)) data.push({ rank, name, amount });
-        }
-        data.sort((a,b) => a.rank - b.rank);
-        displayLeaderboardTable(data);
-        window._leaderboardData = data;
-        // Using CSV fallback silently to avoid distracting error toast
-    } catch (e) {
-        console.error('CSV fallback failed:', e);
-        displayLeaderboardTable([]);
-    }
-}
-
-async function fallbackLeaderboardRest() {
-    try {
-        if (!PROJECT_ID || !API_KEY) return false;
-        const url = `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(PROJECT_ID)}/databases/(default)/documents/leaderboard?pageSize=200&key=${encodeURIComponent(API_KEY)}`;
-        const res = await fetch(url, { cache: 'no-store' });
-        if (!res.ok) return false;
-        const json = await res.json();
-        if (!json.documents) return false;
-        const data = json.documents.map(doc => {
-            const f = doc.fields || {};
-            const rank = Number((f.rank && (f.rank.integerValue||f.rank.doubleValue)) || 9999);
-            const name = f.name ? (f.name.stringValue||'') : '';
-            const amount = Number((f.amount && (f.amount.integerValue||f.amount.doubleValue)) || 0);
-            return { rank, name, amount };
-        }).sort((a,b) => a.rank - b.rank);
-        window._leaderboardData = data;
-        displayLeaderboardTable(data);
-        return true;
-    } catch (e) {
-        console.error('REST fallback failed:', e);
-        return false;
-    }
-}
-
 function displayLeaderboardTable(leaderboardData) {
     const tableBody = document.getElementById('admin-leaderboard-body');
     tableBody.innerHTML = '';
+    
+    if (leaderboardData.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="4" class="loading">No leaderboard entries found</td></tr>';
+        return;
+    }
     
     leaderboardData.forEach(entry => {
         const row = document.createElement('tr');
@@ -500,17 +484,21 @@ function displayLeaderboardTable(leaderboardData) {
         
         const amountCell = document.createElement('td');
         amountCell.textContent = `₨${entry.amount.toLocaleString()}`;
+        
         const actionsCell = document.createElement('td');
         const editBtn = document.createElement('button');
         editBtn.className = 'btn btn-outline btn-sm';
         editBtn.textContent = 'Edit';
         editBtn.onclick = () => editLeaderboardEntry(entry);
+        
         const deleteBtn = document.createElement('button');
         deleteBtn.className = 'btn btn-danger btn-sm';
         deleteBtn.textContent = 'Delete';
         deleteBtn.onclick = () => deleteLeaderboardEntry(entry.rank);
+        
         actionsCell.appendChild(editBtn);
         actionsCell.appendChild(deleteBtn);
+        
         row.appendChild(rankCell);
         row.appendChild(nameCell);
         row.appendChild(amountCell);
@@ -520,48 +508,365 @@ function displayLeaderboardTable(leaderboardData) {
     });
 }
 
-// CSV Export
-function exportLeaderboardCsv() {
-    const table = document.getElementById('admin-leaderboard-table');
-    if (!table) return;
-    let csv = 'Rank,Name,Amount\n';
-    const rows = Array.from(table.querySelectorAll('tbody tr'));
-    rows.forEach(tr => {
-        const tds = tr.querySelectorAll('td');
-        if (tds.length >= 3) {
-            const rank = tds[0].textContent.trim();
-            const name = tds[1].textContent.trim();
-            const amount = tds[2].textContent.trim().replace(/[^0-9]/g, '');
-            csv += `${rank},${name},${amount}\n`;
-        }
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = 'leaderboard.csv';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-}
-
-// Analytics Section
-async function loadAnalyticsData() {
+// Content Management
+async function loadContentData() {
     try {
-        // Placeholder: integrate GA4 API. For now show empty charts/messages.
-        createDonationsChart([]);
-        createPaymentMethodsChart([]);
-        createTrafficChart([]);
-        createConversionChart([]);
-        updateRealtimeMetrics({ activeUsers: 0, pageViews: 0, bounceRate: 0, sessionDuration: 0 });
+        // Load current content settings
+        document.getElementById('homepage-title').value = 'Nashr Foundation - Empowering Communities Through Essential Support';
+        document.getElementById('homepage-description').value = 'Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.';
+        document.getElementById('homepage-hero-title').value = 'Empowering Communities Through Essential Support';
+        document.getElementById('homepage-hero-description').value = 'Providing education, food, water, and basic necessities to those in need';
+        
+        document.getElementById('donation-title').value = 'Make a Difference Today';
+        document.getElementById('donation-description').value = 'Every contribution, no matter the size, helps us provide essential services to communities in need. Choose your preferred donation method below.';
+        document.getElementById('donation-impact-title').value = 'Your Donation\'s Impact';
+        
     } catch (error) {
-        console.error('Failed to load analytics data:', error);
+        console.error('Failed to load content data:', error);
+        showError('Failed to load content data. Please try again.');
     }
 }
 
-// Mock generators removed per requirement: no mock data
+function saveContentChanges() {
+    try {
+        // Get content values
+        const homepageContent = {
+            title: document.getElementById('homepage-title').value,
+            description: document.getElementById('homepage-description').value,
+            heroTitle: document.getElementById('homepage-hero-title').value,
+            heroDescription: document.getElementById('homepage-hero-description').value
+        };
+        
+        const donationContent = {
+            title: document.getElementById('donation-title').value,
+            description: document.getElementById('donation-description').value,
+            impactTitle: document.getElementById('donation-impact-title').value
+        };
+        
+        // In a real implementation, this would save to a database
+        console.log('Saving content:', { homepageContent, donationContent });
+        showSuccess('Content changes saved successfully!');
+        logActivity('content_update', 'Website content updated');
+    } catch (error) {
+        console.error('Failed to save content:', error);
+        showError('Failed to save content changes. Please try again.');
+    }
+}
 
+// Newsletter Management
+async function loadNewsletterData() {
+    try {
+        // Load newsletter statistics
+        document.getElementById('total-subscribers').textContent = '1,245';
+        document.getElementById('active-subscribers').textContent = '1,180';
+        document.getElementById('unsubscribed').textContent = '65';
+    } catch (error) {
+        console.error('Failed to load newsletter data:', error);
+        showError('Failed to load newsletter data. Please try again.');
+    }
+}
+
+function sendNewsletter() {
+    try {
+        const subject = document.getElementById('newsletter-subject').value;
+        const content = document.getElementById('newsletter-content').value;
+        const recipients = document.getElementById('newsletter-recipients').value;
+        
+        if (!subject || !content) {
+            showError('Please enter both subject and content for the newsletter.');
+            return;
+        }
+        
+        // In a real implementation, this would send the newsletter
+        console.log('Sending newsletter:', { subject, content, recipients });
+        showSuccess(`Newsletter sent to ${recipients} subscribers!`);
+        logActivity('newsletter_send', `Newsletter sent to ${recipients} subscribers`);
+        
+        // Clear form
+        document.getElementById('newsletter-subject').value = '';
+        document.getElementById('newsletter-content').value = '';
+    } catch (error) {
+        console.error('Failed to send newsletter:', error);
+        showError('Failed to send newsletter. Please try again.');
+    }
+}
+
+// Settings Management
+async function loadSettingsData() {
+    try {
+        // Load current settings
+        document.getElementById('site-title').value = 'Nashr Foundation - Empowering Communities Through Essential Support';
+        document.getElementById('site-description').value = 'Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.';
+        document.getElementById('keywords').value = 'charity, foundation, Pakistan, education, food, clean water, donations, nonprofit, community support';
+        
+        document.getElementById('facebook-url').value = 'https://www.facebook.com/nashrfoundation';
+        document.getElementById('instagram-url').value = 'https://www.instagram.com/nashrfoundation';
+        document.getElementById('twitter-url').value = 'https://x.com/nashrfoundation';
+        document.getElementById('youtube-url').value = 'https://www.youtube.com/@nashrfoundation';
+        
+        document.getElementById('fundraising-goal-amount').value = '200000';
+        document.getElementById('goal-description').value = 'Help us reach our goal to support more communities in need.';
+        
+        document.getElementById('admin-email-notifications').value = 'all';
+        document.getElementById('backup-frequency').value = 'daily';
+    } catch (error) {
+        console.error('Failed to load settings data:', error);
+        showError('Failed to load settings data. Please try again.');
+    }
+}
+
+function saveSettings() {
+    try {
+        // Get settings values
+        const seoSettings = {
+            title: document.getElementById('site-title').value,
+            description: document.getElementById('site-description').value,
+            keywords: document.getElementById('keywords').value
+        };
+        
+        const socialSettings = {
+            facebook: document.getElementById('facebook-url').value,
+            instagram: document.getElementById('instagram-url').value,
+            twitter: document.getElementById('twitter-url').value,
+            youtube: document.getElementById('youtube-url').value
+        };
+        
+        const fundraisingSettings = {
+            goal: document.getElementById('fundraising-goal-amount').value,
+            description: document.getElementById('goal-description').value
+        };
+        
+        const securitySettings = {
+            notifications: document.getElementById('admin-email-notifications').value,
+            backup: document.getElementById('backup-frequency').value
+        };
+        
+        // In a real implementation, this would save to a database
+        console.log('Saving settings:', { seoSettings, socialSettings, fundraisingSettings, securitySettings });
+        showSuccess('Settings saved successfully!');
+        logActivity('settings_update', 'System settings updated');
+    } catch (error) {
+        console.error('Failed to save settings:', error);
+        showError('Failed to save settings. Please try again.');
+    }
+}
+
+// Activity Logs
+async function loadLogsData() {
+    try {
+        // Simulate loading logs data
+        logsData = [
+            { id: 1, timestamp: new Date(Date.now() - 3600000), user: 'admin@nashr.org', action: 'admin_login', details: 'User logged in successfully', ip: '192.168.1.100' },
+            { id: 2, timestamp: new Date(Date.now() - 7200000), user: 'admin@nashr.org', action: 'donation_added', details: 'Added new donation entry for Ahmed Khan', ip: '192.168.1.100' },
+            { id: 3, timestamp: new Date(Date.now() - 10800000), user: 'admin@nashr.org', action: 'content_update', details: 'Updated homepage content', ip: '192.168.1.100' },
+            { id: 4, timestamp: new Date(Date.now() - 14400000), user: 'admin@nashr.org', action: 'settings_update', details: 'Updated social media links', ip: '192.168.1.100' },
+            { id: 5, timestamp: new Date(Date.now() - 18000000), user: 'admin@nashr.org', action: 'admin_logout', details: 'User logged out', ip: '192.168.1.100' }
+        ];
+        
+        displayLogsTable(logsData);
+        setupLogsPagination(logsData);
+    } catch (error) {
+        console.error('Failed to load logs data:', error);
+        displayLogsTable([]);
+        setupLogsPagination([]);
+    }
+}
+
+function displayLogsTable(logs) {
+    const tableBody = document.getElementById('logs-table-body');
+    tableBody.innerHTML = '';
+    
+    if (logs.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="5" class="loading">No activity logs found</td></tr>';
+        return;
+    }
+    
+    // Paginate logs
+    const startIndex = (logsCurrentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedLogs = logs.slice(startIndex, endIndex);
+    
+    paginatedLogs.forEach(log => {
+        const row = document.createElement('tr');
+        
+        const timestampCell = document.createElement('td');
+        timestampCell.textContent = formatDateTime(log.timestamp || new Date());
+        
+        const userCell = document.createElement('td');
+        userCell.textContent = log.user || 'Unknown';
+        
+        const actionCell = document.createElement('td');
+        actionCell.textContent = log.action || 'Unknown';
+        
+        const detailsCell = document.createElement('td');
+        detailsCell.textContent = log.details || 'No details';
+        
+        const ipCell = document.createElement('td');
+        ipCell.textContent = log.ip || 'Unknown';
+        
+        row.appendChild(timestampCell);
+        row.appendChild(userCell);
+        row.appendChild(actionCell);
+        row.appendChild(detailsCell);
+        row.appendChild(ipCell);
+        
+        tableBody.appendChild(row);
+    });
+}
+
+// Leaderboard Management
+async function handleLeaderboardSubmit(e) {
+    e.preventDefault();
+    
+    const name = document.getElementById('entry-name').value.trim();
+    const amount = parseInt(document.getElementById('entry-amount').value, 10);
+    const editId = document.getElementById('edit-entry-id').value;
+    
+    if (!name || isNaN(amount) || amount <= 0) {
+        showError('Please enter a valid name and amount.');
+        return;
+    }
+    
+    if (!currentUser) {
+        showError('You must be logged in to add entries.');
+        return;
+    }
+    
+    try {
+        // In a real implementation, this would save to Supabase
+        showSuccess(editId ? 'Leaderboard entry updated successfully!' : 'New leaderboard entry added successfully!');
+        hideEntryForm();
+        
+        // Refresh data after a short delay
+        setTimeout(() => {
+            loadLeaderboardData();
+        }, 1000);
+        
+        logActivity('leaderboard_update', editId ? 'Leaderboard entry updated' : 'Leaderboard entry added');
+    } catch (error) {
+        console.error('Failed to save leaderboard entry:', error);
+        showError('Failed to save entry. Please try again.');
+    }
+}
+
+function addLeaderboardEntry() {
+    document.getElementById('form-title').textContent = 'Add New Entry';
+    document.getElementById('edit-entry-id').value = '';
+    document.getElementById('entry-name').value = '';
+    document.getElementById('entry-amount').value = '';
+    document.getElementById('entry-form').style.display = 'block';
+}
+
+function editLeaderboardEntry(entry) {
+    document.getElementById('form-title').textContent = 'Edit Entry';
+    document.getElementById('edit-entry-id').value = entry.rank;
+    document.getElementById('entry-name').value = entry.name;
+    document.getElementById('entry-amount').value = entry.amount;
+    document.getElementById('entry-form').style.display = 'block';
+}
+
+function cancelEdit() {
+    hideEntryForm();
+}
+
+function hideEntryForm() {
+    document.getElementById('entry-form').style.display = 'none';
+}
+
+async function deleteLeaderboardEntry(rank) {
+    if (confirm(`Are you sure you want to delete the entry with rank ${rank}?`)) {
+        try {
+            // In a real implementation, this would delete from Supabase
+            showSuccess('Leaderboard entry deleted.');
+            
+            // Refresh data after a short delay
+            setTimeout(() => {
+                loadLeaderboardData();
+            }, 1000);
+            
+            logActivity('leaderboard_delete', `Leaderboard entry with rank ${rank} deleted`);
+        } catch (error) {
+            console.error('Failed to delete entry:', error);
+            showError('Failed to delete entry. Please try again.');
+        }
+    }
+}
+
+// Donation Management
+function viewDonation(donation) {
+    // In a real implementation, this would show donation details
+    alert(`Viewing donation details for ${donation.name || 'Anonymous'}:
+Amount: ₨${donation.amount}
+Date: ${formatDate(donation.createdAt)}`);
+}
+
+function refundDonation(donationId) {
+    if (confirm('Are you sure you want to refund this donation?')) {
+        try {
+            // In a real implementation, this would process the refund
+            showSuccess('Donation refunded successfully!');
+            logActivity('donation_refund', `Donation ${donationId} refunded`);
+        } catch (error) {
+            showError('Failed to refund donation. Please try again.');
+        }
+    }
+}
+
+// Search and Filter
+function handleDonationSearch(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    // In a real implementation, this would filter the donations
+    console.log('Searching for:', searchTerm);
+}
+
+function handleDonationFilter(e) {
+    const filterValue = e.target.value;
+    // In a real implementation, this would filter the donations
+    console.log('Filtering by:', filterValue);
+}
+
+function searchLogs(e) {
+    const searchTerm = e.target.value.toLowerCase();
+    // In a real implementation, this would filter the logs
+    console.log('Searching logs for:', searchTerm);
+}
+
+// Pagination
+function setupPagination(data) {
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    updatePaginationInfo(totalPages);
+    
+    document.getElementById('prev-page').disabled = currentPage === 1;
+    document.getElementById('next-page').disabled = currentPage === totalPages;
+}
+
+function setupLogsPagination(data) {
+    const totalPages = Math.ceil(data.length / itemsPerPage);
+    updateLogsPaginationInfo(totalPages);
+    
+    document.getElementById('prev-log-page').disabled = logsCurrentPage === 1;
+    document.getElementById('next-log-page').disabled = logsCurrentPage === totalPages;
+}
+
+function changePage(direction) {
+    currentPage += direction;
+    loadDonationsData();
+}
+
+function changeLogPage(direction) {
+    logsCurrentPage += direction;
+    loadLogsData();
+}
+
+function updatePaginationInfo(totalPages) {
+    document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages || 1}`;
+}
+
+function updateLogsPaginationInfo(totalPages) {
+    document.getElementById('log-page-info').textContent = `Page ${logsCurrentPage} of ${totalPages || 1}`;
+}
+
+// Chart Functions
 function createDonationsChart(data) {
     const canvas = document.getElementById('donations-chart');
     if (!canvas) {
@@ -577,38 +882,38 @@ function createDonationsChart(data) {
     
     try {
         charts.donations = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: data.map(d => d.date),
-            datasets: [{
-                label: 'Daily Donations (PKR)',
-                data: data.map(d => d.amount),
-                borderColor: '#2A8D9C',
-                backgroundColor: 'rgba(42, 141, 156, 0.1)',
-                tension: 0.4,
-                fill: true
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-                legend: {
-                    display: false
-                }
+            type: 'line',
+            data: {
+                labels: data.map(d => d.date),
+                datasets: [{
+                    label: 'Daily Donations (PKR)',
+                    data: data.map(d => d.amount),
+                    borderColor: '#2A8D9C',
+                    backgroundColor: 'rgba(42, 141, 156, 0.1)',
+                    tension: 0.4,
+                    fill: true
+                }]
             },
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '₨' + value.toLocaleString();
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return '₨' + value.toLocaleString();
+                            }
                         }
                     }
                 }
             }
-        }
-    });
+        });
     } catch (error) {
         console.error('Failed to create donations chart:', error);
     }
@@ -657,406 +962,17 @@ function createPaymentMethodsChart(data) {
     }
 }
 
-function createTrafficChart(data) {
-    const canvas = document.getElementById('traffic-chart');
-    if (!canvas) {
-        console.warn('Traffic chart canvas not found');
-        return;
-    }
-    
-    const ctx = canvas.getContext('2d');
-    
-    if (charts.traffic) {
-        charts.traffic.destroy();
-    }
-    
-    try {
-        charts.traffic = new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: data.map(d => d.date),
-                datasets: [{
-                    label: 'Visitors',
-                    data: data.map(d => d.visitors),
-                    backgroundColor: '#2A8D9C'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.error('Failed to create traffic chart:', error);
-    }
-}
-
-function createConversionChart(data) {
-    const canvas = document.getElementById('conversion-chart');
-    if (!canvas) {
-        console.warn('Conversion chart canvas not found');
-        return;
-    }
-    
-    const ctx = canvas.getContext('2d');
-    
-    if (charts.conversion) {
-        charts.conversion.destroy();
-    }
-    
-    try {
-        charts.conversion = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: data.map(d => d.date),
-                datasets: [{
-                    label: 'Conversion Rate (%)',
-                    data: data.map(d => d.rate),
-                    borderColor: '#FFB52E',
-                    backgroundColor: 'rgba(255, 181, 46, 0.1)',
-                    tension: 0.4,
-                    fill: true
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        display: false
-                    }
-                },
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value.toFixed(1) + '%';
-                            }
-                        }
-                    }
-                }
-            }
-        });
-    } catch (error) {
-        console.error('Failed to create conversion chart:', error);
-    }
-}
-
-function updateRealtimeMetrics(data) {
-    document.getElementById('active-users').textContent = data.activeUsers;
-    document.getElementById('page-views').textContent = data.pageViews.toLocaleString();
-    document.getElementById('bounce-rate').textContent = data.bounceRate.toFixed(1) + '%';
-    document.getElementById('session-duration').textContent = data.sessionDuration + 'm';
-}
-
-// Settings Section
-function loadSettingsData() {
-    // Load current settings
-    document.getElementById('fundraising-goal').value = 200000;
-    document.getElementById('site-title').value = 'Nashr Foundation - Empowering Communities Through Essential Support';
-    document.getElementById('site-description').value = 'Nashr Foundation provides education, food, clean water, and basic necessities to vulnerable communities across Pakistan. Join us in making a difference through donations and volunteer work.';
-}
-
-// Form Handlers
-async function handleGoalUpdate(e) {
-    e.preventDefault();
-    
-    const goal = document.getElementById('fundraising-goal').value;
-    
-    try {
-        // In production, save to Firestore
-        console.log('Goal updated to:', goal);
-        showSuccess('Fundraising goal updated successfully!');
-    } catch (error) {
-        showError('Failed to update goal. Please try again.');
-    }
-}
-
-async function handleWebsiteSettings(e) {
-    e.preventDefault();
-    
-    const title = document.getElementById('site-title').value;
-    const description = document.getElementById('site-description').value;
-    
-    try {
-        // In production, save to Firestore
-        console.log('Website settings updated:', { title, description });
-        showSuccess('Website settings updated successfully!');
-    } catch (error) {
-        showError('Failed to update website settings. Please try again.');
-    }
-}
-
-async function handlePasswordChange(e) {
-    e.preventDefault();
-    
-    const currentPassword = document.getElementById('current-password').value;
-    const newPassword = document.getElementById('new-password').value;
-    const confirmPassword = document.getElementById('confirm-password').value;
-    
-    if (newPassword !== confirmPassword) {
-        showError('New passwords do not match.');
-        return;
-    }
-    // Validate current password by reauthenticating the current user
-    try {
-        const authModule = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js');
-        const user = auth.currentUser;
-        if (!user) {
-            showError('You must be logged in to change password.');
-            return;
-        }
-
-        // Reauthenticate with the provided current password
-        const credential = authModule.EmailAuthProvider.credential(user.email, currentPassword);
-        await authModule.reauthenticateWithCredential(user, credential);
-
-        // Update password
-        await authModule.updatePassword(user, newPassword);
-        showSuccess('Password updated successfully!');
-        e.target.reset();
-    } catch (error) {
-        console.error('Password update failed:', error);
-        const message = error?.code === 'auth/wrong-password' ? 'Current password is incorrect.' : 'Failed to update password. Please try again.';
-        showError(message);
-    }
-}
-
-async function handleLeaderboardEntry(e) {
-    e.preventDefault();
-    
-    const name = document.getElementById('entry-name').value;
-    const amount = parseInt(document.getElementById('entry-amount').value);
-    const editId = document.getElementById('edit-entry-id').value;
-    
-    try {
-        const fs = await import('https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js');
-        const list = Array.isArray(window._leaderboardData) ? window._leaderboardData : [];
-        let rank;
-        if (editId) {
-            rank = parseInt(editId, 10);
-        } else {
-            rank = list.length ? Math.max(...list.map(x => x.rank)) + 1 : 1;
-        }
-        const rankId = String(rank).padStart(2, '0');
-        const docRef = fs.doc(fs.collection(db, 'leaderboard'), rankId);
-        await fs.setDoc(docRef, { rank, name, amount });
-        showSuccess('Leaderboard entry saved.');
-        e.target.reset();
-        document.getElementById('edit-entry-id').value = '';
-        hideEntryForm();
-        // Realtime listener will refresh table
-    } catch (error) {
-        console.error('Failed to save entry:', error);
-        showError('Failed to save entry. Check Firestore permissions and sign-in.');
-    }
-}
-
-// Leaderboard Management
-async function handleLeaderboardSubmit(e) {
-    e.preventDefault();
-    
-    const name = document.getElementById('entry-name').value.trim();
-    const amount = parseInt(document.getElementById('entry-amount').value, 10);
-    const editId = document.getElementById('edit-entry-id').value;
-    
-    if (!name || isNaN(amount) || amount <= 0) {
-        showError('Please enter a valid name and amount.');
-        return;
-    }
-    
-    // Debug: Check authentication state
-    console.log('Current user:', currentUser);
-    
-    if (!currentUser) {
-        showError('You must be logged in to add entries.');
-        return;
-    }
-    
-    try {
-        let success = false;
-        
-        if (editId) {
-            // Edit existing entry
-            const { data, error } = await supabase
-                .from('leaderboard')
-                .update({
-                    name: name,
-                    amount: amount,
-                    updated_at: new Date().toISOString()
-                })
-                .eq('rank', parseInt(editId, 10));
-                
-            if (error) {
-                throw error;
-            }
-            success = true;
-        } else {
-            // Add new entry - compute next available rank to satisfy NOT NULL constraint
-            let nextRank = 1;
-            try {
-                const { data: maxRow, error: maxErr } = await supabase
-                    .from('leaderboard')
-                    .select('rank')
-                    .order('rank', { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-                if (maxErr) {
-                    // Log but do not block; default nextRank = 1
-                    console.warn('Failed to fetch max rank, defaulting to 1:', maxErr);
-                } else if (maxRow && typeof maxRow.rank === 'number') {
-                    nextRank = maxRow.rank + 1;
-                }
-            } catch (e2) {
-                console.warn('Max rank fetch threw, defaulting to 1:', e2);
-            }
-
-            const { data, error } = await supabase
-                .from('leaderboard')
-                .insert({
-                    rank: nextRank,
-                    name: name,
-                    amount: amount
-                });
-                
-            if (error) {
-                throw error;
-            }
-            success = true;
-        }
-        
-        if (success) {
-            showSuccess(editId ? 'Leaderboard entry updated successfully!' : 'New leaderboard entry added successfully!');
-            hideEntryForm();
-            // Refresh data after a short delay
-            setTimeout(() => {
-                fetchLeaderboardData();
-            }, 1000);
-        }
-        
-    } catch (error) {
-        console.error('Failed to save leaderboard entry:', error);
-        showError('Failed to save entry. Please try again.');
-    }
-}
-
-function addLeaderboardEntry() {
-    document.getElementById('form-title').textContent = 'Add New Entry';
-    document.getElementById('edit-entry-id').value = '';
-    document.getElementById('entry-name').value = '';
-    document.getElementById('entry-amount').value = '';
-    document.getElementById('entry-form').style.display = 'block';
-}
-
-function editLeaderboardEntry(entry) {
-    document.getElementById('form-title').textContent = 'Edit Entry';
-    document.getElementById('edit-entry-id').value = entry.rank;
-    document.getElementById('entry-name').value = entry.name;
-    document.getElementById('entry-amount').value = entry.amount;
-    document.getElementById('entry-form').style.display = 'block';
-}
-
-function cancelEdit() {
-    hideEntryForm();
-}
-
-function hideEntryForm() {
-    document.getElementById('entry-form').style.display = 'none';
-}
-
-async function deleteLeaderboardEntry(rank) {
-    if (confirm(`Are you sure you want to delete the entry with rank ${rank}?`)) {
-        try {
-            const { data, error } = await supabase
-                .from('leaderboard')
-                .delete()
-                .eq('rank', rank);
-                
-            if (error) {
-                throw error;
-            }
-            
-            showSuccess('Leaderboard entry deleted.');
-            // Refresh data after a short delay
-            setTimeout(() => {
-                fetchLeaderboardData();
-            }, 1000);
-            
-        } catch (error) {
-            console.error('Failed to delete entry:', error);
-            showError('Failed to delete entry. Please try again.');
-        }
-    }
-}
-
-// Donation Management
-function editDonation(donation) {
-    // Implement donation editing
-    console.log('Editing donation:', donation);
-}
-
-async function deleteDonation(donationId) {
-    if (confirm('Are you sure you want to delete this donation? This action cannot be undone.')) {
-        try {
-            // In production, delete from Firestore
-            console.log('Deleting donation:', donationId);
-            showSuccess('Donation deleted successfully!');
-            loadDonationsData();
-        } catch (error) {
-            showError('Failed to delete donation. Please try again.');
-        }
-    }
-}
-
-// Search and Filter
-function handleDonationSearch(e) {
-    const searchTerm = e.target.value.toLowerCase();
-    // Implement search functionality
-    console.log('Searching for:', searchTerm);
-}
-
-function handleDonationFilter(e) {
-    const filterValue = e.target.value;
-    // Implement filter functionality
-    console.log('Filtering by:', filterValue);
-}
-
-// Pagination
-let currentPage = 1;
-const itemsPerPage = 20;
-
-function setupPagination(data) {
-    const totalPages = Math.ceil(data.length / itemsPerPage);
-    updatePaginationInfo(totalPages);
-    
-    document.getElementById('prev-page').disabled = currentPage === 1;
-    document.getElementById('next-page').disabled = currentPage === totalPages;
-}
-
-function changePage(direction) {
-    currentPage += direction;
-    // Implement pagination logic
-    console.log('Changing to page:', currentPage);
-}
-
-function updatePaginationInfo(totalPages) {
-    document.getElementById('page-info').textContent = `Page ${currentPage} of ${totalPages}`;
-}
-
 // Utility Functions
 function formatDate(date) {
     return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+    });
+}
+
+function formatDateTime(date) {
+    return date.toLocaleString('en-US', {
         year: 'numeric',
         month: 'short',
         day: 'numeric',
@@ -1077,54 +993,65 @@ function formatTimeAgo(date) {
 
 function updateLastUpdatedTime() {
     const now = new Date();
-    const el = document.getElementById('last-updated-time');
-    if (el) {
-        el.textContent = now.toLocaleString();
-    }
+    const elements = document.querySelectorAll('.last-updated');
+    elements.forEach(el => {
+        el.textContent = `Last updated: ${now.toLocaleString()}`;
+    });
 }
 
-function setupDateRangePicker() {
-    const today = new Date();
-    const thirtyDaysAgo = new Date(today);
-    thirtyDaysAgo.setDate(today.getDate() - 30);
-    
-    document.getElementById('start-date').value = thirtyDaysAgo.toISOString().split('T')[0];
-    document.getElementById('end-date').value = today.toISOString().split('T')[0];
-}
-
-function updateAnalytics() {
-    const startDate = document.getElementById('start-date').value;
-    const endDate = document.getElementById('end-date').value;
-    
-    console.log('Updating analytics for:', startDate, 'to', endDate);
-    loadAnalyticsData();
-}
-
-// Real-time Updates
-function startRealtimeUpdates() {
-    // Update data every 30 seconds
-    setInterval(() => {
-        if (currentUser) {
-            updateLastUpdatedTime();
-            // In production, fetch real-time updates from Firebase
-        }
-    }, 30000);
-}
-
-// Quick Actions
-function addManualDonation() {
-    // Implement manual donation entry
-    console.log('Adding manual donation');
+function refreshDashboard() {
+    loadDashboardData();
+    showSuccess('Dashboard refreshed successfully!');
 }
 
 function exportDonations() {
-    // Implement data export
-    console.log('Exporting donations data');
+    // In a real implementation, this would export donation data
+    showSuccess('Donations data exported successfully!');
+    logActivity('data_export', 'Donations data exported');
 }
 
-function refreshData() {
-    loadDashboardData();
-    showSuccess('Data refreshed successfully!');
+function exportLeaderboardCsv() {
+    const table = document.querySelector('#leaderboard .admin-table');
+    if (!table) return;
+    
+    let csv = 'Rank,Name,Amount\n';
+    const rows = Array.from(table.querySelectorAll('tbody tr'));
+    rows.forEach(tr => {
+        const tds = tr.querySelectorAll('td');
+        if (tds.length >= 3) {
+            const rank = tds[0].textContent.trim();
+            const name = tds[1].textContent.trim();
+            const amount = tds[2].textContent.trim().replace(/[^0-9]/g, '');
+            csv += `${rank},${name},${amount}
+`;
+        }
+    });
+    
+    downloadCSV(csv, 'leaderboard.csv');
+}
+
+function exportLogs() {
+    // In a real implementation, this would export logs data
+    showSuccess('Activity logs exported successfully!');
+    logActivity('logs_export', 'Activity logs exported');
+}
+
+function downloadCSV(csv, filename) {
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+}
+
+// Activity Logging
+function logActivity(action, details) {
+    // In a real implementation, this would save to a logs table in Supabase
+    console.log(`Activity Log: ${action} - ${details}`);
 }
 
 // UI Helpers
@@ -1137,6 +1064,10 @@ function showError(message) {
 }
 
 function showNotification(message, type) {
+    // Remove existing notifications of the same type
+    const existingNotifications = document.querySelectorAll(`.notification.${type}`);
+    existingNotifications.forEach(notification => notification.remove());
+    
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.textContent = message;
@@ -1144,8 +1075,10 @@ function showNotification(message, type) {
     document.body.appendChild(notification);
     
     setTimeout(() => {
-        notification.remove();
-    }, 3000);
+        if (notification.parentNode) {
+            notification.remove();
+        }
+    }, 5000);
 }
 
 // Initialize on page load

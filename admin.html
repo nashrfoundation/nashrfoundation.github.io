@@ -11,7 +11,7 @@
     <link rel="preload" href="admin-styles.css" as="style">
     
     <!-- Fonts -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display">
     
     <!-- Admin Styles -->
     <link rel="stylesheet" href="admin-styles.css">
@@ -24,36 +24,62 @@
 <body>
     <!-- Login Modal -->
     <div id="login-modal" class="modal" style="display: flex;">
-        <div class="modal-content" role="dialog" aria-labelledby="admin-login-title" aria-describedby="admin-login-desc">
-            <div class="modal-brand">
-                <img src="logo.webp" alt="Nashr Foundation" class="admin-logo" width="40" height="40">
-                <h2 id="admin-login-title">Welcome back</h2>
+        <div class="modal-content login-card" role="dialog" aria-labelledby="admin-login-title" aria-describedby="admin-login-desc">
+            <div class="login-header">
+                <div class="logo-container">
+                    <img src="logo.webp" alt="Nashr Foundation" class="admin-logo" width="80" height="80">
+                </div>
+                <h2 id="admin-login-title">Welcome to Admin Portal</h2>
+                <p id="admin-login-desc" class="modal-subtitle">Sign in to manage your Nashr Foundation dashboard</p>
             </div>
-            <p id="admin-login-desc" class="modal-subtitle">Sign in to manage the donor leaderboard.</p>
+            
             <form id="login-form" class="login-form" novalidate>
                 <div class="form-group">
-                    <label for="admin-email">Email</label>
-                    <div class="input-group">
-                        <input type="email" id="admin-email" class="input-lg" placeholder="name@example.com" autocomplete="username" required>
+                    <label for="admin-email">Email Address</label>
+                    <div class="input-wrapper">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <input type="email" id="admin-email" class="form-control input-lg" placeholder="Enter your email" autocomplete="username" required>
                     </div>
                 </div>
+                
                 <div class="form-group">
                     <label for="admin-password">Password</label>
-                    <div class="input-group password-field">
-                        <input type="password" id="admin-password" class="input-lg" placeholder="••••••••" autocomplete="current-password" required>
-                        <button type="button" class="toggle-password" aria-label="Show password" onclick="const i=document.getElementById('admin-password'); const show=i.type==='password'; i.type=show?'text':'password'; this.setAttribute('aria-label', show?'Hide password':'Show password'); this.textContent = show ? 'Hide' : 'Show';">Show</button>
+                    <div class="input-wrapper password-field">
+                        <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <input type="password" id="admin-password" class="form-control input-lg" placeholder="Enter your password" autocomplete="current-password" required>
+                        <button type="button" class="toggle-password" aria-label="Show password" onclick="togglePasswordVisibility()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                <circle cx="12" cy="12" r="3"></circle>
+                            </svg>
+                        </button>
                     </div>
                 </div>
-                <div class="form-row" style="align-items:center;">
-                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
-                        <input type="checkbox" id="remember-me"> <span>Remember me</span>
+                
+                <div class="form-options">
+                    <label class="checkbox-container">
+                        <input type="checkbox" id="remember-me">
+                        <span class="checkmark"></span>
+                        Remember me
                     </label>
-                    <button type="button" class="btn btn-outline btn-sm" style="margin-left:auto;" onclick="alert('Password reset is managed in Firebase Console for admins.');">Forgot password?</button>
+                    <button type="button" class="btn btn-link" onclick="showPasswordResetInfo()">Forgot password?</button>
                 </div>
-                <div class="modal-actions">
-                    <button type="submit" id="login-submit" class="btn btn-primary btn-lg full-width">Sign in</button>
+                
+                <div class="form-actions">
+                    <button type="submit" id="login-submit" class="btn btn-primary btn-lg full-width">Sign In</button>
+                </div>
+                
+                <div class="login-footer">
+                    <p>Need help? Contact <a href="mailto:nashrfoundationpk@gmail.com">support team</a></p>
                 </div>
             </form>
+            
             <div id="login-error" class="error-message" style="display: none;"></div>
         </div>
     </div>
@@ -78,28 +104,237 @@
             </div>
         </header>
 
-        <!-- Navigation (Simplified) -->
+        <!-- Navigation -->
         <nav class="admin-nav">
             <ul>
-                <li><a href="#leaderboard" class="nav-link active" data-section="leaderboard">Leaderboard</a></li>
+                <li><a href="#dashboard" class="nav-link active" data-section="dashboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="3" width="7" height="7"></rect>
+                        <rect x="14" y="14" width="7" height="7"></rect>
+                        <rect x="3" y="14" width="7" height="7"></rect>
+                    </svg>
+                    Dashboard
+                </a></li>
+                <li><a href="#donations" class="nav-link" data-section="donations">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                    </svg>
+                    Donations
+                </a></li>
+                <li><a href="#leaderboard" class="nav-link" data-section="leaderboard">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 2L4 9l8 7 8-7-8-7z"></path>
+                        <path d="M12 22l8-7"></path>
+                        <path d="M4 9l8 7"></path>
+                    </svg>
+                    Leaderboard
+                </a></li>
+                <li><a href="#content" class="nav-link" data-section="content">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                    </svg>
+                    Content
+                </a></li>
+                <li><a href="#newsletter" class="nav-link" data-section="newsletter">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    Newsletter
+                </a></li>
+                <li><a href="#settings" class="nav-link" data-section="settings">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Settings
+                </a></li>
+                <li><a href="#logs" class="nav-link" data-section="logs">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                    </svg>
+                    Activity Logs
+                </a></li>
             </ul>
         </nav>
 
         <!-- Main Content -->
         <main class="admin-main">
-            <!-- Leaderboard Section -->
-            <section id="leaderboard" class="dashboard-section active">
+            <!-- Dashboard Overview Section -->
+            <section id="dashboard" class="dashboard-section active">
                 <div class="section-header">
-                    <h2>Leaderboard</h2>
+                    <h2>Dashboard Overview</h2>
                     <div class="header-actions">
-                        <button class="btn btn-primary" onclick="addLeaderboardEntry()">Add Entry</button>
-                        <button class="btn btn-secondary" onclick="exportLeaderboardCsv()">Export CSV</button>
+                        <button class="btn btn-secondary" onclick="refreshDashboard()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <polyline points="23 4 23 10 17 10"></polyline>
+                                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                            </svg>
+                            Refresh
+                        </button>
                     </div>
                 </div>
+                
+                <div class="dashboard-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Donations</h3>
+                            <div class="stat-value" id="total-donations">₨0</div>
+                            <div class="stat-change positive" id="donations-change">+0 today</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                <circle cx="9" cy="7" r="4"></circle>
+                                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Total Donors</h3>
+                            <div class="stat-value" id="total-donors">0</div>
+                            <div class="stat-change positive" id="donors-change">+0 today</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <polyline points="12 6 12 12 16 14"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Website Visitors</h3>
+                            <div class="stat-value" id="website-visitors">0</div>
+                            <div class="stat-change positive">+0 today</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                                <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                            </svg>
+                        </div>
+                        <div class="stat-content">
+                            <h3>Fundraising Goal</h3>
+                            <div class="stat-value" id="fundraising-goal">0%</div>
+                            <div class="progress-bar-mini">
+                                <div class="progress-fill" id="goal-progress-fill" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="dashboard-content">
+                    <div class="recent-activity">
+                        <h3>Recent Donations</h3>
+                        <div class="activity-list" id="recent-activity-list">
+                            <div class="loading">Loading recent donations...</div>
+                        </div>
+                    </div>
+                    
+                    <div class="analytics-grid">
+                        <div class="chart-container">
+                            <h3>Donations Over Time</h3>
+                            <canvas id="donations-chart"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Payment Methods</h3>
+                            <canvas id="payment-methods-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Donations Section -->
+            <section id="donations" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Donation Management</h2>
+                    <div class="header-actions">
+                        <input type="text" class="search-input" placeholder="Search donations..." oninput="handleDonationSearch(event)">
+                        <select class="filter-select" onchange="handleDonationFilter(event)">
+                            <option value="all">All Donations</option>
+                            <option value="completed">Completed</option>
+                            <option value="pending">Pending</option>
+                        </select>
+                        <button class="btn btn-primary" onclick="exportDonations()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Donor</th>
+                                <th>Amount</th>
+                                <th>Method</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="donations-table-body">
+                            <tr>
+                                <td colspan="6" class="loading">Loading donations...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button class="btn btn-outline" id="prev-page" onclick="changePage(-1)">Previous</button>
+                    <span id="page-info">Page 1 of 1</span>
+                    <button class="btn btn-outline" id="next-page" onclick="changePage(1)">Next</button>
+                </div>
+            </section>
+            
+            <!-- Leaderboard Section -->
+            <section id="leaderboard" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Leaderboard Management</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="addLeaderboardEntry()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                            </svg>
+                            Add Entry
+                        </button>
+                        <button class="btn btn-secondary" onclick="exportLeaderboardCsv()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export CSV
+                        </button>
+                    </div>
+                </div>
+                
                 <div class="leaderboard-editor">
                     <div class="current-leaderboard">
                         <div class="leaderboard-table-container">
-                            <table class="admin-table" id="admin-leaderboard-table">
+                            <table class="admin-table">
                                 <thead>
                                     <tr>
                                         <th>Rank</th>
@@ -109,11 +344,14 @@
                                     </tr>
                                 </thead>
                                 <tbody id="admin-leaderboard-body">
-                                    <tr><td colspan="4" class="loading">Loading leaderboard...</td></tr>
+                                    <tr>
+                                        <td colspan="4" class="loading">Loading leaderboard...</td>
+                                    </tr>
                                 </tbody>
                             </table>
                         </div>
                     </div>
+                    
                     <div class="entry-form" id="entry-form" style="display: none;">
                         <h3 id="form-title">Add New Entry</h3>
                         <form id="leaderboard-form">
@@ -121,11 +359,11 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="entry-name">Name</label>
-                                    <input type="text" id="entry-name" required>
+                                    <input type="text" id="entry-name" class="form-control" required>
                                 </div>
                                 <div class="form-group">
                                     <label for="entry-amount">Amount (PKR)</label>
-                                    <input type="number" id="entry-amount" min="1" required>
+                                    <input type="number" id="entry-amount" class="form-control" min="1" required>
                                 </div>
                             </div>
                             <div class="form-actions">
@@ -136,10 +374,296 @@
                     </div>
                 </div>
             </section>
+            
+            <!-- Content Management Section -->
+            <section id="content" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Content Management</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="saveContentChanges()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Save Changes
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="content-editor">
+                    <div class="setting-card">
+                        <h3>Homepage Content</h3>
+                        <div class="form-group">
+                            <label for="homepage-title">Page Title</label>
+                            <input type="text" id="homepage-title" class="form-control" placeholder="Enter homepage title">
+                        </div>
+                        <div class="form-group">
+                            <label for="homepage-description">Page Description</label>
+                            <textarea id="homepage-description" class="form-control" rows="3" placeholder="Enter homepage description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="homepage-hero-title">Hero Section Title</label>
+                            <input type="text" id="homepage-hero-title" class="form-control" placeholder="Enter hero title">
+                        </div>
+                        <div class="form-group">
+                            <label for="homepage-hero-description">Hero Section Description</label>
+                            <textarea id="homepage-hero-description" class="form-control" rows="2" placeholder="Enter hero description"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-card">
+                        <h3>Donation Page Content</h3>
+                        <div class="form-group">
+                            <label for="donation-title">Page Title</label>
+                            <input type="text" id="donation-title" class="form-control" placeholder="Enter donation page title">
+                        </div>
+                        <div class="form-group">
+                            <label for="donation-description">Page Description</label>
+                            <textarea id="donation-description" class="form-control" rows="3" placeholder="Enter donation page description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="donation-impact-title">Impact Section Title</label>
+                            <input type="text" id="donation-impact-title" class="form-control" placeholder="Enter impact section title">
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Newsletter Section -->
+            <section id="newsletter" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Newsletter Management</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="sendNewsletter()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            Send Newsletter
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="newsletter-editor">
+                    <div class="setting-card">
+                        <h3>Create Newsletter</h3>
+                        <div class="form-group">
+                            <label for="newsletter-subject">Subject</label>
+                            <input type="text" id="newsletter-subject" class="form-control" placeholder="Enter newsletter subject">
+                        </div>
+                        <div class="form-group">
+                            <label for="newsletter-content">Content</label>
+                            <textarea id="newsletter-content" class="form-control" rows="8" placeholder="Enter newsletter content"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="newsletter-recipients">Recipients</label>
+                            <select id="newsletter-recipients" class="form-control">
+                                <option value="all">All Subscribers</option>
+                                <option value="donors">Donors Only</option>
+                                <option value="recent">Recent Donors (Last 30 Days)</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-card">
+                        <h3>Subscriber Statistics</h3>
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-content">
+                                    <h3>Total Subscribers</h3>
+                                    <div class="stat-value" id="total-subscribers">0</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-content">
+                                    <h3>Active Subscribers</h3>
+                                    <div class="stat-value" id="active-subscribers">0</div>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-content">
+                                    <h3>Unsubscribed</h3>
+                                    <div class="stat-value" id="unsubscribed">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Settings Section -->
+            <section id="settings" class="dashboard-section">
+                <div class="section-header">
+                    <h2>System Settings</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="saveSettings()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Save Settings
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="settings-grid">
+                    <div class="setting-card">
+                        <h3>SEO Settings</h3>
+                        <div class="form-group">
+                            <label for="site-title">Site Title</label>
+                            <input type="text" id="site-title" class="form-control" placeholder="Enter site title">
+                        </div>
+                        <div class="form-group">
+                            <label for="site-description">Site Description</label>
+                            <textarea id="site-description" class="form-control" rows="3" placeholder="Enter site description"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="keywords">Keywords</label>
+                            <input type="text" id="keywords" class="form-control" placeholder="Enter keywords separated by commas">
+                        </div>
+                    </div>
+                    
+                    <div class="setting-card">
+                        <h3>Social Media Links</h3>
+                        <div class="form-group">
+                            <label for="facebook-url">Facebook URL</label>
+                            <input type="url" id="facebook-url" class="form-control" placeholder="https://facebook.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label for="instagram-url">Instagram URL</label>
+                            <input type="url" id="instagram-url" class="form-control" placeholder="https://instagram.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label for="twitter-url">Twitter URL</label>
+                            <input type="url" id="twitter-url" class="form-control" placeholder="https://twitter.com/...">
+                        </div>
+                        <div class="form-group">
+                            <label for="youtube-url">YouTube URL</label>
+                            <input type="url" id="youtube-url" class="form-control" placeholder="https://youtube.com/...">
+                        </div>
+                    </div>
+                    
+                    <div class="setting-card">
+                        <h3>Fundraising Goal</h3>
+                        <div class="form-group">
+                            <label for="fundraising-goal-amount">Goal Amount (PKR)</label>
+                            <input type="number" id="fundraising-goal-amount" class="form-control" min="1000" placeholder="Enter fundraising goal">
+                        </div>
+                        <div class="form-group">
+                            <label for="goal-description">Goal Description</label>
+                            <textarea id="goal-description" class="form-control" rows="2" placeholder="Describe your fundraising goal"></textarea>
+                        </div>
+                    </div>
+                    
+                    <div class="setting-card">
+                        <h3>Security Settings</h3>
+                        <div class="form-group">
+                            <label for="admin-email-notifications">Admin Email Notifications</label>
+                            <select id="admin-email-notifications" class="form-control">
+                                <option value="all">All Activities</option>
+                                <option value="important">Important Only</option>
+                                <option value="none">None</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="backup-frequency">Backup Frequency</label>
+                            <select id="backup-frequency" class="form-control">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly">Monthly</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Activity Logs Section -->
+            <section id="logs" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Activity Logs</h2>
+                    <div class="header-actions">
+                        <input type="text" class="search-input" placeholder="Search logs..." oninput="searchLogs(event)">
+                        <button class="btn btn-secondary" onclick="exportLogs()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                <polyline points="7 10 12 15 17 10"></polyline>
+                                <line x1="12" y1="15" x2="12" y2="3"></line>
+                            </svg>
+                            Export Logs
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="logs-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Timestamp</th>
+                                <th>User</th>
+                                <th>Action</th>
+                                <th>Details</th>
+                                <th>IP Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logs-table-body">
+                            <tr>
+                                <td colspan="5" class="loading">Loading activity logs...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="pagination">
+                    <button class="btn btn-outline" id="prev-log-page" onclick="changeLogPage(-1)">Previous</button>
+                    <span id="log-page-info">Page 1 of 1</span>
+                    <button class="btn btn-outline" id="next-log-page" onclick="changeLogPage(1)">Next</button>
+                </div>
+            </section>
         </main>
+    </div>
+
+    <!-- Password Reset Modal -->
+    <div id="password-reset-modal" class="modal" style="display: none;">
+        <div class="modal-content" role="dialog" aria-labelledby="reset-title">
+            <h2 id="reset-title">Password Reset</h2>
+            <p>Password reset is managed through the Firebase Console. Please contact your system administrator for assistance.</p>
+            <div class="form-actions">
+                <button class="btn btn-primary full-width" onclick="closePasswordResetModal()">Close</button>
+            </div>
+        </div>
     </div>
 
     <!-- Scripts -->
     <script src="admin.js" defer></script>
+    
+    <!-- Password Visibility Toggle Script -->
+    <script>
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('admin-password');
+            const toggleButton = document.querySelector('.toggle-password');
+            const showIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>';
+            const hideIcon = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>';
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleButton.innerHTML = hideIcon;
+                toggleButton.setAttribute('aria-label', 'Hide password');
+            } else {
+                passwordInput.type = 'password';
+                toggleButton.innerHTML = showIcon;
+                toggleButton.setAttribute('aria-label', 'Show password');
+            }
+        }
+        
+        function showPasswordResetInfo() {
+            document.getElementById('password-reset-modal').style.display = 'flex';
+        }
+        
+        function closePasswordResetModal() {
+            document.getElementById('password-reset-modal').style.display = 'none';
+        }
+    </script>
 </body>
 </html>
