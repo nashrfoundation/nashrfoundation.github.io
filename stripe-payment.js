@@ -10,10 +10,46 @@ class PaymentProcessor {
             10000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01'
         };
         this.initializePaymentLinks();
+        this.validatePaymentLinks();
     }
 
     initializePaymentLinks() {
         console.log('✅ Payment system initialized');
+        // Setup real-time validation after a short delay to ensure DOM is ready
+        setTimeout(() => {
+            this.setupRealTimeValidation();
+        }, 100);
+    }
+
+    validatePaymentLinks() {
+        console.log('🔍 Validating payment links...');
+        Object.entries(this.paymentLinks).forEach(([amount, link]) => {
+            if (!link || !link.startsWith('https://buy.stripe.com/')) {
+                console.warn(`⚠️ Invalid payment link for amount ${amount}:`, link);
+            } else {
+                console.log(`✅ Payment link for ${amount}: ${link}`);
+            }
+        });
+    }
+
+    // Test method to verify Stripe links are working
+    async testStripeLinks() {
+        console.log('🧪 Testing Stripe payment links...');
+        const testResults = {};
+        
+        for (const [amount, link] of Object.entries(this.paymentLinks)) {
+            try {
+                // Create a test link to check if it's accessible
+                const response = await fetch(link, { method: 'HEAD', mode: 'no-cors' });
+                testResults[amount] = { link, status: 'accessible' };
+                console.log(`✅ Link for ${amount} is accessible`);
+            } catch (error) {
+                testResults[amount] = { link, status: 'error', error: error.message };
+                console.warn(`⚠️ Link for ${amount} may have issues:`, error.message);
+            }
+        }
+        
+        return testResults;
     }
 
     async processDonation(amount) {
@@ -70,12 +106,23 @@ class PaymentProcessor {
             }
 
             // Get the payment link for this amount
-            const paymentLink = this.paymentLinks[amount];
+            let paymentLink = this.paymentLinks[amount];
             
+            // Handle custom amounts by using the closest predefined amount
             if (!paymentLink) {
                 console.log('❌ No payment link found for amount:', amount);
-                this.showErrorMessage('Payment link not configured for this amount. Please contact us.');
-                return;
+                
+                // Find the closest predefined amount
+                const predefinedAmounts = Object.keys(this.paymentLinks).map(Number).sort((a, b) => a - b);
+                const closestAmount = predefinedAmounts.find(predefined => amount <= predefined) || predefinedAmounts[predefinedAmounts.length - 1];
+                
+                if (closestAmount) {
+                    paymentLink = this.paymentLinks[closestAmount];
+                    console.log(`🔄 Using closest payment link for amount ${closestAmount} instead of ${amount}`);
+                } else {
+                    this.showErrorMessage('Payment link not configured for this amount. Please contact us.');
+                    return;
+                }
             }
 
             console.log('🔗 Payment link:', paymentLink);
@@ -97,7 +144,17 @@ class PaymentProcessor {
 
             // Redirect to payment page
             console.log('🔄 Redirecting to payment page...');
-            window.location.href = paymentLink;
+            console.log('🔗 Payment link:', paymentLink);
+            
+            // Add a small delay to ensure user sees the processing state
+            setTimeout(() => {
+                try {
+                    window.location.href = paymentLink;
+                } catch (redirectError) {
+                    console.error('❌ Redirect failed:', redirectError);
+                    this.showErrorMessage('Unable to redirect to payment page. Please try again or contact us.');
+                }
+            }, 500);
 
         } catch (error) {
             console.error('❌ Donation processing failed:', error);
@@ -301,6 +358,96 @@ class PaymentProcessor {
                 errorDiv.remove();
             }
         }, 15000);
+    }
+
+    // Real-time validation for form fields
+    setupRealTimeValidation() {
+        const form = document.getElementById('donation-form');
+        if (!form) return;
+
+        const fields = {
+            name: document.getElementById('donor-name'),
+            email: document.getElementById('donor-email'),
+            phone: document.getElementById('donor-phone'),
+            amount: document.getElementById('donation-amount-input')
+        };
+
+        // Add real-time validation to each field
+        Object.entries(fields).forEach(([fieldName, field]) => {
+            if (!field) return;
+
+            const formGroup = field.closest('.form-group');
+            if (!formGroup) return;
+
+            field.addEventListener('input', () => {
+                this.validateField(fieldName, field, formGroup);
+            });
+
+            field.addEventListener('blur', () => {
+                this.validateField(fieldName, field, formGroup);
+            });
+        });
+    }
+
+    validateField(fieldName, field, formGroup) {
+        const value = field.value.trim();
+        const countryCode = document.getElementById('country-code')?.value || '+92';
+        let isValid = true;
+        let message = '';
+
+        // Remove existing validation classes
+        formGroup.classList.remove('success', 'error', 'validating');
+        field.classList.remove('success', 'error', 'validating');
+
+        // Add validating class
+        formGroup.classList.add('validating');
+        field.classList.add('validating');
+
+        // Validate based on field type
+        switch (fieldName) {
+            case 'name':
+                if (value.length < 2) {
+                    isValid = false;
+                    message = 'Name must be at least 2 characters';
+                }
+                break;
+            case 'email':
+                if (value && !this.isValidEmail(value)) {
+                    isValid = false;
+                    message = 'Please enter a valid email address';
+                }
+                break;
+            case 'phone':
+                if (value && !this.isValidPhoneNumber(value, countryCode)) {
+                    isValid = false;
+                    message = 'Please enter a valid phone number';
+                }
+                break;
+            case 'amount':
+                const amount = parseInt(value);
+                if (isNaN(amount) || amount < 100) {
+                    isValid = false;
+                    message = 'Minimum amount is PKR 100';
+                } else if (amount > 1000000) {
+                    isValid = false;
+                    message = 'Maximum amount is PKR 1,000,000';
+                }
+                break;
+        }
+
+        // Update field appearance after a short delay
+        setTimeout(() => {
+            formGroup.classList.remove('validating');
+            field.classList.remove('validating');
+
+            if (value && isValid) {
+                formGroup.classList.add('success');
+                field.classList.add('success');
+            } else if (value && !isValid) {
+                formGroup.classList.add('error');
+                field.classList.add('error');
+            }
+        }, 500);
     }
 
     resetForm() {

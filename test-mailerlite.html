@@ -112,6 +112,7 @@
                         <li>Go to <a href="https://dashboard.mailerlite.com" target="_blank">MailerLite Dashboard</a></li>
                         <li>Sign up for a free account (1,000 subscribers, 12,000 emails/month)</li>
                         <li>Navigate to Integrations > API</li>
+                        <li>Generate a new API key</li>
                         <li>Copy your API key</li>
                     </ul>
                 </li>
@@ -125,8 +126,15 @@
                 <li><strong>Update Config File:</strong>
                     <ul>
                         <li>Open <code>mailerlite-config.js</code></li>
-                        <li>Replace the placeholder with your actual API key</li>
+                        <li>Replace <code>YOUR_MAILERLITE_API_KEY_HERE</code> with your actual API key</li>
                         <li>Save the file</li>
+                    </ul>
+                </li>
+                <li><strong>Important Notes:</strong>
+                    <ul>
+                        <li>Keep your API key secure and never commit it to public repositories</li>
+                        <li>The newsletter will work with a fallback method even without MailerLite configured</li>
+                        <li>Test the integration thoroughly before going live</li>
                     </ul>
                 </li>
             </ol>

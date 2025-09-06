@@ -921,7 +921,7 @@
         addFieldValidation();
 
         form.addEventListener("submit", async (e) => {
-            // This is the most important line. It stops the page reload.
+            // Prevent default form submission
             e.preventDefault(); 
             
             // Check HTML5 validation 'required' fields manually
@@ -932,61 +932,8 @@
             
             submitButton.disabled = true;
             submitButton.classList.add('loading');
-            submitButton.textContent = "Processing Demo...";
+            submitButton.textContent = "Processing...";
 
-            const name = document.getElementById("donor-name").value;
-            const email = document.getElementById("donor-email").value;
-            const phone = document.getElementById("donor-phone").value;
-            const countryCode = document.getElementById("country-code").value;
-            const amount = document.getElementById("donation-amount-input").value;
-            const donationType = document.getElementById("donation-type-input").value;
-            const paymentMethod = 'secure';
-            const anonymous = document.getElementById("anonymous-donation").checked;
-            const leaderboardConsent = document.getElementById("leaderboard-consent").checked;
-
-            // Enhanced validation with comprehensive checks
-            const validationErrors = [];
-            
-            // Name validation (required unless anonymous)
-            if (!anonymous && (!name || name.trim().length < 2)) {
-              validationErrors.push("Please enter your full name (at least 2 characters).");
-            }
-            
-            // Email validation (if provided)
-            if (email && !isValidEmail(email)) {
-              validationErrors.push("Please enter a valid email address.");
-            }
-            
-            // Phone validation (if provided)
-            if (phone && !isValidPhoneNumber(phone, countryCode)) {
-              validationErrors.push("Please enter a valid phone number.");
-            }
-            
-            // At least one contact method required
-            if (!email && !phone) {
-              validationErrors.push("Please provide either an email address or phone number for payment confirmation.");
-            }
-            
-            // Amount validation
-            if (!amount || isNaN(amount) || Number(amount) <= 0) {
-              validationErrors.push("Please enter a valid donation amount.");
-            } else if (Number(amount) < 100) {
-              validationErrors.push("Minimum donation amount is PKR 100.");
-            } else if (Number(amount) > 1000000) {
-              validationErrors.push("Maximum donation amount is PKR 1,000,000.");
-            }
-            
-            if (validationErrors.length > 0) {
-              showValidationErrors(validationErrors);
-              submitButton.disabled = false;
-              submitButton.classList.remove('loading');
-              submitButton.textContent = "Complete Donation";
-              return;
-            }
-
-            const donationData = { name: anonymous ? "Anonymous" : name || "Anonymous", email: email || null, phone: phone ? (countryCode + phone) : null, amount: Number(amount), donationType, paymentMethod, leaderboardConsent: !anonymous && leaderboardConsent, createdAt: serverTimestamp() };
-
-            // Process donation payment
             try {
               console.log('🔄 Form submission - starting payment process');
               const amount = parseInt(document.getElementById("donation-amount-input").value);
@@ -998,6 +945,7 @@
                 return;
               }
               
+              // Let the Stripe payment processor handle all validation and processing
               await window.stripePaymentProcessor.processDonation(amount);
               
               // Note: User will be redirected to payment page

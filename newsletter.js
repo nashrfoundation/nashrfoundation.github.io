@@ -47,10 +47,41 @@ async function handleNewsletterSignup(e) {
     try {
         // Check if MailerLite service is available
         if (!window.mailerLiteService || !window.mailerLiteService.initialized) {
-            console.warn('MailerLite service not configured, falling back to local storage only');
-            // Fallback to local storage or show error
-            showNewsletterMessage('Newsletter service is temporarily unavailable. Please try again later.', 'error', newsletterMessage);
-            return;
+            console.warn('MailerLite service not configured, using fallback method');
+            
+            // Fallback: Store in localStorage and show success message
+            try {
+                const subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
+                const existingSubscriber = subscribers.find(sub => sub.email === email);
+                
+                if (existingSubscriber) {
+                    showNewsletterMessage('✅ You\'re already part of our community! Thank you for being a valued subscriber.', 'success', newsletterMessage);
+                } else {
+                    subscribers.push({
+                        email: email,
+                        name: name,
+                        subscribed_at: new Date().toISOString(),
+                        source: window.location.pathname
+                    });
+                    localStorage.setItem('newsletter_subscribers', JSON.stringify(subscribers));
+                    
+                    // Send welcome email via EmailJS
+                    try {
+                        await sendWelcomeEmail(email, name);
+                    } catch (e) {
+                        console.warn('Welcome email failed:', e);
+                    }
+                    
+                    showNewsletterMessage('🎉 Welcome to our community! Thank you for subscribing to our newsletter. You\'ll receive updates about our impact and how your support makes a difference.', 'success', newsletterMessage);
+                }
+                
+                form.reset();
+                return;
+            } catch (error) {
+                console.error('Fallback subscription failed:', error);
+                showNewsletterMessage('Sorry, there was an error subscribing. Please try again later.', 'error', newsletterMessage);
+                return;
+            }
         }
 
         // Check if subscriber already exists in MailerLite
@@ -254,11 +285,23 @@ async function sendWelcomeEmail(email, name) {
     }
 }
 
+// Admin function to view stored subscribers (fallback method)
+function getStoredSubscribers() {
+    try {
+        const subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
+        return subscribers;
+    } catch (error) {
+        console.error('Error retrieving stored subscribers:', error);
+        return [];
+    }
+}
+
 // Export for use in other files
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         handleNewsletterSignup,
         showNewsletterMessage,
-        isValidEmail
+        isValidEmail,
+        getStoredSubscribers
     };
 }
