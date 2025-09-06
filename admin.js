@@ -1041,6 +1041,12 @@ async function loadNewsletterData() {
         console.log('Loading newsletter data...');
         showSectionLoading('.newsletter-editor .stats-grid', 'Loading newsletter statistics...');
         
+        // Add timeout to prevent infinite loading
+        const timeoutId = setTimeout(() => {
+            console.warn('Newsletter data loading timeout, hiding loading state');
+            hideSectionLoading('.newsletter-editor .stats-grid');
+        }, 10000); // 10 second timeout
+        
         // Fetch real-time newsletter subscriber statistics from Supabase
         const { data: subscribers, error: subscribersError } = await supabase
             .from('newsletter_subscribers')
@@ -1062,6 +1068,22 @@ async function loadNewsletterData() {
                 if (totalEl) totalEl.textContent = '0';
                 if (activeEl) activeEl.textContent = '0';
                 if (unsubEl) unsubEl.textContent = '0';
+                
+                // Add test subscribers button when no data is accessible
+                const newsletterSection = document.getElementById('newsletter');
+                if (newsletterSection && !newsletterSection.querySelector('.add-test-subscribers-btn')) {
+                    const buttonDiv = document.createElement('div');
+                    buttonDiv.className = 'add-test-subscribers-btn';
+                    buttonDiv.style.marginTop = '10px';
+                    buttonDiv.innerHTML = `
+                        <button onclick="addTestSubscribers()" class="btn btn-outline btn-sm">
+                            Add Test Subscribers
+                        </button>
+                    `;
+                    newsletterSection.appendChild(buttonDiv);
+                }
+                
+                clearTimeout(timeoutId);
                 hideSectionLoading('.newsletter-editor .stats-grid');
                 return;
             }
@@ -1098,12 +1120,24 @@ async function loadNewsletterData() {
             }
         }
         
+        clearTimeout(timeoutId);
         hideSectionLoading('.newsletter-editor .stats-grid');
         
     } catch (error) {
         console.error('Failed to load newsletter data:', error);
         showError('Failed to load newsletter data. Please try again.');
+        
+        // Ensure loading is hidden even on error
+        clearTimeout(timeoutId);
         hideSectionLoading('.newsletter-editor .stats-grid');
+        
+        // Show zero counts on error
+        const totalEl = document.getElementById('total-subscribers');
+        const activeEl = document.getElementById('active-subscribers');
+        const unsubEl = document.getElementById('unsubscribed');
+        if (totalEl) totalEl.textContent = '0';
+        if (activeEl) activeEl.textContent = '0';
+        if (unsubEl) unsubEl.textContent = '0';
     }
 }
 
@@ -1214,7 +1248,7 @@ async function sendNewsletter() {
             return;
         }
         
-        // Send via Resend-backed HTTP function
+        // Send via Supabase Edge Function or external service
         const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
         if (!endpoint) {
             showError('Email service not configured. Set window.RESEND_FUNCTION_URL in settings or as a global variable.');
@@ -1237,6 +1271,24 @@ async function sendNewsletter() {
             return;
         }
         
+        // Check if it's a Supabase Edge Function
+        const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
+        let headers = { 'Content-Type': 'application/json' };
+        
+        if (isSupabaseFunction) {
+            // Add Supabase authentication headers
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
+                console.log('Using Supabase session token for authentication');
+            } else {
+                console.warn('No Supabase session found, using API key only');
+            }
+            // Also add the API key as fallback
+            headers['apikey'] = supabaseConfig.anonKey;
+            console.log('Headers for Supabase Edge Function:', headers);
+        }
+        
         // Batch sending to avoid large payloads; retry with backoff
         const batchSize = 50;
         let sentCount = 0;
@@ -1251,7 +1303,7 @@ async function sendNewsletter() {
                         method: 'POST',
                         mode: 'cors',
                         credentials: 'omit',
-                        headers: { 'Content-Type': 'application/json' },
+                        headers: headers,
                         body: JSON.stringify({
                             type: 'newsletter',
                             subject,
@@ -1263,7 +1315,15 @@ async function sendNewsletter() {
                         const errText = await res.text().catch(() => '');
                         console.error('Newsletter send failed', { status: res.status, errText });
                         let message = `Send failed for batch starting ${i + 1}`;
-                        if (errText) message += `: ${errText}`;
+                        
+                        if (res.status === 401) {
+                            message = 'Authentication failed. Please check your Supabase Edge Function configuration and ensure you are logged in.';
+                        } else if (res.status === 403) {
+                            message = 'Access forbidden. Please check your Supabase Edge Function permissions.';
+                        } else if (errText) {
+                            message += `: ${errText}`;
+                        }
+                        
                         throw new Error(message);
                     }
                     break;
@@ -1330,6 +1390,9 @@ async function loadSettingsData() {
             // Auto-configure newsletter endpoint if provided in settings and not already set
             if (!window.RESEND_FUNCTION_URL && s.email_function_url) {
                 window.RESEND_FUNCTION_URL = String(s.email_function_url || '').trim();
+            } else if (!window.RESEND_FUNCTION_URL) {
+                // Auto-configure Supabase Edge Function if no endpoint is set
+                configureSupabaseEdgeFunction('super-function');
             }
         }
     } catch (error) {
@@ -1648,7 +1711,7 @@ async function loadSubscribersData() {
         // Use explicit query to avoid any client-side issues
         const { data: subscribers, error } = await supabase
             .from('newsletter_subscribers')
-            .select('email, name, status, source, created_at, updated_at')
+            .select('email, status, source, created_at, updated_at')
             .order('created_at', { ascending: false });
 
         console.log('Subscribers query result:', { subscribers, error, count: subscribers?.length });
@@ -1779,9 +1842,6 @@ function displaySubscribersTable(subscribers) {
         const emailTd = document.createElement('td');
         emailTd.textContent = sub.email;
 
-        const nameTd = document.createElement('td');
-        nameTd.textContent = sub.name || '-';
-
         const statusTd = document.createElement('td');
         const badge = document.createElement('span');
         badge.className = `status-badge ${sub.status === 'active' ? 'confirmed' : 'error'}`;
@@ -1809,7 +1869,6 @@ function displaySubscribersTable(subscribers) {
         actionsTd.appendChild(deleteBtn);
 
         tr.appendChild(emailTd);
-        tr.appendChild(nameTd);
         tr.appendChild(statusTd);
         tr.appendChild(dateTd);
         tr.appendChild(sourceTd);
@@ -2088,6 +2147,72 @@ function refreshDashboard() {
     showSuccess('Dashboard refreshed successfully!');
 }
 
+// Manual refresh function for newsletter data
+function refreshNewsletterData() {
+    console.log('Manually refreshing newsletter data...');
+    loadNewsletterData();
+    showSuccess('Newsletter data refreshed!');
+}
+
+// Helper function to configure Supabase Edge Function URL
+function configureSupabaseEdgeFunction(functionName = 'super-function') {
+    const functionUrl = `https://${supabaseConfig.url.split('//')[1]}/functions/v1/${functionName}`;
+    window.RESEND_FUNCTION_URL = functionUrl;
+    console.log('Configured Supabase Edge Function URL:', functionUrl);
+    showSuccess(`Email service configured: ${functionName}`);
+    return functionUrl;
+}
+
+// Test welcome email function
+async function testWelcomeEmail(email = 'test@example.com') {
+    try {
+        console.log('Testing welcome email to:', email);
+        
+        const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
+        if (!endpoint) {
+            showError('No email service configured. Please configure window.RESEND_FUNCTION_URL first.');
+            return;
+        }
+        
+        // Check if it's a Supabase Edge Function and add authentication headers
+        const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
+        let headers = { 'Content-Type': 'application/json' };
+        
+        if (isSupabaseFunction) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
+                console.log('Using Supabase session token for test welcome email');
+            } else {
+                console.warn('No Supabase session found for test welcome email, using API key only');
+            }
+            headers['apikey'] = supabaseConfig.anonKey;
+        }
+        
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                type: 'welcome',
+                to: email,
+                name: 'Test User'
+            })
+        });
+        
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            throw new Error(`Test welcome email failed: ${res.status} ${text}`);
+        }
+        
+        showSuccess(`Test welcome email sent successfully to ${email}!`);
+        console.log('Test welcome email sent successfully');
+        
+    } catch (error) {
+        console.error('Test welcome email failed:', error);
+        showError(`Test welcome email failed: ${error.message}`);
+    }
+}
+
 function exportDonations() {
     try {
         const rows = donationsData && donationsData.length ? donationsData : [];
@@ -2151,14 +2276,13 @@ function exportLogs() {
 function exportSubscribers() {
     try {
         const subscribers = window._subscribers && window._subscribers.length ? window._subscribers : [];
-        let csv = 'Email,Name,Status,Subscribed Date,Source\n';
+        let csv = 'Email,Status,Subscribed Date,Source\n';
         subscribers.forEach(s => {
             const email = (s.email || '').replace(/,/g, '');
-            const name = (s.name || '').replace(/,/g, '');
             const status = (s.status || '').replace(/,/g, '');
             const date = s.created_at ? new Date(s.created_at).toLocaleDateString() : '';
             const source = (s.source || '').replace(/,/g, '');
-            csv += `${email},${name},${status},${date},${source}\n`;
+            csv += `${email},${status},${date},${source}\n`;
         });
         downloadCSV(csv, 'newsletter_subscribers.csv');
         showSuccess('Newsletter subscribers exported successfully!');
@@ -2199,11 +2323,23 @@ function showSectionLoading(selector, message = 'Loading...') {
 // Helper function to hide loading state in a section
 function hideSectionLoading(selector) {
     const element = document.querySelector(selector);
-    if (element && element.querySelector('.loading')) {
-        // Don't hide if it's an error or empty state
-        const loadingElement = element.querySelector('.loading');
-        if (loadingElement && !loadingElement.classList.contains('error-message') && !loadingElement.classList.contains('success-message')) {
-            // Keep the element visible but remove loading content if needed elsewhere
+    if (element) {
+        // Remove any loading content
+        const loadingElements = element.querySelectorAll('.loading, .loading-spinner, .loading-text');
+        loadingElements.forEach(el => {
+            if (el.parentNode) {
+                el.parentNode.removeChild(el);
+            }
+        });
+        
+        // Clear loading content from the element itself
+        if (element.innerHTML.includes('Loading') || element.innerHTML.includes('loading')) {
+            // Only clear if it's actually loading content
+            if (element.innerHTML.includes('Loading newsletter statistics') || 
+                element.innerHTML.includes('Loading subscribers') ||
+                element.innerHTML.includes('Loading...')) {
+                element.innerHTML = '';
+            }
         }
     }
 }

@@ -75,7 +75,7 @@ async function handleNewsletterSignup(e) {
         
         if (existingSubscriber) {
             if (existingSubscriber.status === 'active') {
-                showNewsletterMessage('You are already subscribed to our newsletter!', 'success', newsletterMessage);
+                showNewsletterMessage('✅ You\'re already part of our community! Thank you for being a valued subscriber. You\'ll continue to receive our updates.', 'success', newsletterMessage);
                 form.reset();
                 return;
             } else {
@@ -95,7 +95,7 @@ async function handleNewsletterSignup(e) {
                     throw new Error(`Failed to reactivate subscription: ${updateError.message}`);
                 }
                 
-                showNewsletterMessage('Welcome back! Your subscription has been reactivated.', 'success', newsletterMessage);
+                showNewsletterMessage('🎉 Welcome back! We\'re thrilled to have you back in our community. Your subscription has been reactivated and you\'ll start receiving our updates again.', 'success', newsletterMessage);
                 form.reset();
                 return;
             }
@@ -122,7 +122,15 @@ async function handleNewsletterSignup(e) {
         
         // Attempt to send welcome email via Resend-backed function and notify admin portal if open
         try {
-            await sendWelcomeEmail(email, name);
+            const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
+            if (endpoint) {
+                console.log('Attempting to send welcome email to:', email);
+                await sendWelcomeEmail(email, name);
+                console.log('Welcome email sent successfully to:', email);
+            } else {
+                console.warn('No email service configured. Welcome email will not be sent.');
+            }
+            
             if (window.adminNotifications) {
                 window.adminNotifications.addNotification({
                     type: 'success',
@@ -135,12 +143,14 @@ async function handleNewsletterSignup(e) {
                 });
             }
         } catch (e) {
-            console.warn('Welcome email failed:', e);
-            // Do not block subscription on email failure
+            console.error('Welcome email failed:', e);
+            // Do not block subscription on email failure, but log the error
+            console.warn('Subscription successful but welcome email failed. User will still receive newsletters.');
         }
 
         // Show success message
-        showNewsletterMessage('Thank you for subscribing! If configured, a welcome email will arrive shortly.', 'success', newsletterMessage);
+        const welcomeEmailText = endpoint ? 'Check your inbox for a welcome email!' : 'You\'ll receive our updates soon!';
+        showNewsletterMessage(`🎉 Welcome to our community! Thank you for subscribing to our newsletter. You'll receive updates about our impact and how your support makes a difference. ${welcomeEmailText}`, 'success', newsletterMessage);
         
         // Reset form
         form.reset();
@@ -196,9 +206,32 @@ async function sendWelcomeEmail(email, name) {
     try {
         const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
         if (endpoint) {
+            // Check if it's a Supabase Edge Function and add authentication headers
+            const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
+            let headers = { 'Content-Type': 'application/json' };
+            
+            if (isSupabaseFunction) {
+                // Get Supabase client and session
+                const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+                const supabase = createClient(
+                    'https://jtuhnndwhotxjjolwcuz.supabase.co',
+                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
+                );
+                
+                const { data: { session } } = await supabase.auth.getSession();
+                if (session?.access_token) {
+                    headers['Authorization'] = `Bearer ${session.access_token}`;
+                    console.log('Using Supabase session token for welcome email');
+                } else {
+                    console.warn('No Supabase session found for welcome email, using API key only');
+                }
+                // Also add the API key as fallback
+                headers['apikey'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc';
+            }
+            
             const res = await fetch(endpoint, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: headers,
                 body: JSON.stringify({
                     type: 'welcome',
                     to: email,
@@ -207,8 +240,9 @@ async function sendWelcomeEmail(email, name) {
             });
             if (!res.ok) {
                 const text = await res.text().catch(() => '');
-                throw new Error(`Resend welcome email failed: ${res.status} ${text}`);
+                throw new Error(`Welcome email failed: ${res.status} ${text}`);
             }
+            console.log('Welcome email sent successfully to:', email);
             return;
         }
         // Optional fallback to EmailJS if configured on window

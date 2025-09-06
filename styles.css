@@ -197,7 +197,7 @@ header {
     backdrop-filter: blur(10px);
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
     z-index: 1000;
-    padding: 0.9rem 0;
+    padding: 0.8rem 0;
 }
 
 header .container {
@@ -989,7 +989,7 @@ footer {
 
 @media (max-width: 768px) {
     .logo img {
-        height: clamp(40px, 10vw, 56px);
+        height: clamp(80px, 20vw, 112px);
     }
 
     .mobile-menu-toggle {
@@ -1390,7 +1390,7 @@ footer {
     }
 
     .logo img {
-        height: clamp(36px, 8vw, 48px) !important;
+        height: clamp(72px, 16vw, 96px) !important;
         transform: none;
     }
 
