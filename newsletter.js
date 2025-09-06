@@ -45,116 +45,61 @@ async function handleNewsletterSignup(e) {
     submitButton.disabled = true;
     
     try {
-        // Initialize Supabase
-        const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-        
-        const globalCfg = (typeof window !== 'undefined' && window.SUPABASE_CONFIG) ? window.SUPABASE_CONFIG : null;
-        const supabaseConfig = {
-            url: globalCfg?.url || 'https://jtuhnndwhotxjjolwcuz.supabase.co',
-            anonKey: globalCfg?.anonKey || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
-        };
-        
-        const supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey, {
-            auth: {
-                storageKey: 'nf_newsletter',
-                persistSession: false,
-                autoRefreshToken: false
-            }
-        });
-        
-        // Check if subscriber already exists
-        const { data: existingSubscriber, error: checkError } = await supabase
-            .from('newsletter_subscribers')
-            .select('*')
-            .eq('email', email)
-            .single();
-            
-        if (checkError && checkError.code !== 'PGRST116') {
-            throw new Error(`Failed to check subscriber: ${checkError.message}`);
+        // Check if Brevo service is available
+        if (!window.brevoService || !window.brevoService.initialized) {
+            console.warn('Brevo service not configured, falling back to local storage only');
+            // Fallback to local storage or show error
+            showNewsletterMessage('Newsletter service is temporarily unavailable. Please try again later.', 'error', newsletterMessage);
+            return;
         }
-        
-        if (existingSubscriber) {
-            if (existingSubscriber.status === 'active') {
-                showNewsletterMessage('✅ You\'re already part of our community! Thank you for being a valued subscriber. You\'ll continue to receive our updates.', 'success', newsletterMessage);
-                form.reset();
-                return;
-            } else {
-                // Reactivate unsubscribed user
-                const { error: updateError } = await supabase
-                    .from('newsletter_subscribers')
-                    .update({
-                        status: 'active',
-                        consent_given: true,
-                        consent_timestamp: new Date().toISOString(),
-                        updated_at: new Date().toISOString(),
-                        name: name || existingSubscriber.name || null
-                    })
-                    .eq('email', email);
-                    
-                if (updateError) {
-                    throw new Error(`Failed to reactivate subscription: ${updateError.message}`);
-                }
-                
-                // Send welcome back email for reactivated subscribers
-                try {
-                    await sendWelcomeEmail(email, name);
-                    console.log('Welcome back email sent to reactivated subscriber:', email);
-                } catch (e) {
-                    console.error('Welcome back email failed:', e);
-                    // Don't block reactivation on email failure
-                }
-                
-                showNewsletterMessage('🎉 Welcome back! We\'re thrilled to have you back in our community. Your subscription has been reactivated and you\'ll start receiving our updates again. Check your inbox for a welcome back email!', 'success', newsletterMessage);
-                form.reset();
-                return;
-            }
-        }
-        
-        // Add new subscriber to Supabase
-        const { data, error } = await supabase
-            .from('newsletter_subscribers')
-            .insert([{
-                email: email,
-                name: name || null,
-                status: 'active',
-                consent_given: true,
-                consent_timestamp: new Date().toISOString(),
-                created_at: new Date().toISOString(),
-                updated_at: new Date().toISOString(),
-                source: window.location.pathname,
-                ip_address: '0.0.0.0' // In a real implementation, you would get the actual IP
-            }]);
-            
-        if (error) {
-            throw new Error(`Failed to subscribe: ${error.message}`);
-        }
-        
-        // Attempt to send welcome email via Resend-backed function and notify admin portal if open
+
+        // Check if subscriber already exists in Brevo
+        let existingSubscriber = null;
         try {
-            const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
-            if (endpoint) {
-                console.log('Attempting to send welcome email to:', email);
-                await sendWelcomeEmail(email, name);
-                console.log('Welcome email sent successfully to:', email);
-            } else {
-                console.warn('No email service configured. Welcome email will not be sent.');
-            }
-            
-            if (window.adminNotifications) {
-                window.adminNotifications.addNotification({
-                    type: 'success',
-                    title: 'New Subscriber',
-                    message: `${email} subscribed to the newsletter`,
-                    action: () => {
-                        const link = document.querySelector('[data-section="subscribers"]');
-                        if (link) link.click();
-                    }
-                });
-            }
+            existingSubscriber = await window.brevoService.getSubscriber(email);
+        } catch (error) {
+            console.log('Error checking existing subscriber:', error);
+            // Continue with subscription process
+        }
+
+        if (existingSubscriber) {
+            // Subscriber already exists in Brevo
+            showNewsletterMessage('✅ You\'re already part of our community! Thank you for being a valued subscriber. You\'ll continue to receive our updates.', 'success', newsletterMessage);
+            form.reset();
+            return;
+        }
+
+        // Add new subscriber to Brevo
+        const brevoResult = await window.brevoService.addSubscriber(email, name, {
+            SOURCE: window.location.pathname,
+            SUBSCRIBED_AT: new Date().toISOString(),
+            CONSENT: 'yes'
+        });
+
+        console.log('✅ Subscriber added to Brevo:', brevoResult);
+        
+        // Send welcome email via EmailJS (always attempt this)
+        try {
+            console.log('Sending welcome email via EmailJS to:', email);
+            await sendWelcomeEmail(email, name);
+            console.log('✅ Welcome email sent successfully to:', email);
         } catch (e) {
-            console.error('Welcome email failed:', e);
+            console.error('❌ Welcome email failed:', e);
             // Do not block subscription on email failure, but log the error
             console.warn('Subscription successful but welcome email failed. User will still receive newsletters.');
+        }
+        
+        // Notify admin portal if open
+        if (window.adminNotifications) {
+            window.adminNotifications.addNotification({
+                type: 'success',
+                title: 'New Subscriber',
+                message: `${email} subscribed to the newsletter via Brevo`,
+                action: () => {
+                    const link = document.querySelector('[data-section="subscribers"]');
+                    if (link) link.click();
+                }
+            });
         }
 
         // Show success message
