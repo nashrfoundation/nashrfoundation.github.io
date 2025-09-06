@@ -5,7 +5,7 @@ const BREVO_CONFIG = {
     // Your Brevo API Key (get this from Brevo dashboard > API Keys)
     // SECURITY: Never commit API keys to version control!
     // Set this via environment variable or configure manually
-    apiKey: process.env.BREVO_API_KEY || window.BREVO_API_KEY || 'YOUR_BREVO_API_KEY',
+    apiKey: process.env.BREVO_API_KEY || window.BREVO_API_KEY || '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',
     
     // Your Brevo List ID (get this from Brevo dashboard > Contacts > Lists)
     listId: '3',
