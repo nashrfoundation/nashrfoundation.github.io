@@ -81,40 +81,6 @@
             }
         }
         
-        /* Fix mobile menu toggle visibility */
-        .mobile-menu-toggle {
-            display: flex !important;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            width: 30px;
-            height: 30px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            padding: 0;
-        }
-        
-        .mobile-menu-toggle span {
-            display: block;
-            width: 20px;
-            height: 2px;
-            background: var(--text-primary);
-            margin: 2px 0;
-            transition: all 0.3s ease;
-        }
-        
-        .mobile-menu-toggle.active span:nth-child(1) {
-            transform: rotate(45deg) translate(5px, 5px);
-        }
-        
-        .mobile-menu-toggle.active span:nth-child(2) {
-            opacity: 0;
-        }
-        
-        .mobile-menu-toggle.active span:nth-child(3) {
-            transform: rotate(-45deg) translate(7px, -6px);
-        }
         
         /* Fix text hierarchy - make descriptions vertical under headings */
         .aim-item h3,
@@ -477,7 +443,6 @@
                 <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"> <img src="youtube.webp" alt="YouTube" width="24" height="24" loading="lazy" decoding="async"> </a>
             </div>
             <div class="donate-button"> <a href="donate.html" class="btn">Donate Now</a> </div>
-            <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-nav"> <span></span> <span></span> <span></span> </button>
         </div>
     </header>
 

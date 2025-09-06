@@ -16,8 +16,7 @@ window.BREVO_LIST_ID = '3';
 
 // Option 3: Manual configuration for GitHub Pages
 // IMPORTANT: Uncomment and set your API key for GitHub Pages deployment
-// Replace 'YOUR_API_KEY_HERE' with your actual Brevo API key
-// window.BREVO_API_KEY = 'YOUR_API_KEY_HERE';
-// window.BREVO_LIST_ID = '3';
+window.BREVO_API_KEY = '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';
+window.BREVO_LIST_ID = '3';
 
 console.log('🔧 Brevo production configuration loaded');
