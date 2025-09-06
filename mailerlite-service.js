@@ -153,6 +153,7 @@ class MailerLiteService {
             });
 
             // Create a campaign in MailerLite
+            // For regular campaigns, we need to specify emails directly
             const campaignData = {
                 name: `Newsletter - ${subject} - ${new Date().toISOString()}`,
                 type: 'regular',
@@ -165,9 +166,7 @@ class MailerLiteService {
                     html: content,
                     text: this.stripHtml(content)
                 },
-                recipients: {
-                    groups: ['newsletter'] // Send to newsletter group
-                }
+                emails: recipients // Required for regular campaigns
             };
 
             console.log('Creating campaign with data:', campaignData);
