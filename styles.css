@@ -620,16 +620,6 @@ nav ul li a.active::after {
 
 /* Remove hero-image to prevent dots/indicators */
 
-.hero-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: var(--overlay-color);
-    z-index: -1;
-}
-
 
 
 .aims {
@@ -1293,9 +1283,6 @@ footer {
         font-size: 1.8rem;
     }
 
-    .hero-content h1 {
-        font-size: 2.5rem;
-    }
 }
 
 @media (max-width: 768px) {
@@ -1358,13 +1345,6 @@ footer {
         margin-bottom: 0;
     }
 
-    .hero-content h1 {
-        font-size: 2.2rem;
-    }
-
-    .hero-content p {
-        font-size: 1.1rem;
-    }
 
     .impact-stats {
         grid-template-columns: repeat(2, 1fr);
@@ -1403,21 +1383,6 @@ footer {
         padding: 2rem 1rem;
     }
 
-    .hero {
-        min-height: 520px;
-        padding: 1rem 0;
-        margin-top: 0;
-    }
-
-    .hero-content h1 {
-        font-size: 2rem;
-        line-height: 1.3;
-    }
-
-    .hero-content p {
-        font-size: 1.05rem;
-        line-height: 1.5;
-    }
 
     .aims-grid,
     .involvement-options,
@@ -1873,14 +1838,6 @@ footer {
 }
 
 /* Image Loading States */
-.hero-image img {
-    opacity: 0;
-    transition: opacity 0.5s ease;
-}
-
-.hero-image img.loaded {
-    opacity: 1;
-}
 
 /* Skeleton Loading Animation */
 @keyframes skeleton-loading {
@@ -1963,9 +1920,6 @@ footer {
         top: 110px !important;
     }
 
-    .hero {
-        margin-top: 0 !important;
-    }
 }
 
 @media (max-width: 576px) {
@@ -1995,9 +1949,6 @@ footer {
         top: 105px !important;
     }
 
-    .hero {
-        margin-top: 0 !important;
-    }
 }
 
 
@@ -2564,13 +2515,6 @@ body.donate-page section {
 /* ===== PROFESSIONAL ENHANCEMENTS ===== */
 
 /* Enhanced Visual Hierarchy */
-.hero-content h1 {
-    background: linear-gradient(135deg, var(--white) 0%, var(--primary-light) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
 
 /* Professional Card Design */
 .aim-item, .involvement-option {
@@ -2968,19 +2912,6 @@ section::before {
 
 /* Mobile landscape optimizations */
 @media (max-width: 768px) and (orientation: landscape) {
-    .hero {
-        min-height: 100vh;
-        padding: var(--spacing-md) 0;
-        margin-top: 0;
-    }
-    
-    .hero-content h1 {
-        font-size: clamp(1.5rem, 4vw, 2rem);
-    }
-    
-    .hero-content p {
-        font-size: clamp(0.9rem, 2vw, 1.1rem);
-    }
     
     .mobile-nav {
         width: 60%;
@@ -3383,27 +3314,6 @@ section::before {
 
 /* Desktop-only features */
 @media (min-width: 1024px) {
-    /* Parallax effect for hero background */
-    .hero-image {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        z-index: 0;
-    }
-    
-    .hero-image img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transform: scale(1.1);
-        transition: transform 0.3s ease;
-    }
-    
-    .hero:hover .hero-image img {
-        transform: scale(1.05);
-    }
     
     /* Desktop loading animations */
     .desktop-loading {
@@ -3746,10 +3656,6 @@ section::before {
     .aim-item,
     .involvement-option,
     .social-icons a img,
-    .hero-image img {
-        transition: none;
-        animation: none;
-    }
     
     .desktop-loading-spinner {
         animation: none;
@@ -3768,7 +3674,6 @@ section::before {
     .aim-item,
     .involvement-option,
     .social-icons a img,
-    .hero-image img,
     .scroll-progress {
         will-change: transform;
         transform: translateZ(0);
@@ -3985,9 +3890,6 @@ footer {
 }
 
 /* Enhanced Hero Section */
-.hero-content {
-    animation: heroReveal 1s cubic-bezier(0.4, 0, 0.2, 1) both;
-}
 
 @keyframes heroReveal {
     from {
@@ -4157,17 +4059,9 @@ footer::before {
         padding: 3rem 1rem;
     }
     
-    .hero {
-        padding: 2rem 1rem;
-    }
     
     /* Larger touch targets for key actions */
     .donate-button .btn,
-    .hero-content .btn {
-        min-height: 48px;
-        padding: 1rem 1.5rem;
-        font-size: 1.1rem;
-    }
     
     .amount-options {
         gap: 0.75rem;
