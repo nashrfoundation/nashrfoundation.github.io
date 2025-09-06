@@ -1156,9 +1156,9 @@ async function sendNewsletter() {
             return;
         }
         
-        // Check if MailerLite service is available
-        if (!window.mailerLiteService || !window.mailerLiteService.initialized) {
-            showError('MailerLite service not loaded. Please refresh the page.');
+        // Check if email service is available (fallback to EmailJS)
+        if (!window.emailService) {
+            showError('Email service not loaded. Please refresh the page.');
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -1166,24 +1166,69 @@ async function sendNewsletter() {
             return;
         }
         
-        console.log('Sending newsletter via MailerLite...');
+        console.log('Sending newsletter via EmailJS...');
         console.log('Recipients:', recipients.length);
         
-        // Send newsletter via MailerLite
-        const result = await window.mailerLiteService.sendNewsletter(
-            subject,
-            content,
-            recipients
-        );
+        // Send emails using the email service (EmailJS)
+        let sentCount = 0;
+        const maxRetries = 2;
         
-        console.log('Newsletter sending result:', result);
-        
-        if (result.success) {
-            showSuccess(`Newsletter sent to ${result.totalSent} recipients!${result.totalErrors > 0 ? ` (${result.totalErrors} failed)` : ''}`);
-            await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${result.totalSent} recipients via MailerLite`);
-        } else {
-            throw new Error(result.message || 'Failed to send newsletter');
+        // Send emails one by one to avoid rate limits
+        for (let i = 0; i < recipients.length; i++) {
+            const recipient = recipients[i];
+            let attempt = 0;
+            
+            while (true) {
+                try {
+                    console.log(`Sending to ${recipient} (${i + 1}/${recipients.length})`);
+                    
+                    // Use the email service (EmailJS)
+                    const result = await window.emailService.sendEmail(
+                        recipient,
+                        subject,
+                        content,
+                        'newsletter'
+                    );
+                    
+                    console.log('Email sent successfully:', { 
+                        recipient, 
+                        result,
+                        attempt: attempt + 1
+                    });
+                    
+                    sentCount++;
+                    break;
+                    
+                } catch (err) {
+                    console.log('Email send error:', { 
+                        error: err.message, 
+                        recipient,
+                        attempt: attempt + 1, 
+                        maxRetries: maxRetries + 1,
+                        willRetry: attempt < maxRetries
+                    });
+                    
+                    if (attempt >= maxRetries) {
+                        console.error('Max retries reached for recipient:', recipient);
+                        throw new Error(`Failed to send to ${recipient}: ${err.message}`);
+                    }
+                    
+                    // Wait before retry (exponential backoff)
+                    const delay = 1000 * Math.pow(2, attempt);
+                    console.log(`Retrying in ${delay}ms...`);
+                    await new Promise(r => setTimeout(r, delay));
+                    attempt++;
+                }
+            }
+            
+            // Small delay between emails to avoid rate limits
+            if (i < recipients.length - 1) {
+                await new Promise(r => setTimeout(r, 100));
+            }
         }
+        
+        showSuccess(`Newsletter sent to ${sentCount} recipients!`);
+        await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${sentCount} recipients via EmailJS`);
         
         // Clear form
         document.getElementById('newsletter-subject').value = '';
