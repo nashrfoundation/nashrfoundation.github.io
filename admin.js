@@ -40,6 +40,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeSupabase();
     setupEventListeners();
     checkAuthState();
+    loadEmailConfig();
 });
 
 // Supabase Initialization
@@ -1156,10 +1157,10 @@ async function sendNewsletter() {
             return;
         }
         
-        // Send via Supabase Edge Function or external service
-        const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
-        if (!endpoint) {
-            showError('Email service not configured. Set window.RESEND_FUNCTION_URL in settings or as a global variable.');
+        // Send via Resend API directly
+        const resendApiKey = window.RESEND_API_KEY || '';
+        if (!resendApiKey) {
+            showError('Resend API key not configured. Set window.RESEND_API_KEY in your admin settings.');
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -1167,127 +1168,94 @@ async function sendNewsletter() {
             return;
         }
         
-        // Validate endpoint URL
-        try {
-            new URL(endpoint);
-        } catch (e) {
-            showError('Invalid email service URL. Please check window.RESEND_FUNCTION_URL.');
-            if (sendButton) {
-                sendButton.innerHTML = originalText;
-                sendButton.disabled = false;
-            }
-            return;
-        }
-        
-        // Check if it's a Supabase Edge Function
-        const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
-        let headers = { 'Content-Type': 'application/json' };
-        
-        if (isSupabaseFunction) {
-            // Supabase Edge Functions require authentication
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.access_token) {
-                headers['Authorization'] = `Bearer ${session.access_token}`;
-                console.log('Using Supabase session token for authentication');
-            } else {
-                console.warn('No Supabase session found, using API key only');
-            }
-            // Also add the API key as fallback
-            headers['apikey'] = supabaseConfig.anonKey;
-            console.log('Headers for Supabase Edge Function:', headers);
-        }
-        
-        // Batch sending to avoid large payloads; retry with backoff
-        const batchSize = 50;
+        // Send emails directly via Resend API
+        const fromEmail = window.FROM_EMAIL || 'Nashr Foundation <no-reply@nashrfoundation.org>';
         let sentCount = 0;
         const maxRetries = 2;
-        for (let i = 0; i < recipients.length; i += batchSize) {
-            const batch = recipients.slice(i, i + batchSize);
+        
+        console.log('Sending newsletter via Resend API...');
+        console.log('From email:', fromEmail);
+        console.log('Recipients:', recipients.length);
+        
+        // Send emails one by one to avoid rate limits
+        for (let i = 0; i < recipients.length; i++) {
+            const recipient = recipients[i];
             let attempt = 0;
+            
             while (true) {
                 try {
-                    console.log('Newsletter batch attempt', { 
-                        endpoint, 
-                        start: i + 1, 
-                        size: batch.length, 
-                        attempt: attempt + 1,
-                        maxRetries: maxRetries + 1
-                    });
+                    console.log(`Sending to ${recipient} (${i + 1}/${recipients.length})`);
                     
-                    const res = await fetch(endpoint, {
+                    const res = await fetch('https://api.resend.com/emails', {
                         method: 'POST',
-                        mode: 'cors',
-                        credentials: 'omit',
-                        headers: headers,
+                        headers: {
+                            'Authorization': `Bearer ${resendApiKey}`,
+                            'Content-Type': 'application/json'
+                        },
                         body: JSON.stringify({
-                            type: 'newsletter',
-                            subject,
-                            content,
-                            to: batch
+                            from: fromEmail,
+                            to: [recipient],
+                            subject: subject,
+                            html: content
                         })
-                    });
-                    
-                    console.log('Newsletter batch response:', { 
-                        status: res.status, 
-                        ok: res.ok, 
-                        statusText: res.statusText,
-                        batchSize: batch.length,
-                        batchIndex: i + 1,
-                        attempt: attempt + 1
                     });
                     
                     if (!res.ok) {
                         const errText = await res.text().catch(() => '');
-                        console.error('Newsletter send failed', { 
+                        console.error('Resend API error:', { 
                             status: res.status, 
                             errText, 
-                            batch,
-                            attempt: attempt + 1,
-                            willRetry: attempt < maxRetries
+                            recipient,
+                            attempt: attempt + 1
                         });
                         
-                        let message = `Send failed for batch starting ${i + 1}`;
-                        
                         if (res.status === 401) {
-                            message = 'Authentication failed. Please check your Supabase Edge Function configuration and ensure you are logged in.';
-                        } else if (res.status === 403) {
-                            message = 'Access forbidden. Please check your Supabase Edge Function permissions.';
-                        } else if (errText) {
-                            message += `: ${errText}`;
+                            throw new Error('Invalid Resend API key. Please check your API key.');
+                        } else if (res.status === 422) {
+                            throw new Error(`Invalid email address: ${recipient}`);
+                        } else if (res.status === 429) {
+                            throw new Error('Rate limit exceeded. Please wait a moment and try again.');
+                        } else {
+                            throw new Error(`Resend API error: ${res.status} ${errText}`);
                         }
-                        
-                        throw new Error(message);
                     }
                     
-                    // Log successful response
-                    const responseText = await res.text().catch(() => '');
-                    console.log('Newsletter batch sent successfully:', { 
-                        batchIndex: i + 1, 
-                        recipients: batch.length,
-                        attempt: attempt + 1,
-                        response: responseText.substring(0, 200) // First 200 chars of response
+                    const responseData = await res.json().catch(() => ({}));
+                    console.log('Email sent successfully:', { 
+                        recipient, 
+                        id: responseData.id,
+                        attempt: attempt + 1
                     });
+                    
+                    sentCount++;
                     break;
+                    
                 } catch (err) {
-                    console.log('Newsletter batch error:', { 
+                    console.log('Email send error:', { 
                         error: err.message, 
+                        recipient,
                         attempt: attempt + 1, 
                         maxRetries: maxRetries + 1,
                         willRetry: attempt < maxRetries
                     });
                     
                     if (attempt >= maxRetries) {
-                        console.error('Max retries reached, giving up on this batch');
-                        throw err;
+                        console.error('Max retries reached for recipient:', recipient);
+                        throw new Error(`Failed to send to ${recipient}: ${err.message}`);
                     }
                     
-                    const delay = 500 * (attempt + 1);
+                    // Wait before retry (exponential backoff)
+                    const delay = 1000 * Math.pow(2, attempt);
                     console.log(`Retrying in ${delay}ms...`);
                     await new Promise(r => setTimeout(r, delay));
                     attempt++;
                 }
             }
-            sentCount += batch.length;
+            
+            // Small delay between emails to avoid rate limits
+            if (i < recipients.length - 1) {
+                await new Promise(r => setTimeout(r, 100));
+            }
         }
         
         showSuccess(`Newsletter sent to ${sentCount} recipients!`);
@@ -2108,13 +2076,133 @@ function refreshNewsletterData() {
     showSuccess('Newsletter data refreshed!');
 }
 
-// Helper function to configure Supabase Edge Function URL
-function configureSupabaseEdgeFunction(functionName = 'super-function') {
-    const functionUrl = `https://${supabaseConfig.url.split('//')[1]}/functions/v1/${functionName}`;
-    window.RESEND_FUNCTION_URL = functionUrl;
-    console.log('Configured Supabase Edge Function URL:', functionUrl);
-    showSuccess(`Email service configured: ${functionName}`);
-    return functionUrl;
+// Helper function to configure Resend API
+function configureResendAPI(apiKey, fromEmail = 'Nashr Foundation <no-reply@nashrfoundation.org>') {
+    window.RESEND_API_KEY = apiKey;
+    window.FROM_EMAIL = fromEmail;
+    console.log('Configured Resend API:', { apiKey: apiKey.substring(0, 10) + '...', fromEmail });
+    showSuccess('Resend API configured successfully!');
+    return { apiKey, fromEmail };
+}
+
+// Test Resend API configuration
+async function testResendAPI() {
+    try {
+        const apiKey = window.RESEND_API_KEY || '';
+        if (!apiKey) {
+            showError('Resend API key not configured. Please save your configuration first.');
+            return;
+        }
+        
+        console.log('Testing Resend API...');
+        
+        const fromEmail = window.FROM_EMAIL || 'Nashr Foundation <no-reply@nashrfoundation.org>';
+        
+        const res = await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                from: fromEmail,
+                to: ['test@example.com'],
+                subject: 'Test Email from Nashr Foundation',
+                html: '<p>This is a test email to verify Resend API configuration.</p>'
+            })
+        });
+        
+        if (!res.ok) {
+            const text = await res.text().catch(() => '');
+            throw new Error(`Resend API test failed: ${res.status} ${text}`);
+        }
+        
+        const responseData = await res.json().catch(() => ({}));
+        console.log('Resend API test successful:', responseData);
+        showSuccess('Resend API is working correctly!');
+        
+    } catch (error) {
+        console.error('Resend API test failed:', error);
+        showError(`Resend API test failed: ${error.message}`);
+    }
+}
+
+// Save email configuration
+function saveEmailConfig() {
+    try {
+        const apiKey = document.getElementById('resend-api-key').value.trim();
+        const fromEmail = document.getElementById('from-email').value.trim();
+        
+        if (!apiKey) {
+            showError('Please enter your Resend API key.');
+            return;
+        }
+        
+        if (!fromEmail) {
+            showError('Please enter your from email address.');
+            return;
+        }
+        
+        // Save to global variables
+        window.RESEND_API_KEY = apiKey;
+        window.FROM_EMAIL = fromEmail;
+        
+        // Show success message
+        const statusDiv = document.getElementById('email-config-status');
+        const messageSpan = document.getElementById('email-config-message');
+        
+        messageSpan.textContent = 'Configuration saved successfully!';
+        statusDiv.style.display = 'block';
+        statusDiv.className = 'config-status success';
+        
+        // Hide after 3 seconds
+        setTimeout(() => {
+            statusDiv.style.display = 'none';
+        }, 3000);
+        
+        console.log('Email configuration saved:', { 
+            apiKey: apiKey.substring(0, 10) + '...', 
+            fromEmail 
+        });
+        
+        showSuccess('Email configuration saved successfully!');
+        
+    } catch (error) {
+        console.error('Failed to save email configuration:', error);
+        showError('Failed to save email configuration. Please try again.');
+    }
+}
+
+// Toggle API key visibility
+function toggleApiKeyVisibility() {
+    const input = document.getElementById('resend-api-key');
+    const button = event.target;
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        button.textContent = 'Hide';
+    } else {
+        input.type = 'password';
+        button.textContent = 'Show';
+    }
+}
+
+// Load email configuration on page load
+function loadEmailConfig() {
+    try {
+        // Set default values if not already configured
+        if (window.RESEND_API_KEY) {
+            document.getElementById('resend-api-key').value = window.RESEND_API_KEY;
+        }
+        
+        if (window.FROM_EMAIL) {
+            document.getElementById('from-email').value = window.FROM_EMAIL;
+        }
+        
+        console.log('Email configuration loaded');
+    } catch (error) {
+        console.error('Failed to load email configuration:', error);
+    }
 }
 
 // Test welcome email function
@@ -2371,6 +2459,7 @@ async function testEdgeFunctionMinimal() {
         }
         
         console.log('Testing Edge Function with minimal payload...');
+        console.log('Endpoint URL:', endpoint);
         
         // Test with authentication headers
         const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
@@ -2381,11 +2470,24 @@ async function testEdgeFunctionMinimal() {
             if (session?.access_token) {
                 headers['Authorization'] = `Bearer ${session.access_token}`;
                 console.log('Using session token for minimal test');
+                console.log('Session token (first 50 chars):', session.access_token.substring(0, 50) + '...');
             } else {
                 console.warn('No session token available for minimal test');
             }
             headers['apikey'] = supabaseConfig.anonKey;
+            console.log('API key (first 20 chars):', supabaseConfig.anonKey.substring(0, 20) + '...');
         }
+        
+        console.log('Request headers:', headers);
+        console.log('Request payload:', {
+            type: 'welcome',
+            to: 'test@example.com',
+            name: 'Test User'
+        });
+        
+        // Add timeout to the fetch request
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
         
         const res = await fetch(endpoint, {
             method: 'POST',
@@ -2396,8 +2498,11 @@ async function testEdgeFunctionMinimal() {
                 type: 'welcome',
                 to: 'test@example.com',
                 name: 'Test User'
-            })
+            }),
+            signal: controller.signal
         });
+        
+        clearTimeout(timeoutId);
         
         const responseText = await res.text().catch(() => '');
         
@@ -2416,7 +2521,51 @@ async function testEdgeFunctionMinimal() {
         
     } catch (error) {
         console.error('Minimal Edge Function test failed:', error);
-        showError(`Minimal test failed: ${error.message}`);
+        
+        if (error.name === 'AbortError') {
+            showError('Request timed out after 10 seconds. The Edge Function may be slow or unresponsive.');
+        } else if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            showError('Network error: Cannot reach the Edge Function. This could be due to:\n1. Edge Function not deployed\n2. CORS issues\n3. Network connectivity problems\n4. Incorrect URL\n5. Firewall blocking the request');
+        } else {
+            showError(`Minimal test failed: ${error.message}`);
+        }
+    }
+}
+
+// Test basic network connectivity to Supabase
+async function testSupabaseNetwork() {
+    try {
+        console.log('Testing basic network connectivity to Supabase...');
+        
+        // Test basic Supabase API endpoint
+        const supabaseUrl = 'https://jtuhnndwhotxjjolwcuz.supabase.co';
+        const testUrl = `${supabaseUrl}/rest/v1/settings?select=*&limit=1`;
+        
+        console.log('Testing URL:', testUrl);
+        
+        const res = await fetch(testUrl, {
+            method: 'GET',
+            headers: {
+                'apikey': supabaseConfig.anonKey,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('Supabase API test response:', {
+            status: res.status,
+            ok: res.ok,
+            statusText: res.statusText
+        });
+        
+        if (res.ok) {
+            showSuccess('Supabase API connectivity is working!');
+        } else {
+            showError(`Supabase API test failed: ${res.status} ${res.statusText}`);
+        }
+        
+    } catch (error) {
+        console.error('Supabase network test failed:', error);
+        showError(`Supabase network test failed: ${error.message}`);
     }
 }
 

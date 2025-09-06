@@ -207,45 +207,40 @@ function isValidEmail(email) {
 // Lightweight welcome email via Resend HTTP function if configured; falls back to EmailJS if present
 async function sendWelcomeEmail(email, name) {
     try {
-        const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
-        if (endpoint) {
-            // Check if it's a Supabase Edge Function and add authentication headers
-            const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
-            let headers = { 'Content-Type': 'application/json' };
+        const resendApiKey = window.RESEND_API_KEY || '';
+        if (resendApiKey) {
+            // Send welcome email directly via Resend API
+            const fromEmail = window.FROM_EMAIL || 'Nashr Foundation <no-reply@nashrfoundation.org>';
+            const subject = 'Welcome to Nashr Foundation Newsletter';
+            const html = `
+                <p>Hi ${name || 'Friend'},</p>
+                <p>Thank you for subscribing to the Nashr Foundation newsletter. We appreciate your support and will keep you informed about our impact and initiatives.</p>
+                <p>Best regards,<br>The Nashr Foundation Team</p>
+            `;
             
-            if (isSupabaseFunction) {
-                // Supabase Edge Functions require authentication
-                const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-                const supabase = createClient(
-                    'https://jtuhnndwhotxjjolwcuz.supabase.co',
-                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
-                );
-                
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session?.access_token) {
-                    headers['Authorization'] = `Bearer ${session.access_token}`;
-                    console.log('Using Supabase session token for welcome email');
-                } else {
-                    console.warn('No Supabase session found for welcome email, using API key only');
-                }
-                // Also add the API key as fallback
-                headers['apikey'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc';
-            }
+            console.log('Sending welcome email via Resend API to:', email);
             
-            const res = await fetch(endpoint, {
+            const res = await fetch('https://api.resend.com/emails', {
                 method: 'POST',
-                headers: headers,
+                headers: {
+                    'Authorization': `Bearer ${resendApiKey}`,
+                    'Content-Type': 'application/json'
+                },
                 body: JSON.stringify({
-                    type: 'welcome',
-                    to: email,
-                    name: name || 'Friend'
+                    from: fromEmail,
+                    to: [email],
+                    subject: subject,
+                    html: html
                 })
             });
+            
             if (!res.ok) {
                 const text = await res.text().catch(() => '');
                 throw new Error(`Welcome email failed: ${res.status} ${text}`);
             }
-            console.log('Welcome email sent successfully to:', email);
+            
+            const responseData = await res.json().catch(() => ({}));
+            console.log('Welcome email sent successfully to:', email, 'ID:', responseData.id);
             return;
         }
         // Optional fallback to EmailJS if configured on window

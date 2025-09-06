@@ -147,6 +147,13 @@
                     </svg>
                     Newsletter
                 </a></li>
+                <li><a href="#email-config" class="nav-link" data-section="email-config">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <path d="M22 6L12 13 2 6"></path>
+                    </svg>
+                    Email Config
+                </a></li>
                 <li><a href="#subscribers" class="nav-link" data-section="subscribers">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -490,6 +497,77 @@
                         </div>
                     </div>
                     
+                </div>
+            </section>
+            
+            <!-- Email Configuration Section -->
+            <section id="email-config" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Email Configuration</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-outline" onclick="testResendAPI()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 12l2 2 4-4"></path>
+                                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
+                                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
+                                <path d="M13 12h3a2 2 0 0 1 2 2v1"></path>
+                                <path d="M11 12H8a2 2 0 0 0-2 2v1"></path>
+                            </svg>
+                            Test API
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="setting-card">
+                    <h3>Resend API Configuration</h3>
+                    <p class="setting-description">Configure your Resend API key to enable email sending functionality.</p>
+                    
+                    <div class="form-group">
+                        <label for="resend-api-key">Resend API Key</label>
+                        <div class="input-wrapper">
+                            <input type="password" id="resend-api-key" class="form-control" placeholder="re_..." value="re_LPnRzAL8_CG6cby57HsRVguQGRYLgFCxE">
+                            <button type="button" class="btn btn-outline btn-sm" onclick="toggleApiKeyVisibility()">Show</button>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="from-email">From Email Address</label>
+                        <input type="email" id="from-email" class="form-control" placeholder="Nashr Foundation <no-reply@nashrfoundation.org>" value="Nashr Foundation <no-reply@nashrfoundation.org>">
+                    </div>
+                    
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-primary" onclick="saveEmailConfig()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17,21 17,13 7,13 7,21"></polyline>
+                                <polyline points="7,3 7,8 15,8"></polyline>
+                            </svg>
+                            Save Configuration
+                        </button>
+                        <button type="button" class="btn btn-outline" onclick="testResendAPI()">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 12l2 2 4-4"></path>
+                                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
+                                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
+                                <path d="M13 12h3a2 2 0 0 1 2 2v1"></path>
+                                <path d="M11 12H8a2 2 0 0 0-2 2v1"></path>
+                            </svg>
+                            Test Connection
+                        </button>
+                    </div>
+                    
+                    <div class="config-status" id="email-config-status" style="display: none;">
+                        <div class="status-indicator">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M9 12l2 2 4-4"></path>
+                                <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
+                                <path d="M3 12c1 0 3-1 3-3s-2-3-3-3-3 1-3 3 2 3 3 3"></path>
+                                <path d="M13 12h3a2 2 0 0 1 2 2v1"></path>
+                                <path d="M11 12H8a2 2 0 0 0-2 2v1"></path>
+                            </svg>
+                            <span id="email-config-message">Configuration saved successfully!</span>
+                        </div>
+                    </div>
                 </div>
             </section>
             

@@ -563,31 +563,19 @@ nav ul li a.active::after {
     justify-content: center;
     text-align: center;
     color: var(--white);
-    margin-top: 80px;
+    margin-top: 0;
     overflow: hidden;
     contain: layout style paint;
     will-change: transform;
     width: 100%;
     max-width: 100vw;
+    background-image: url('hero_background.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
 }
 
-.hero-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -2;
-}
-
-.hero-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    aspect-ratio: 16/9;
-    will-change: transform;
-    contain: layout style paint;
-}
+/* Remove hero-image to prevent dots/indicators */
 
 .hero-overlay {
     position: absolute;
@@ -843,7 +831,6 @@ table tr:hover {
     height: 100%;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
     align-items: center;
 }
 
@@ -1386,7 +1373,7 @@ footer {
     .hero {
         min-height: 520px;
         padding: 1rem 0;
-        margin-top: 60px;
+        margin-top: 0;
     }
 
     .hero-content h1 {
@@ -1944,7 +1931,7 @@ footer {
     }
 
     .hero {
-        margin-top: 80px !important;
+        margin-top: 0 !important;
     }
 }
 
@@ -1976,7 +1963,7 @@ footer {
     }
 
     .hero {
-        margin-top: 70px !important;
+        margin-top: 0 !important;
     }
 }
 
@@ -2917,6 +2904,7 @@ section::before {
     .hero {
         min-height: 100vh;
         padding: var(--spacing-md) 0;
+        margin-top: 0;
     }
     
     .hero-content h1 {
@@ -3032,25 +3020,20 @@ section::before {
 
 /* Desktop-specific hover effects and interactions */
 @media (min-width: 1024px) {
+    /* Hide donate button on large screens */
+    .donate-button {
+        display: none !important;
+    }
+    
     /* Enhanced desktop navigation */
     nav ul li a {
         position: relative;
         overflow: hidden;
     }
     
+        /* Remove navbar effects */
     nav ul li a::before {
-        content: '';
-        position: absolute;
-        top: 0;
-        left: -100%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-        transition: left 0.5s ease;
-    }
-    
-    nav ul li a:hover::before {
-        left: 100%;
+        display: none;
     }
     
     /* Desktop hero enhancements */
@@ -3820,9 +3803,36 @@ section::before {
 
 /* ===== ENHANCED UI/UX IMPROVEMENTS ===== */
 
-/* Fix remaining color inconsistencies */
+/* Restore previous theme colors */
 :root {
-    --accent-dark: #357ABD;
+    --accent: #FFB52E;
+    --accent-light: #FFCA5F;
+    --accent-dark: #E6A02B;
+}
+
+/* Fix donate page visibility issues */
+.donation-section,
+.fund-tracker,
+.impact {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.donation-form-container {
+    position: relative;
+    z-index: 1;
+}
+
+/* Ensure all donate page content is visible */
+main {
+    display: block !important;
+    visibility: visible !important;
+}
+
+section {
+    display: block !important;
+    visibility: visible !important;
 }
 
 /* Fix inconsistent spacing */
