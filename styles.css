@@ -574,7 +574,6 @@ nav ul li a.active::after {
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
-    background-attachment: fixed;
 }
 
 /* Remove hero-image to prevent dots/indicators */
@@ -592,7 +591,7 @@ nav ul li a.active::after {
 .hero-content {
     max-width: 800px;
     padding: var(--spacing-md);
-    padding-top: calc(var(--spacing-md) + 120px);
+    padding-top: calc(var(--spacing-md) + 180px);
     z-index: 1;
     animation: reveal-up 0.8s ease-out both;
 }
@@ -2152,7 +2151,7 @@ body.donate-page section {
 /* Desktop Navigation - Only visible on big screens */
 .desktop-nav {
     display: none;
-    gap: var(--spacing-lg);
+    gap: var(--spacing-2xl);
     align-items: center;
 }
 
@@ -2216,14 +2215,13 @@ body.donate-page .hero {
     min-height: 100vh;
     z-index: -1;
     background-image: url('hero_background.webp');
-    background-attachment: fixed;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
 }
 
 body.donate-page .hero-content {
-    padding-top: calc(var(--spacing-md) + 120px);
+    padding-top: calc(var(--spacing-md) + 180px);
 }
 
 body.donate-page .aims {
@@ -3112,6 +3110,9 @@ section::before {
         align-items: center;
         position: fixed !important;
         overflow: hidden;
+        top: 0;
+        left: 0;
+        z-index: -1;
     }
     
     .hero::before {
@@ -3244,6 +3245,9 @@ section::before {
         min-height: 100vh;
         padding: var(--spacing-2xl) 0;
         position: fixed !important;
+        top: 0;
+        left: 0;
+        z-index: -1;
     }
     
     .hero-content h1 {
@@ -3325,6 +3329,9 @@ section::before {
         min-height: 100vh;
         padding: var(--spacing-lg) 0;
         position: fixed !important;
+        top: 0;
+        left: 0;
+        z-index: -1;
     }
     
     .hero-content h1 {
@@ -4132,6 +4139,9 @@ table th::after {
 footer {
     position: relative;
     overflow: hidden;
+    z-index: 10;
+    background: linear-gradient(135deg, var(--bg-dark) 0%, var(--bg-medium) 100%);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
 }
 
 footer::before {

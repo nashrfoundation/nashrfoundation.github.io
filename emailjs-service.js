@@ -186,10 +186,10 @@ class EmailJSService {
             issues.push('Service ID not configured or using placeholder');
         }
         
-        if (!this.templateId || (this.templateId === 'template_newsletter' && this.templateId !== '__ejs-test-mail-service__')) {
-            // Only flag as issue if it's the old placeholder, not the test template
+        if (!this.templateId || (this.templateId === 'template_newsletter' && this.templateId !== '__ejs-test-mail-service__' && this.templateId !== 'template_7pk902j')) {
+            // Only flag as issue if it's the old placeholder, not the valid templates
             if (this.templateId === 'template_newsletter') {
-                issues.push('Template ID using old placeholder - consider using __ejs-test-mail-service__');
+                issues.push('Template ID using old placeholder - consider using template_7pk902j (Welcome) or __ejs-test-mail-service__');
             } else {
                 issues.push('Template ID not configured');
             }
@@ -223,6 +223,7 @@ class EmailJSService {
     // Test different template IDs to find a working one
     async findWorkingTemplate() {
         const commonTemplateIds = [
+            'template_7pk902j', // Welcome template
             '__ejs-test-mail-service__',
             'template_newsletter',
             'template_contact',
@@ -272,7 +273,7 @@ window.emailJSService = new EmailJSService();
 // Auto-configure with actual EmailJS credentials
 window.emailJSService.configure(
     'service_01wge0v',
-    '__ejs-test-mail-service__', 
+    'template_7pk902j', 
     '8vdEHnT9o9ThMp3qc'
 );
 

@@ -51,7 +51,7 @@
 <body>
     <div class="container">
         <h1>Simple EmailJS Test</h1>
-        <p>This page tests EmailJS with the correct template ID: <code>__ejs-test-mail-service__</code></p>
+        <p>This page tests EmailJS with the Welcome template ID: <code>template_7pk902j</code></p>
         
         <div id="status"></div>
         
@@ -79,7 +79,8 @@
             const configDiv = document.getElementById('config');
             const config = {
                 serviceId: 'service_01wge0v',
-                templateId: '__ejs-test-mail-service__',
+                templateId: 'template_7pk902j',
+                templateName: 'Welcome',
                 publicKey: '8vdEHnT9o9ThMp3qc',
                 emailjsLoaded: typeof emailjs !== 'undefined',
                 emailJSServiceLoaded: typeof window.emailJSService !== 'undefined'
@@ -97,7 +98,7 @@
                 // Test with minimal parameters
                 const result = await emailjs.send(
                     'service_01wge0v',
-                    '__ejs-test-mail-service__',
+                    'template_7pk902j',
                     {
                         to_email: 'test@example.com',
                         subject: 'Test Email from Nashr Foundation',
