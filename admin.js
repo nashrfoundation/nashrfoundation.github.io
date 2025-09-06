@@ -1311,9 +1311,18 @@ async function sendNewsletter() {
                             to: batch
                         })
                     });
+                    
+                    console.log('Newsletter batch response:', { 
+                        status: res.status, 
+                        ok: res.ok, 
+                        statusText: res.statusText,
+                        batchSize: batch.length,
+                        batchIndex: i + 1
+                    });
+                    
                     if (!res.ok) {
                         const errText = await res.text().catch(() => '');
-                        console.error('Newsletter send failed', { status: res.status, errText });
+                        console.error('Newsletter send failed', { status: res.status, errText, batch });
                         let message = `Send failed for batch starting ${i + 1}`;
                         
                         if (res.status === 401) {
@@ -1326,6 +1335,14 @@ async function sendNewsletter() {
                         
                         throw new Error(message);
                     }
+                    
+                    // Log successful response
+                    const responseText = await res.text().catch(() => '');
+                    console.log('Newsletter batch sent successfully:', { 
+                        batchIndex: i + 1, 
+                        recipients: batch.length,
+                        response: responseText.substring(0, 200) // First 200 chars of response
+                    });
                     break;
                 } catch (err) {
                     if (attempt >= maxRetries) throw err;
@@ -2210,6 +2227,67 @@ async function testWelcomeEmail(email = 'test@example.com') {
     } catch (error) {
         console.error('Test welcome email failed:', error);
         showError(`Test welcome email failed: ${error.message}`);
+    }
+}
+
+// Test newsletter function
+async function testNewsletterFunction() {
+    try {
+        console.log('Testing newsletter function...');
+        
+        const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
+        if (!endpoint) {
+            showError('No email service configured. Please configure window.RESEND_FUNCTION_URL first.');
+            return;
+        }
+        
+        // Check if it's a Supabase Edge Function and add authentication headers
+        const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
+        let headers = { 'Content-Type': 'application/json' };
+        
+        if (isSupabaseFunction) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
+                console.log('Using Supabase session token for test newsletter');
+            } else {
+                console.warn('No Supabase session found for test newsletter, using API key only');
+            }
+            headers['apikey'] = supabaseConfig.anonKey;
+        }
+        
+        console.log('Testing with headers:', headers);
+        
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({
+                type: 'newsletter',
+                subject: 'Test Newsletter',
+                content: 'This is a test newsletter',
+                to: ['test@example.com']
+            })
+        });
+        
+        console.log('Test newsletter response:', { 
+            status: res.status, 
+            ok: res.ok, 
+            statusText: res.statusText 
+        });
+        
+        const responseText = await res.text().catch(() => '');
+        console.log('Test newsletter response body:', responseText);
+        
+        if (!res.ok) {
+            throw new Error(`Test newsletter failed: ${res.status} ${responseText}`);
+        }
+        
+        showSuccess('Newsletter function test successful!');
+        console.log('Test newsletter sent successfully');
+        
+    } catch (error) {
+        console.error('Test newsletter failed:', error);
+        showError(`Test newsletter failed: ${error.message}`);
     }
 }
 
