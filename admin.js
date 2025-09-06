@@ -1156,9 +1156,9 @@ async function sendNewsletter() {
             return;
         }
         
-        // Check if email service is available
-        if (!window.emailService) {
-            showError('Email service not loaded. Please refresh the page.');
+        // Check if Brevo newsletter service is available
+        if (!window.brevoNewsletterService || !window.brevoNewsletterService.initialized) {
+            showError('Brevo newsletter service not loaded. Please refresh the page.');
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -1166,69 +1166,28 @@ async function sendNewsletter() {
             return;
         }
         
-        // Send emails using the email service
-        let sentCount = 0;
-        const maxRetries = 2;
-        
-        console.log('Sending newsletter via email service...');
+        console.log('Sending newsletter via Brevo...');
         console.log('Recipients:', recipients.length);
         
-        // Send emails one by one to avoid rate limits
-        for (let i = 0; i < recipients.length; i++) {
-            const recipient = recipients[i];
-            let attempt = 0;
-            
-            while (true) {
-                try {
-                    console.log(`Sending to ${recipient} (${i + 1}/${recipients.length})`);
-                    
-                    // Use the email service
-                    const result = await window.emailService.sendEmail(
-                        recipient,
-                        subject,
-                        content,
-                        'newsletter'
-                    );
-                    
-                    console.log('Email sent successfully:', { 
-                        recipient, 
-                        result,
-                        attempt: attempt + 1
-                    });
-                    
-                    sentCount++;
-                    break;
-                    
-                } catch (err) {
-                    console.log('Email send error:', { 
-                        error: err.message, 
-                        recipient,
-                        attempt: attempt + 1, 
-                        maxRetries: maxRetries + 1,
-                        willRetry: attempt < maxRetries
-                    });
-                    
-                    if (attempt >= maxRetries) {
-                        console.error('Max retries reached for recipient:', recipient);
-                        throw new Error(`Failed to send to ${recipient}: ${err.message}`);
-                    }
-                    
-                    // Wait before retry (exponential backoff)
-                    const delay = 1000 * Math.pow(2, attempt);
-                    console.log(`Retrying in ${delay}ms...`);
-                    await new Promise(r => setTimeout(r, delay));
-                    attempt++;
-                }
+        // Send newsletter via Brevo
+        const result = await window.brevoNewsletterService.sendNewsletter(
+            recipients,
+            subject,
+            content,
+            {
+                senderName: 'Nashr Foundation',
+                senderEmail: 'nashrfoundationpk@gmail.com'
             }
-            
-            // Small delay between emails to avoid rate limits
-            if (i < recipients.length - 1) {
-                await new Promise(r => setTimeout(r, 100));
-            }
-        }
+        );
         
-        showSuccess(`Newsletter sent to ${sentCount} recipients!`);
-        await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${sentCount} recipients`);
+        console.log('Newsletter sending result:', result);
+        
+        if (result.success) {
+            showSuccess(`Newsletter sent to ${result.totalSent} recipients!${result.totalErrors > 0 ? ` (${result.totalErrors} failed)` : ''}`);
+            await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${result.totalSent} recipients via Brevo`);
+        } else {
+            throw new Error(result.message || 'Failed to send newsletter');
+        }
         
         // Clear form
         document.getElementById('newsletter-subject').value = '';
