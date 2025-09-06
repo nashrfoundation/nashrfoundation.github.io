@@ -637,65 +637,9 @@
                 section.classList.add('visible');
             });
             // Enhanced validation and user feedback functions
-            function showValidationErrors(errors) {
-                // Remove existing error messages
-                const existingErrors = document.querySelector('.validation-errors');
-                if (existingErrors) existingErrors.remove();
-                
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'validation-errors';
-                errorDiv.innerHTML = `
-                    <ul>
-                        ${errors.map(error => `<li>${error}</li>`).join('')}
-                    </ul>
-                `;
-                
-                const form = document.getElementById('donation-form');
-                form.insertBefore(errorDiv, form.firstChild);
-                
-                // Scroll to errors
-                errorDiv.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
+            // Note: showValidationErrors is now handled by the Stripe payment processor
             
-            function showSuccessMessage(message) {
-                // Remove existing messages
-                const existingMessages = document.querySelectorAll('.success-message, .error-message');
-                existingMessages.forEach(msg => msg.remove());
-                
-                const successDiv = document.createElement('div');
-                successDiv.className = 'success-message';
-                successDiv.textContent = message;
-                
-                const form = document.getElementById('donation-form');
-                form.insertBefore(successDiv, form.firstChild);
-                
-                // Auto-remove after 5 seconds
-                setTimeout(() => {
-                    if (successDiv.parentNode) {
-                        successDiv.remove();
-                    }
-                }, 5000);
-            }
-            
-            function showErrorMessage(message) {
-                // Remove existing messages
-                const existingMessages = document.querySelectorAll('.success-message, .error-message');
-                existingMessages.forEach(msg => msg.remove());
-                
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'error-message';
-                errorDiv.textContent = message;
-                
-                const form = document.getElementById('donation-form');
-                form.insertBefore(errorDiv, form.firstChild);
-                
-                // Auto-remove after 5 seconds
-                setTimeout(() => {
-                    if (errorDiv.parentNode) {
-                        errorDiv.remove();
-                    }
-                }, 5000);
-            }
+            // Note: showSuccessMessage and showErrorMessage are now handled by the Stripe payment processor
             // UI interaction logic, no changes needed here.
             const amountRaised=7e4,targetAmount=2e5,percentage=amountRaised/targetAmount*100,progressBar=document.getElementById("fund-progress-bar");progressBar&&setTimeout(()=>{progressBar.style.width=percentage+"%",progressBar.textContent=Math.round(percentage)+"%"},500);const donationTabs=document.querySelectorAll(".donation-tab"),donationTypeInput=document.getElementById("donation-type-input"),donationTypeDisplay=document.getElementById("donation-type-display");donationTabs.forEach(e=>{e.addEventListener("click",function(){donationTabs.forEach(e=>{e.classList.remove("active"),e.setAttribute("aria-selected","false"),e.setAttribute("tabindex","-1")}),this.classList.add("active"),this.setAttribute("aria-selected","true"),this.setAttribute("tabindex","0");const t=this.dataset.tab;donationTypeInput.value=t,donationTypeDisplay.textContent=t.charAt(0).toUpperCase()+t.slice(1).replace("-"," ")+" Donation"}),e.addEventListener("keydown",function(t){"Enter"!==t.key&&" "!==t.key||(t.preventDefault(),this.click())})});const amountOptions=document.querySelectorAll(".amount-option"),donationAmountInput=document.getElementById("donation-amount-input"),customAmountContainer=document.getElementById("custom-amount-container"),customAmountInput=document.getElementById("custom-amount");amountOptions.forEach(e=>{e.addEventListener("click",function(){amountOptions.forEach(e=>{e.classList.remove("active")}),this.classList.add("active");const t=this.dataset.amount;"custom"===t?(customAmountContainer.style.display="block",customAmountInput.focus(),donationAmountInput.value=""): (customAmountContainer.style.display="none",donationAmountInput.value=t,customAmountInput.value="")}),e.addEventListener("keydown",function(t){"Enter"!==t.key&&" "!==t.key||(t.preventDefault(),this.click())})}),customAmountInput&&(customAmountInput.addEventListener("input",function(){donationAmountInput.value=this.value&&this.value>0?this.value:""}),customAmountInput.addEventListener("blur",function(){if(!this.value||this.value<=0){customAmountContainer.style.display="none";const e=document.querySelector('.amount-option[data-amount="2500"]');e&&(amountOptions.forEach(e=>e.classList.remove("active")),e.classList.add("active"),donationAmountInput.value="2500")}}),customAmountInput.addEventListener("keydown",function(e){"Escape"===e.key&&this.blur()}));const anonymousCheckbox=document.getElementById("anonymous-donation"),leaderboardCheckbox=document.getElementById("leaderboard-consent");anonymousCheckbox&&leaderboardCheckbox&&anonymousCheckbox.addEventListener("change",function(){this.checked?(leaderboardCheckbox.checked=!1,leaderboardCheckbox.disabled=!0):(leaderboardCheckbox.disabled=!1,leaderboardCheckbox.checked=!0)});const mobileMenuToggle=document.querySelector(".mobile-menu-toggle"),nav=document.querySelector("nav");mobileMenuToggle&&nav&&(mobileMenuToggle.addEventListener("click",function(){const isExpanded=nav.classList.toggle("active");this.classList.toggle("active");this.setAttribute("aria-expanded",isExpanded)}),nav.querySelectorAll("a").forEach(e=>{e.addEventListener("click",function(){nav.classList.remove("active"),mobileMenuToggle.classList.remove("active"),mobileMenuToggle.setAttribute("aria-expanded","false")})}));
         });
@@ -759,31 +703,9 @@
           }
         }
         
-        function showValidationErrors(errors) {
-          // Remove existing validation messages
-          const existingMessages = document.querySelectorAll('.validation-message, .success-message, .error-message');
-          existingMessages.forEach(msg => msg.remove());
-
-          const errorDiv = document.createElement('div');
-          errorDiv.className = 'validation-message error-message';
-          errorDiv.innerHTML = '<strong>Please fix the following issues:</strong><ul>' + 
-            errors.map(error => `<li>${error}</li>`).join('') + 
-            '</ul>';
-
-          const form = document.getElementById('donation-form');
-          if (form) {
-            form.insertBefore(errorDiv, form.firstChild);
-          }
-
-          // Auto-remove after 15 seconds
-          setTimeout(() => {
-            if (errorDiv.parentNode) {
-              errorDiv.remove();
-            }
-          }, 15000);
-        }
-
-        // Define error and success message functions
+        // Note: showValidationErrors is now handled by the Stripe payment processor
+        
+        // Define error message function for form submission errors
         function showErrorMessage(message) {
             // Remove existing messages
             const existingMessages = document.querySelectorAll('.success-message, .error-message');
@@ -804,33 +726,6 @@
                     errorDiv.remove();
                 }
             }, 10000);
-        }
-        
-        function showSuccessMessage(message) {
-            // Remove existing messages
-            const existingMessages = document.querySelectorAll('.success-message, .error-message');
-            existingMessages.forEach(msg => msg.remove());
-
-            const successDiv = document.createElement('div');
-            successDiv.className = 'success-message';
-            successDiv.textContent = message;
-
-            const form = document.getElementById('donation-form');
-            if (form) {
-                form.insertBefore(successDiv, form.firstChild);
-            }
-
-            // Auto-remove after 10 seconds
-            setTimeout(() => {
-                if (successDiv.parentNode) {
-                    successDiv.remove();
-                }
-            }, 10000);
-        }
-        
-        function showValidationErrors(errors) {
-            const errorMessage = errors.join('\n');
-            showErrorMessage(errorMessage);
         }
 
         // Add real-time validation feedback

@@ -71,31 +71,31 @@ class PaymentProcessor {
             
             // Name validation (required unless anonymous)
             if (!anonymous && (!donorName || donorName.trim().length < 2)) {
-                validationErrors.push('Please enter your full name (at least 2 characters).');
+                validationErrors.push('Name must be at least 2 characters');
             }
             
             // Email validation (if provided)
             if (donorEmail && !this.isValidEmail(donorEmail)) {
-                validationErrors.push('Please enter a valid email address.');
+                validationErrors.push('Invalid email address');
             }
             
             // Phone validation (if provided)
             if (donorPhone && !this.isValidPhoneNumber(donorPhone, countryCode)) {
-                validationErrors.push('Please enter a valid phone number.');
+                validationErrors.push('Invalid phone number');
             }
             
             // At least one contact method required
             if (!donorEmail && !donorPhone) {
-                validationErrors.push('Please provide either an email address or phone number for payment confirmation.');
+                validationErrors.push('Email or phone required');
             }
             
             // Amount validation
             if (!amount || amount <= 0) {
-                validationErrors.push('Please enter a valid donation amount.');
+                validationErrors.push('Enter valid amount');
             } else if (amount < 100) {
-                validationErrors.push('Minimum donation amount is PKR 100.');
+                validationErrors.push('Minimum PKR 100');
             } else if (amount > 1000000) {
-                validationErrors.push('Maximum donation amount is PKR 1,000,000.');
+                validationErrors.push('Maximum PKR 1M');
             }
             
             // If there are validation errors, show them and stop
@@ -343,7 +343,7 @@ class PaymentProcessor {
 
         const errorDiv = document.createElement('div');
         errorDiv.className = 'validation-message error-message';
-        errorDiv.innerHTML = '<strong>Please fix the following issues:</strong><ul>' + 
+        errorDiv.innerHTML = '<strong>Fix these issues:</strong><ul>' + 
             errors.map(error => `<li>${error}</li>`).join('') + 
             '</ul>';
 
@@ -352,12 +352,12 @@ class PaymentProcessor {
             form.insertBefore(errorDiv, form.firstChild);
         }
 
-        // Auto-remove after 15 seconds
+        // Auto-remove after 10 seconds
         setTimeout(() => {
             if (errorDiv.parentNode) {
                 errorDiv.remove();
             }
-        }, 15000);
+        }, 10000);
     }
 
     // Real-time validation for form fields
@@ -408,29 +408,29 @@ class PaymentProcessor {
             case 'name':
                 if (value.length < 2) {
                     isValid = false;
-                    message = 'Name must be at least 2 characters';
+                    message = 'Name too short';
                 }
                 break;
             case 'email':
                 if (value && !this.isValidEmail(value)) {
                     isValid = false;
-                    message = 'Please enter a valid email address';
+                    message = 'Invalid email';
                 }
                 break;
             case 'phone':
                 if (value && !this.isValidPhoneNumber(value, countryCode)) {
                     isValid = false;
-                    message = 'Please enter a valid phone number';
+                    message = 'Invalid phone';
                 }
                 break;
             case 'amount':
                 const amount = parseInt(value);
                 if (isNaN(amount) || amount < 100) {
                     isValid = false;
-                    message = 'Minimum amount is PKR 100';
+                    message = 'Min PKR 100';
                 } else if (amount > 1000000) {
                     isValid = false;
-                    message = 'Maximum amount is PKR 1,000,000';
+                    message = 'Max PKR 1M';
                 }
                 break;
         }

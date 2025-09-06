@@ -1568,18 +1568,20 @@ footer {
     margin: 0 var(--spacing-xs);
 }
 
-/* Enhanced Form Validation Messages */
+/* Modern Compact Validation Messages */
 .validation-errors {
     background: linear-gradient(135deg, #dc3545, #c82333);
     color: var(--white);
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius-lg);
-    margin-bottom: var(--spacing-lg);
-    border-left: 5px solid #b21e2f;
-    box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-md);
+    border-left: 4px solid #b21e2f;
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.25);
     position: relative;
     overflow: hidden;
-    animation: slideInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.9rem;
+    line-height: 1.4;
 }
 
 .validation-errors::before {
@@ -1588,43 +1590,47 @@ footer {
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: linear-gradient(90deg, #ff6b6b, #ee5a52, #dc3545);
     animation: shimmer 2s infinite;
 }
 
 .validation-errors ul {
     margin: 0;
-    padding-left: var(--spacing-lg);
+    padding-left: var(--spacing-md);
     list-style: none;
 }
 
 .validation-errors li {
-    margin-bottom: var(--spacing-sm);
+    margin-bottom: var(--spacing-xs);
     position: relative;
-    padding-left: var(--spacing-md);
+    padding-left: var(--spacing-sm);
+    font-size: 0.85rem;
 }
 
 .validation-errors li::before {
-    content: '⚠️';
+    content: '•';
     position: absolute;
     left: 0;
     top: 0;
-    font-size: 1.1em;
+    font-size: 1.2em;
+    color: #ffcccb;
 }
 
 .success-message {
     background: linear-gradient(135deg, #10B981, #059669);
     color: var(--white);
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius-lg);
-    margin-bottom: var(--spacing-lg);
-    border-left: 5px solid #047857;
-    box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-md);
+    border-left: 4px solid #047857;
+    box-shadow: 0 4px 15px rgba(16, 185, 129, 0.25);
     position: relative;
     overflow: hidden;
-    animation: slideInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.4;
 }
 
 .success-message::before {
@@ -1633,32 +1639,35 @@ footer {
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: linear-gradient(90deg, #34d399, #10b981, #059669);
     animation: shimmer 2s infinite;
 }
 
 .success-message::after {
-    content: '✅';
+    content: '✓';
     position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-lg);
-    font-size: 1.5em;
-    opacity: 0.8;
+    top: 50%;
+    right: var(--spacing-md);
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    opacity: 0.9;
 }
 
 .error-message {
     background: linear-gradient(135deg, #EF4444, #dc2626);
     color: var(--white);
-    padding: var(--spacing-lg);
-    border-radius: var(--border-radius-lg);
-    margin-bottom: var(--spacing-lg);
-    border-left: 5px solid #b91c1c;
-    box-shadow: 0 8px 25px rgba(239, 68, 68, 0.3);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--border-radius-md);
+    margin-bottom: var(--spacing-md);
+    border-left: 4px solid #b91c1c;
+    box-shadow: 0 4px 15px rgba(239, 68, 68, 0.25);
     position: relative;
     overflow: hidden;
-    animation: slideInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    animation: slideInDown 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     text-align: center;
+    font-size: 0.9rem;
+    line-height: 1.4;
 }
 
 .error-message::before {
@@ -1667,23 +1676,102 @@ footer {
     top: 0;
     left: 0;
     right: 0;
-    height: 3px;
+    height: 2px;
     background: linear-gradient(90deg, #fca5a5, #ef4444, #dc2626);
     animation: shimmer 2s infinite;
 }
 
 .error-message::after {
-    content: '❌';
+    content: '✕';
     position: absolute;
-    top: var(--spacing-md);
-    right: var(--spacing-lg);
-    font-size: 1.5em;
-    opacity: 0.8;
+    top: 50%;
+    right: var(--spacing-md);
+    transform: translateY(-50%);
+    font-size: 1.2em;
+    opacity: 0.9;
 }
 
 @keyframes shimmer {
     0% { transform: translateX(-100%); }
     100% { transform: translateX(100%); }
+}
+
+/* Compact Field-Level Validation Messages */
+.field-error {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #EF4444, #dc2626);
+    color: var(--white);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    animation: slideInUp 0.3s ease;
+    z-index: 10;
+    border-left: 3px solid #b91c1c;
+}
+
+.field-success {
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #10B981, #059669);
+    color: var(--white);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    animation: slideInUp 0.3s ease;
+    z-index: 10;
+    border-left: 3px solid #047857;
+}
+
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Compact validation message for inline errors */
+.validation-message {
+    position: absolute;
+    bottom: -18px;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, #EF4444, #dc2626);
+    color: var(--white);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.75rem;
+    line-height: 1.2;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+    animation: slideInUp 0.3s ease;
+    z-index: 10;
+    border-left: 3px solid #b91c1c;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: all 0.3s ease;
+}
+
+.validation-message.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.validation-message.success {
+    background: linear-gradient(135deg, #10B981, #059669);
+    border-left-color: #047857;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
 }
 
 /* Enhanced Focus Indicators */

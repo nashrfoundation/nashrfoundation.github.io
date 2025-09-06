@@ -318,6 +318,11 @@ class MailerLiteService {
 
                 if (!createResponse.ok) {
                     const createResult = await createResponse.json();
+                    // If group already exists, that's fine
+                    if (createResult.message && createResult.message.includes('already been taken')) {
+                        console.log('✅ Newsletter group already exists (detected during creation)');
+                        return;
+                    }
                     throw new Error(`Failed to create newsletter group: ${createResult.message}`);
                 }
 
@@ -328,7 +333,7 @@ class MailerLiteService {
 
         } catch (error) {
             console.error('❌ Failed to ensure newsletter group:', error);
-            // Don't throw error, just log it
+            // Don't throw error, just log it - the service can still work without groups
         }
     }
 
@@ -345,8 +350,8 @@ class MailerLiteService {
             // Ensure newsletter group exists
             await this.ensureNewsletterGroup();
 
-            // Test by getting account info
-            const response = await fetch(`${this.baseUrl}/me`, {
+            // Test by getting groups (this endpoint exists and works)
+            const response = await fetch(`${this.baseUrl}/groups`, {
                 method: 'GET',
                 headers: {
                     'Authorization': `Bearer ${this.apiKey}`,
@@ -365,8 +370,8 @@ class MailerLiteService {
                 success: true,
                 message: 'MailerLite service is working',
                 data: {
-                    account: result.data.name,
-                    email: result.data.email
+                    groupsCount: result.data?.length || 0,
+                    newsletterGroup: result.data?.find(group => group.name === 'newsletter') ? 'Found' : 'Not found'
                 }
             };
 
