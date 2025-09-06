@@ -555,7 +555,9 @@ nav ul li a.active::after {
 }
 
 .hero {
-    position: relative;
+    position: fixed;
+    top: 0;
+    left: 0;
     height: 100vh;
     min-height: 600px;
     display: flex;
@@ -569,10 +571,7 @@ nav ul li a.active::after {
     will-change: transform;
     width: 100%;
     max-width: 100vw;
-    background-image: url('hero_background.webp');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    z-index: -1;
 }
 
 /* Remove hero-image to prevent dots/indicators */
@@ -611,6 +610,7 @@ nav ul li a.active::after {
 .aims {
     background-color: var(--bg-medium);
     padding: var(--spacing-xl) 0;
+    padding-top: calc(var(--spacing-xl) + 100vh);
 }
 
 .aims-grid {
@@ -832,6 +832,7 @@ table tr:hover {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-between;
 }
 
 .involvement-option h3 {
@@ -844,6 +845,14 @@ table tr:hover {
     margin-bottom: var(--spacing-md);
     order: 3;
     text-align: center;
+    flex-grow: 1;
+}
+
+/* Position buttons at bottom of involvement cards */
+.involvement-option .btn,
+.involvement-option .social-share {
+    margin-top: auto;
+    order: 4;
 }
 
 .involvement-option:hover {
@@ -2129,6 +2138,12 @@ section.visible {
     transform: translateY(0);
 }
 
+/* Fix for donate page - make all sections visible by default */
+body.donate-page section {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
 /* Mobile-Specific Animations */
 @media (max-width: 768px) {
     .mobile-slide-in {
@@ -2192,29 +2207,6 @@ section.visible {
     height: 100px;
 }
 
-/* Swipe Gesture Indicators */
-.swipe-indicator {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 8px;
-    z-index: 100;
-}
-
-.swipe-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.5);
-    transition: all 0.3s ease;
-}
-
-.swipe-dot.active {
-    background: var(--white);
-    transform: scale(1.2);
-}
 
 /* Mobile Navigation Enhancements */
 @media (max-width: 768px) {
@@ -3468,23 +3460,6 @@ section::before {
         opacity: 1;
     }
     
-    /* Desktop scroll indicators */
-    .scroll-indicator {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.1);
-        z-index: 1000;
-    }
-    
-    .scroll-progress {
-        height: 100%;
-        background: linear-gradient(90deg, var(--primary), var(--accent));
-        width: 0%;
-        transition: width 0.1s ease;
-    }
     
     /* Desktop section dividers */
     section::after {
@@ -3828,6 +3803,9 @@ section::before {
 main {
     display: block !important;
     visibility: visible !important;
+    margin-top: 0;
+    position: relative;
+    z-index: 1;
 }
 
 section {

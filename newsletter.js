@@ -207,10 +207,8 @@ function isValidEmail(email) {
 // Lightweight welcome email via Resend HTTP function if configured; falls back to EmailJS if present
 async function sendWelcomeEmail(email, name) {
     try {
-        const resendApiKey = window.RESEND_API_KEY || '';
-        if (resendApiKey) {
-            // Send welcome email directly via Resend API
-            const fromEmail = window.FROM_EMAIL || 'Nashr Foundation <no-reply@nashrfoundation.org>';
+        if (window.emailService) {
+            // Send welcome email via email service
             const subject = 'Welcome to Nashr Foundation Newsletter';
             const html = `
                 <p>Hi ${name || 'Friend'},</p>
@@ -218,29 +216,10 @@ async function sendWelcomeEmail(email, name) {
                 <p>Best regards,<br>The Nashr Foundation Team</p>
             `;
             
-            console.log('Sending welcome email via Resend API to:', email);
+            console.log('Sending welcome email via email service to:', email);
             
-            const res = await fetch('https://api.resend.com/emails', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${resendApiKey}`,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    from: fromEmail,
-                    to: [email],
-                    subject: subject,
-                    html: html
-                })
-            });
-            
-            if (!res.ok) {
-                const text = await res.text().catch(() => '');
-                throw new Error(`Welcome email failed: ${res.status} ${text}`);
-            }
-            
-            const responseData = await res.json().catch(() => ({}));
-            console.log('Welcome email sent successfully to:', email, 'ID:', responseData.id);
+            const result = await window.emailService.sendEmail(email, subject, html, 'welcome');
+            console.log('Welcome email sent successfully to:', email, 'Result:', result);
             return;
         }
         // Optional fallback to EmailJS if configured on window

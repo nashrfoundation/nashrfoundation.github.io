@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Service Test - Nashr Foundation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .btn {
+            background: #2A8D9C;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .btn:hover {
+            background: #1A6E7C;
+        }
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .log {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 14px;
+            max-height: 300px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📧 Email Service Test</h1>
+        <p>Test your Resend API configuration and email sending functionality.</p>
+        
+        <div class="status info" id="status">
+            Ready to test email service...
+        </div>
+        
+        <div>
+            <button class="btn" onclick="testEmailService()">Test Email Service</button>
+            <button class="btn" onclick="sendTestEmail()">Send Test Email</button>
+            <button class="btn" onclick="clearLog()">Clear Log</button>
+        </div>
+        
+        <h3>Test Log:</h3>
+        <div class="log" id="log"></div>
+    </div>
+
+    <!-- Email Service -->
+    <script src="email-service.js"></script>
+    
+    <script>
+        function log(message) {
+            const logDiv = document.getElementById('log');
+            const timestamp = new Date().toLocaleTimeString();
+            logDiv.textContent += `[${timestamp}] ${message}\n`;
+            logDiv.scrollTop = logDiv.scrollHeight;
+        }
+        
+        function setStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+        
+        async function testEmailService() {
+            setStatus('Testing email service...', 'info');
+            log('Starting email service test...');
+            
+            try {
+                if (!window.emailService) {
+                    throw new Error('Email service not loaded');
+                }
+                
+                log('Email service loaded successfully');
+                log(`Resend API Key: ${window.emailService.resendApiKey ? 'Configured' : 'Not configured'}`);
+                log(`From Email: ${window.emailService.fromEmail || 'Not configured'}`);
+                
+                const result = await window.emailService.testService();
+                
+                if (result.success) {
+                    setStatus('✅ Email service is working correctly!', 'success');
+                    log('✅ Test successful: ' + result.message);
+                } else {
+                    setStatus('❌ Email service test failed', 'error');
+                    log('❌ Test failed: ' + result.message);
+                }
+                
+            } catch (error) {
+                setStatus('❌ Email service test failed', 'error');
+                log('❌ Error: ' + error.message);
+                console.error('Email service test error:', error);
+            }
+        }
+        
+        async function sendTestEmail() {
+            setStatus('Sending test email...', 'info');
+            log('Sending test email...');
+            
+            try {
+                if (!window.emailService) {
+                    throw new Error('Email service not loaded');
+                }
+                
+                const testEmail = prompt('Enter email address to send test to:', 'test@example.com');
+                if (!testEmail) {
+                    log('Test email cancelled');
+                    return;
+                }
+                
+                log(`Sending test email to: ${testEmail}`);
+                
+                const result = await window.emailService.sendEmail(
+                    testEmail,
+                    'Test Email from Nashr Foundation',
+                    '<h2>Test Email</h2><p>This is a test email to verify your email service configuration.</p><p>If you received this, your email service is working correctly!</p>',
+                    'test'
+                );
+                
+                setStatus('✅ Test email sent successfully!', 'success');
+                log('✅ Test email sent successfully!');
+                log('Result: ' + JSON.stringify(result, null, 2));
+                
+            } catch (error) {
+                setStatus('❌ Failed to send test email', 'error');
+                log('❌ Error: ' + error.message);
+                console.error('Test email error:', error);
+            }
+        }
+        
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+            setStatus('Log cleared', 'info');
+        }
+        
+        // Initialize
+        window.addEventListener('load', function() {
+            log('Email service test page loaded');
+            log('Email service status: ' + (window.emailService ? 'Loaded' : 'Not loaded'));
+        });
+    </script>
+</body>
+</html>

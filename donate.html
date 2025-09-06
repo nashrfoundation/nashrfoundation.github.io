@@ -128,22 +128,7 @@
             margin-bottom: var(--spacing-md);
         }
         
-        /* Replace golden color with better option */
-        :root {
-            --accent: #4A90E2; /* Professional blue instead of gold */
-            --accent-light: #6BA3F0;
-            --accent-dark: #357ABD;
-        }
-        
-        /* Update any golden colors in the donate page */
-        .fund-details span {
-            color: var(--accent) !important;
-        }
-        
-        .progress-bar {
-            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%) !important;
-            box-shadow: 0 2px 10px rgba(74, 144, 226, 0.3) !important;
-        }
+        /* Use consistent theme colors from main styles */
         
         /* Fix donate page mobile layout */
         @media (max-width: 768px) {
@@ -184,7 +169,7 @@
         .progress-bar-container { background: #333333; border: 1px solid #555555; border-radius: 50px; overflow: hidden; max-width: 800px; margin: 20px auto; }
         .fund-details { font-size: 1.2em; font-weight: bold; font-family: 'Merriweather', serif; color: #f0f0f0; }
         .progress-bar { 
-            background: linear-gradient(90deg, #28a745 0%, #20c997 100%); 
+            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%); 
             height: 35px; 
             width: 0; 
             text-align: center; 
@@ -193,7 +178,7 @@
             transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); 
             border-radius: 50px; 
             font-weight: bold; 
-            box-shadow: 0 2px 10px rgba(40, 167, 69, 0.3); 
+            box-shadow: 0 2px 10px rgba(255, 181, 46, 0.3); 
             position: relative; 
             overflow: hidden; 
         }
@@ -213,7 +198,7 @@
             0% { left: -100%; }
             100% { left: 100%; }
         }
-        .fund-details span { color: #28a745; }
+        .fund-details span { color: var(--accent); }
         #qr-code-details img { max-width: 200px; margin: 20px auto; display: block; }
         .payment-option, .payment-option label { cursor: pointer; }
         .phone-input { display: flex; align-items: center; }
@@ -258,9 +243,9 @@
         }
         
         .card-input:focus {
-            border-color: #28a745;
+            border-color: var(--accent);
             outline: 0;
-            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+            box-shadow: 0 0 0 3px rgba(255, 181, 46, 0.2);
             background: #333;
         }
         
@@ -305,17 +290,17 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: #28a745;
+            color: var(--accent);
             font-size: 14px;
             font-weight: 600;
-            background: rgba(40, 167, 69, 0.1);
+            background: rgba(255, 181, 46, 0.1);
             padding: 8px 12px;
             border-radius: 6px;
-            border: 1px solid rgba(40, 167, 69, 0.3);
+            border: 1px solid rgba(255, 181, 46, 0.3);
         }
         
         .security-badge svg {
-            color: #28a745;
+            color: var(--accent);
         }
         
         .card-types {
@@ -393,8 +378,8 @@
         }
         
         .bank-card-form .form-control:focus {
-            border-color: #28a745;
-            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(255, 181, 46, 0.2);
             background: #333;
             outline: none;
         }
@@ -408,7 +393,7 @@
         
         .bank-card-form .card-input:focus {
             background: #333 !important;
-            border-color: #28a745 !important;
+            border-color: var(--accent) !important;
         }
         
 
@@ -417,13 +402,13 @@
         
         /* Success/Error Message Styles */
         .success-message {
-            background: linear-gradient(135deg, #28a745, #20c997);
+            background: linear-gradient(135deg, var(--accent), var(--accent-light));
             color: white;
             padding: 15px 20px;
             border-radius: 8px;
             margin-bottom: 20px;
-            border-left: 4px solid #1e7e34;
-            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+            border-left: 4px solid var(--accent-dark);
+            box-shadow: 0 4px 15px rgba(255, 181, 46, 0.3);
         }
         
         .error-message {
@@ -437,7 +422,7 @@
         }
     </style>
 </head>
-<body>
+<body class="donate-page">
     <!-- Skip Navigation for Accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
@@ -644,6 +629,11 @@
     </script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+            // Ensure all sections are visible on donate page
+            const sections = document.querySelectorAll('section');
+            sections.forEach(section => {
+                section.classList.add('visible');
+            });
             // Enhanced validation and user feedback functions
             function showValidationErrors(errors) {
                 // Remove existing error messages

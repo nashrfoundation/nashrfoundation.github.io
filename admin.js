@@ -1168,13 +1168,11 @@ async function sendNewsletter() {
             return;
         }
         
-        // Send emails directly via Resend API
-        const fromEmail = window.FROM_EMAIL || 'Nashr Foundation <no-reply@nashrfoundation.org>';
+        // Send emails using the email service
         let sentCount = 0;
         const maxRetries = 2;
         
-        console.log('Sending newsletter via Resend API...');
-        console.log('From email:', fromEmail);
+        console.log('Sending newsletter via email service...');
         console.log('Recipients:', recipients.length);
         
         // Send emails one by one to avoid rate limits
@@ -1186,44 +1184,17 @@ async function sendNewsletter() {
                 try {
                     console.log(`Sending to ${recipient} (${i + 1}/${recipients.length})`);
                     
-                    const res = await fetch('https://api.resend.com/emails', {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `Bearer ${resendApiKey}`,
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            from: fromEmail,
-                            to: [recipient],
-                            subject: subject,
-                            html: content
-                        })
-                    });
+                    // Use the email service
+                    const result = await window.emailService.sendEmail(
+                        recipient,
+                        subject,
+                        content,
+                        'newsletter'
+                    );
                     
-                    if (!res.ok) {
-                        const errText = await res.text().catch(() => '');
-                        console.error('Resend API error:', { 
-                            status: res.status, 
-                            errText, 
-                            recipient,
-                            attempt: attempt + 1
-                        });
-                        
-                        if (res.status === 401) {
-                            throw new Error('Invalid Resend API key. Please check your API key.');
-                        } else if (res.status === 422) {
-                            throw new Error(`Invalid email address: ${recipient}`);
-                        } else if (res.status === 429) {
-                            throw new Error('Rate limit exceeded. Please wait a moment and try again.');
-                        } else {
-                            throw new Error(`Resend API error: ${res.status} ${errText}`);
-                        }
-                    }
-                    
-                    const responseData = await res.json().catch(() => ({}));
                     console.log('Email sent successfully:', { 
                         recipient, 
-                        id: responseData.id,
+                        result,
                         attempt: attempt + 1
                     });
                     
@@ -2088,42 +2059,26 @@ function configureResendAPI(apiKey, fromEmail = 'Nashr Foundation <no-reply@nash
 // Test Resend API configuration
 async function testResendAPI() {
     try {
-        const apiKey = window.RESEND_API_KEY || '';
-        if (!apiKey) {
-            showError('Resend API key not configured. Please save your configuration first.');
+        if (!window.emailService) {
+            showError('Email service not loaded. Please refresh the page.');
             return;
         }
         
-        console.log('Testing Resend API...');
+        console.log('Testing email service...');
         
-        const fromEmail = window.FROM_EMAIL || 'Nashr Foundation <no-reply@nashrfoundation.org>';
+        const result = await window.emailService.testService();
         
-        const res = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                from: fromEmail,
-                to: ['test@example.com'],
-                subject: 'Test Email from Nashr Foundation',
-                html: '<p>This is a test email to verify Resend API configuration.</p>'
-            })
-        });
-        
-        if (!res.ok) {
-            const text = await res.text().catch(() => '');
-            throw new Error(`Resend API test failed: ${res.status} ${text}`);
+        if (result.success) {
+            console.log('Email service test successful:', result);
+            showSuccess('Email service is working correctly!');
+        } else {
+            console.error('Email service test failed:', result);
+            showError(`Email service test failed: ${result.message}`);
         }
         
-        const responseData = await res.json().catch(() => ({}));
-        console.log('Resend API test successful:', responseData);
-        showSuccess('Resend API is working correctly!');
-        
     } catch (error) {
-        console.error('Resend API test failed:', error);
-        showError(`Resend API test failed: ${error.message}`);
+        console.error('Email service test failed:', error);
+        showError(`Email service test failed: ${error.message}`);
     }
 }
 
@@ -2146,6 +2101,11 @@ function saveEmailConfig() {
         // Save to global variables
         window.RESEND_API_KEY = apiKey;
         window.FROM_EMAIL = fromEmail;
+        
+        // Configure the email service
+        if (window.emailService) {
+            window.emailService.configureResend(apiKey, fromEmail);
+        }
         
         // Show success message
         const statusDiv = document.getElementById('email-config-status');
