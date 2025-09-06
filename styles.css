@@ -555,7 +555,7 @@ nav ul li a.active::after {
 }
 
 .hero {
-    position: fixed !important;
+    position: fixed;
     top: 0;
     left: 0;
     height: 100vh;
@@ -567,15 +567,14 @@ nav ul li a.active::after {
     color: var(--white);
     margin-top: 0;
     overflow: hidden;
-    contain: layout style paint;
-    will-change: transform;
     width: 100%;
     max-width: 100vw;
     z-index: -1;
-    background-attachment: fixed !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
+    background-image: url('hero_background.webp');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
 }
 
 /* Remove hero-image to prevent dots/indicators */
@@ -2149,13 +2148,63 @@ body.donate-page section {
     transform: translateY(0) !important;
 }
 
-/* Global hero fix - ensure hero is always fixed */
-.hero {
-    position: fixed !important;
-    background-attachment: fixed !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
+
+/* Desktop Navigation - Only visible on big screens */
+.desktop-nav {
+    display: none;
+    gap: var(--spacing-lg);
+    align-items: center;
+}
+
+.nav-btn {
+    position: relative;
+    padding: var(--spacing-sm) var(--spacing-md);
+    color: var(--white);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    border-radius: var(--border-radius);
+    transition: all 0.3s ease;
+    overflow: hidden;
+}
+
+.nav-btn::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s ease;
+}
+
+.nav-btn:hover::before {
+    left: 100%;
+}
+
+.nav-btn:hover {
+    color: var(--accent);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(255, 181, 46, 0.3);
+}
+
+.nav-btn.active {
+    color: var(--accent);
+    background: rgba(255, 181, 46, 0.1);
+    border: 1px solid rgba(255, 181, 46, 0.3);
+}
+
+.nav-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 2px;
+    background: var(--accent);
+    border-radius: 1px;
 }
 
 /* Fix for donate page hero - make it fixed like index page */
@@ -2164,8 +2213,9 @@ body.donate-page .hero {
     top: 0;
     left: 0;
     height: 100vh;
-    min-height: 700px;
+    min-height: 100vh;
     z-index: -1;
+    background-image: url('hero_background.webp');
     background-attachment: fixed;
     background-size: cover;
     background-position: center;
@@ -3133,6 +3183,13 @@ section::before {
     
 }
 
+/* Show desktop navigation on big screens only */
+@media (min-width: 1024px) {
+    .desktop-nav {
+        display: flex;
+    }
+}
+
 /* Large desktop screens (1440px+) */
 @media (min-width: 1440px) {
     .container {
@@ -3807,7 +3864,7 @@ section::before {
 main {
     display: block !important;
     visibility: visible !important;
-    margin-top: 0;
+    margin-top: 100vh;
     position: relative;
     z-index: 1;
 }

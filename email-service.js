@@ -52,7 +52,7 @@ window.emailService = new EmailService();
 if (window.emailJSService) {
     window.emailJSService.configure(
         'service_01wge0v',
-        'template_newsletter',
+        '__ejs-test-mail-service__',
         '8vdEHnT9o9ThMp3qc'
     );
 }
