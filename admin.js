@@ -1039,105 +1039,13 @@ function saveContentChanges() {
 async function loadNewsletterData() {
     try {
         console.log('Loading newsletter data...');
-        showSectionLoading('.newsletter-editor .stats-grid', 'Loading newsletter statistics...');
         
-        // Add timeout to prevent infinite loading
-        const timeoutId = setTimeout(() => {
-            console.warn('Newsletter data loading timeout, hiding loading state');
-            hideSectionLoading('.newsletter-editor .stats-grid');
-        }, 10000); // 10 second timeout
-        
-        // Fetch real-time newsletter subscriber statistics from Supabase
-        const { data: subscribers, error: subscribersError } = await supabase
-            .from('newsletter_subscribers')
-            .select('status');
-            
-        console.log('Newsletter subscribers query result:', { subscribers, error: subscribersError, count: subscribers?.length });
-            
-        if (subscribersError) {
-            console.error('Newsletter subscribers query error:', subscribersError);
-            // If table doesn't exist or permission denied, show zero counts
-            if (subscribersError.code === 'PGRST116' || subscribersError.code === '42501' || 
-                subscribersError.message.includes('relation') || subscribersError.message.includes('does not exist') ||
-                subscribersError.message.includes('permission denied') || subscribersError.message.includes('Forbidden') ||
-                subscribersError.message.includes('row-level security policy')) {
-                console.log('Newsletter subscribers table not accessible due to RLS policies, showing zero counts');
-                const totalEl = document.getElementById('total-subscribers');
-                const activeEl = document.getElementById('active-subscribers');
-                const unsubEl = document.getElementById('unsubscribed');
-                if (totalEl) totalEl.textContent = '0';
-                if (activeEl) activeEl.textContent = '0';
-                if (unsubEl) unsubEl.textContent = '0';
-                
-                // Add test subscribers button when no data is accessible
-                const newsletterSection = document.getElementById('newsletter');
-                if (newsletterSection && !newsletterSection.querySelector('.add-test-subscribers-btn')) {
-                    const buttonDiv = document.createElement('div');
-                    buttonDiv.className = 'add-test-subscribers-btn';
-                    buttonDiv.style.marginTop = '10px';
-                    buttonDiv.innerHTML = `
-                        <button onclick="addTestSubscribers()" class="btn btn-outline btn-sm">
-                            Add Test Subscribers
-                        </button>
-                    `;
-                    newsletterSection.appendChild(buttonDiv);
-                }
-                
-                clearTimeout(timeoutId);
-                hideSectionLoading('.newsletter-editor .stats-grid');
-                return;
-            }
-            throw new Error(`Failed to fetch subscribers: ${subscribersError.message}`);
-        }
-        
-        // Calculate statistics
-        const totalSubscribers = subscribers.length;
-        const activeSubscribers = subscribers.filter(s => s.status === 'active').length;
-        const unsubscribed = subscribers.filter(s => s.status === 'unsubscribed').length;
-        
-        // Update UI - check if elements exist before updating
-        const totalEl = document.getElementById('total-subscribers');
-        const activeEl = document.getElementById('active-subscribers');
-        const unsubEl = document.getElementById('unsubscribed');
-        
-        if (totalEl) totalEl.textContent = totalSubscribers.toLocaleString();
-        if (activeEl) activeEl.textContent = activeSubscribers.toLocaleString();
-        if (unsubEl) unsubEl.textContent = unsubscribed.toLocaleString();
-        
-        // Add test subscribers button if no subscribers exist
-        if (totalSubscribers === 0) {
-            const newsletterSection = document.getElementById('newsletter');
-            if (newsletterSection && !newsletterSection.querySelector('.add-test-subscribers-btn')) {
-                const buttonDiv = document.createElement('div');
-                buttonDiv.className = 'add-test-subscribers-btn';
-                buttonDiv.style.marginTop = '10px';
-                buttonDiv.innerHTML = `
-                    <button onclick="addTestSubscribers()" class="btn btn-outline btn-sm">
-                        Add Test Subscribers
-                    </button>
-                `;
-                newsletterSection.appendChild(buttonDiv);
-            }
-        }
-        
-        clearTimeout(timeoutId);
-        hideSectionLoading('.newsletter-editor .stats-grid');
+        // Just load subscribers data for the table, no statistics needed
+        await loadSubscribersData();
         
     } catch (error) {
         console.error('Failed to load newsletter data:', error);
         showError('Failed to load newsletter data. Please try again.');
-        
-        // Ensure loading is hidden even on error
-        clearTimeout(timeoutId);
-        hideSectionLoading('.newsletter-editor .stats-grid');
-        
-        // Show zero counts on error
-        const totalEl = document.getElementById('total-subscribers');
-        const activeEl = document.getElementById('active-subscribers');
-        const unsubEl = document.getElementById('unsubscribed');
-        if (totalEl) totalEl.textContent = '0';
-        if (activeEl) activeEl.textContent = '0';
-        if (unsubEl) unsubEl.textContent = '0';
     }
 }
 
@@ -2241,6 +2149,23 @@ async function testNewsletterFunction() {
             return;
         }
         
+        console.log('Testing endpoint:', endpoint);
+        
+        // First, try a simple HEAD request to check if the endpoint is reachable
+        try {
+            const headResponse = await fetch(endpoint, {
+                method: 'HEAD',
+                mode: 'cors',
+                credentials: 'omit'
+            });
+            console.log('Endpoint reachability test:', { 
+                status: headResponse.status, 
+                ok: headResponse.ok 
+            });
+        } catch (headError) {
+            console.warn('HEAD request failed, but continuing with POST test:', headError);
+        }
+        
         // Check if it's a Supabase Edge Function and add authentication headers
         const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
         let headers = { 'Content-Type': 'application/json' };
@@ -2260,6 +2185,8 @@ async function testNewsletterFunction() {
         
         const res = await fetch(endpoint, {
             method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
             headers: headers,
             body: JSON.stringify({
                 type: 'newsletter',
@@ -2287,7 +2214,12 @@ async function testNewsletterFunction() {
         
     } catch (error) {
         console.error('Test newsletter failed:', error);
-        showError(`Test newsletter failed: ${error.message}`);
+        
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            showError('Network error: Cannot reach the email service. Check if the Edge Function URL is correct and accessible.');
+        } else {
+            showError(`Test newsletter failed: ${error.message}`);
+        }
     }
 }
 

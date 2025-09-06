@@ -197,7 +197,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         </section>
 
         <section class="leaderboard">
-            <div class="container"> <h2>Top Donors</h2> <p>Join our generous supporters in making a difference</p> <div class="leaderboard-table"> <table> <thead> <tr> <th>Rank</th> <th>Name</th> <th>Amount</th> </tr> </thead> <tbody id="leaderboard-data"> <tr> <td colspan="3">Loading donor data...</td> </tr> </tbody> </table> </div> <div class="leaderboard-cta"> <a href="donate.html" class="btn">Become a Donor</a> </div> </div>
+            <div class="container"> <h2>Top Donors</h2> <p>Join our generous supporters in making a difference</p> <div class="leaderboard-table"> <table> <thead> <tr> <th>Rank</th> <th>Name</th> <th>Amount</th> </tr> </thead> <tbody id="leaderboard-data"> <tr> <td><div class="skeleton-loading narrow"></div></td> <td><div class="skeleton-loading wide"></div></td> <td><div class="skeleton-loading medium"></div></td> </tr> <tr> <td><div class="skeleton-loading narrow"></div></td> <td><div class="skeleton-loading wide"></div></td> <td><div class="skeleton-loading medium"></div></td> </tr> <tr> <td><div class="skeleton-loading narrow"></div></td> <td><div class="skeleton-loading wide"></div></td> <td><div class="skeleton-loading medium"></div></td> </tr> </tbody> </table> </div> <div class="leaderboard-cta"> <a href="donate.html" class="btn">Become a Donor</a> </div> </div>
         </section>
 
         <section class="get-involved">
@@ -262,6 +262,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </div>
     </footer>
+
+    <!-- Back to Top Button -->
+    <button class="back-to-top" id="backToTop" aria-label="Back to top">
+        ↑
+    </button>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
 
     <!-- Consent Banner -->
     <div id="consent-banner" style="position:fixed!important;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom, 0px) + 12px);z-index:10000;background:rgba(26,26,26,0.98);color:#fff;padding:12px 16px;display:none;border:1px solid #444;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,0.4);box-sizing:border-box;contain:none!important;">
@@ -361,6 +369,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     
     <!-- Deferred scripts that do not block rendering -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js" defer></script>
+    <script src="ui-enhancements.js" defer></script>
     <script src="leaderboard.js" defer></script>
     <script src="performance.js" defer></script>
     <script defer>
