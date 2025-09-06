@@ -153,20 +153,17 @@ class MailerLiteService {
             });
 
             // Create a campaign in MailerLite
-            // For regular campaigns, we need to specify emails directly
+            // For regular campaigns, we need to specify emails as objects with details
             const campaignData = {
                 name: `Newsletter - ${subject} - ${new Date().toISOString()}`,
                 type: 'regular',
-                subject: subject,
-                from: {
-                    name: 'Nashr Foundation',
-                    email: 'nashrfoundationpk@gmail.com'
-                },
-                content: {
-                    html: content,
-                    text: this.stripHtml(content)
-                },
-                emails: recipients // Required for regular campaigns
+                emails: [{
+                    subject: subject,
+                    from_name: 'Nashr Foundation',
+                    from: 'nashrfoundationpk@gmail.com',
+                    content: content
+                }],
+                groups: ['newsletter'] // Send to newsletter group
             };
 
             console.log('Creating campaign with data:', campaignData);
