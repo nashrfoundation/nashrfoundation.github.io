@@ -132,6 +132,12 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     <!-- Skip Navigation for Accessibility -->
     <a href="#main-content" class="skip-link">Skip to main content</a>
     
+    <!-- PWA Status Bar -->
+    <div class="pwa-status-bar"></div>
+    
+    <!-- Page Transition Overlay -->
+    <div class="page-transition" id="pageTransition"></div>
+    
     <!-- Loading Overlay -->
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
@@ -139,6 +145,48 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             <p>Loading...</p>
         </div>
     </div>
+    
+    <!-- Mobile Navigation Overlay -->
+    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
+    
+    <!-- Mobile Navigation -->
+    <nav class="mobile-nav" id="mobileNav">
+        <div class="mobile-nav-header">
+            <div class="logo">
+                <img src="logo.webp" alt="Nashr Foundation Logo">
+            </div>
+            <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close navigation">
+                ×
+            </button>
+        </div>
+        <div class="mobile-nav-menu">
+            <div class="mobile-nav-item">
+                <a href="#hero" class="mobile-nav-link">
+                    <span>Home</span>
+                </a>
+            </div>
+            <div class="mobile-nav-item">
+                <a href="#aims" class="mobile-nav-link">
+                    <span>Our Aims</span>
+                </a>
+            </div>
+            <div class="mobile-nav-item">
+                <a href="#leaderboard" class="mobile-nav-link">
+                    <span>Leaderboard</span>
+                </a>
+            </div>
+            <div class="mobile-nav-item">
+                <a href="#get-involved" class="mobile-nav-link">
+                    <span>Get Involved</span>
+                </a>
+            </div>
+            <div class="mobile-nav-item">
+                <a href="donate.html" class="mobile-nav-link">
+                    <span>Donate</span>
+                </a>
+            </div>
+        </div>
+    </nav>
     
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K5F6S4VV"
@@ -176,7 +224,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </header>
 
     <main id="main-content">
-        <section class="hero">
+        <section class="hero" id="hero">
             <div class="hero-image">
                 <img 
                   src="hero_background.webp"
@@ -192,7 +240,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </section>
 
-        <section class="aims">
+        <section class="aims" id="aims">
             <div class="container">
                 <h2>Our Aims</h2>
                 <div class="aims-grid">
@@ -204,11 +252,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             </div>
         </section>
 
-        <section class="leaderboard">
+        <section class="leaderboard" id="leaderboard">
             <div class="container"> <h2>Top Donors</h2> <p>Join our generous supporters in making a difference</p> <div class="leaderboard-table"> <table> <thead> <tr> <th>Rank</th> <th>Name</th> <th>Amount</th> </tr> </thead> <tbody id="leaderboard-data"> <tr> <td><div class="skeleton-loading narrow"></div></td> <td><div class="skeleton-loading wide"></div></td> <td><div class="skeleton-loading medium"></div></td> </tr> <tr> <td><div class="skeleton-loading narrow"></div></td> <td><div class="skeleton-loading wide"></div></td> <td><div class="skeleton-loading medium"></div></td> </tr> <tr> <td><div class="skeleton-loading narrow"></div></td> <td><div class="skeleton-loading wide"></div></td> <td><div class="skeleton-loading medium"></div></td> </tr> </tbody> </table> </div> <div class="leaderboard-cta"> <a href="donate.html" class="btn">Become a Donor</a> </div> </div>
         </section>
 
-        <section class="get-involved">
+        <section class="get-involved" id="get-involved">
             <div class="container"> <h2>Get Involved</h2> <div class="involvement-options"> <div class="involvement-option" data-aos="fade-up"> <h3>Donate</h3> <p>Your financial support helps us provide essential services to those in need.</p> <a href="donate.html" class="btn btn-outline">Donate Now</a> </div> <div class="involvement-option" data-aos="fade-up" data-aos-delay="100"> <h3>Volunteer</h3> <p>Join our team of dedicated volunteers making a difference in communities.</p> <button class="btn btn-outline" aria-disabled="true" disabled>Coming Soon</button> </div> <div class="involvement-option" data-aos="fade-up" data-aos-delay="200"> <h3>Spread Awareness</h3> <p>Share our mission with your network and help us reach more people.</p> <div class="social-share"> <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" width="24" height="24" loading="lazy" decoding="async"></a> <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" width="24" height="24" loading="lazy" decoding="async"></a> </div> </div> </div> </div>
         </section>
     </main>
@@ -278,6 +326,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- Toast Container -->
     <div class="toast-container" id="toastContainer"></div>
+    
+    <!-- PWA Install Banner -->
+    <div class="pwa-install-banner" id="pwaInstallBanner">
+        <div class="pwa-install-content">
+            <div class="pwa-install-icon">📱</div>
+            <div class="pwa-install-text">
+                <h4>Install Nashr Foundation App</h4>
+                <p>Get quick access and stay updated with our work</p>
+            </div>
+            <div class="pwa-install-actions">
+                <button class="pwa-install-btn primary" id="pwaInstallBtn">Install</button>
+                <button class="pwa-install-btn secondary" id="pwaInstallDismiss">Later</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Swipe Indicators -->
+    <div class="swipe-indicator" id="swipeIndicator">
+        <div class="swipe-dot active"></div>
+        <div class="swipe-dot"></div>
+        <div class="swipe-dot"></div>
+        <div class="swipe-dot"></div>
+    </div>
 
     <!-- Consent Banner -->
     <div id="consent-banner" style="position:fixed!important;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom, 0px) + 12px);z-index:10000;background:rgba(26,26,26,0.98);color:#fff;padding:12px 16px;display:none;border:1px solid #444;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,0.4);box-sizing:border-box;contain:none!important;">
@@ -378,6 +449,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- Deferred scripts that do not block rendering -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js" defer></script>
     <script src="ui-enhancements.js" defer></script>
+    <script src="mobile-pwa.js" defer></script>
     <script src="leaderboard.js" defer></script>
     <script src="performance.js" defer></script>
     <script defer>

@@ -2002,6 +2002,409 @@ footer {
     color: var(--text-secondary);
 }
 
+/* ===== SMOOTH PAGE TRANSITIONS & MOBILE ENHANCEMENTS ===== */
+
+/* Smooth Page Transitions */
+.page-transition {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+    z-index: 9999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.page-transition.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.page-transition::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 50px;
+    height: 50px;
+    margin: -25px 0 0 -25px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-top: 3px solid var(--white);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+/* Section Transitions */
+section {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+section.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Mobile-Specific Animations */
+@media (max-width: 768px) {
+    .mobile-slide-in {
+        transform: translateX(-100%);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .mobile-slide-in.active {
+        transform: translateX(0);
+    }
+    
+    .mobile-fade-up {
+        opacity: 0;
+        transform: translateY(20px);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .mobile-fade-up.active {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .mobile-scale-in {
+        opacity: 0;
+        transform: scale(0.9);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .mobile-scale-in.active {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Touch-Friendly Interactions */
+.touch-target {
+    min-height: 44px;
+    min-width: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.touch-feedback {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.3s ease, height 0.3s ease;
+    pointer-events: none;
+}
+
+.touch-target:active .touch-feedback {
+    width: 100px;
+    height: 100px;
+}
+
+/* Swipe Gesture Indicators */
+.swipe-indicator {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 8px;
+    z-index: 100;
+}
+
+.swipe-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transition: all 0.3s ease;
+}
+
+.swipe-dot.active {
+    background: var(--white);
+    transform: scale(1.2);
+}
+
+/* Mobile Navigation Enhancements */
+@media (max-width: 768px) {
+    .mobile-nav-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+        z-index: 998;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+    }
+    
+    .mobile-nav-overlay.active {
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    .mobile-nav {
+        position: fixed;
+        top: 0;
+        left: -100%;
+        width: 80%;
+        max-width: 300px;
+        height: 100%;
+        background: var(--bg-medium);
+        backdrop-filter: blur(20px);
+        z-index: 999;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow-y: auto;
+    }
+    
+    .mobile-nav.active {
+        left: 0;
+    }
+    
+    .mobile-nav-header {
+        padding: var(--spacing-lg);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    
+    .mobile-nav-close {
+        background: none;
+        border: none;
+        color: var(--text-primary);
+        font-size: 1.5rem;
+        cursor: pointer;
+        padding: var(--spacing-sm);
+        border-radius: 50%;
+        transition: background-color 0.2s ease;
+    }
+    
+    .mobile-nav-close:active {
+        background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .mobile-nav-menu {
+        padding: var(--spacing-lg);
+    }
+    
+    .mobile-nav-item {
+        margin-bottom: var(--spacing-md);
+    }
+    
+    .mobile-nav-link {
+        display: flex;
+        align-items: center;
+        gap: var(--spacing-md);
+        padding: var(--spacing-md);
+        color: var(--text-primary);
+        text-decoration: none;
+        border-radius: var(--border-radius-md);
+        transition: all 0.2s ease;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .mobile-nav-link::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+        transition: left 0.3s ease;
+    }
+    
+    .mobile-nav-link:active::before {
+        left: 100%;
+    }
+    
+    .mobile-nav-link:active {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(0.98);
+    }
+}
+
+/* PWA-Specific Styles */
+.pwa-install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--bg-medium);
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding: var(--spacing-md);
+    z-index: 1000;
+    transform: translateY(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pwa-install-banner.show {
+    transform: translateY(0);
+}
+
+.pwa-install-content {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-md);
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.pwa-install-icon {
+    width: 40px;
+    height: 40px;
+    background: var(--primary);
+    border-radius: var(--border-radius-md);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-size: 1.2rem;
+}
+
+.pwa-install-text {
+    flex: 1;
+}
+
+.pwa-install-text h4 {
+    margin: 0 0 var(--spacing-xs) 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+}
+
+.pwa-install-text p {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+}
+
+.pwa-install-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.pwa-install-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.pwa-install-btn.primary {
+    background: var(--primary);
+    color: var(--white);
+}
+
+.pwa-install-btn.secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.pwa-install-btn:active {
+    transform: scale(0.95);
+}
+
+/* App-like Status Bar */
+.pwa-status-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: env(safe-area-inset-top, 0px);
+    background: var(--primary);
+    z-index: 10001;
+}
+
+/* Enhanced Touch Interactions */
+@media (hover: none) and (pointer: coarse) {
+    .btn:hover {
+        transform: none;
+        box-shadow: var(--shadow-md);
+    }
+    
+    .btn:active {
+        transform: scale(0.95);
+        box-shadow: var(--shadow-sm);
+    }
+    
+    .aim-item:hover {
+        transform: none;
+        box-shadow: var(--shadow-lg);
+    }
+    
+    .aim-item:active {
+        transform: scale(0.98);
+        box-shadow: var(--shadow-md);
+    }
+    
+    .social-icons a:hover img {
+        transform: none;
+        filter: brightness(1.1);
+    }
+    
+    .social-icons a:active img {
+        transform: scale(1.1);
+        filter: brightness(1.2);
+    }
+}
+
+/* Swipe Gesture Areas */
+.swipe-area {
+    position: relative;
+    overflow: hidden;
+    touch-action: pan-y;
+}
+
+.swipe-handle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.swipe-handle::before,
+.swipe-handle::after {
+    content: '';
+    position: absolute;
+    top: -8px;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+}
+
+.swipe-handle::before {
+    left: 8px;
+}
+
+.swipe-handle::after {
+    right: 8px;
+}
+
 /* ===== PROFESSIONAL ENHANCEMENTS ===== */
 
 /* Enhanced Visual Hierarchy */
@@ -2369,6 +2772,166 @@ section::before {
         right: 20px;
         width: 45px;
         height: 45px;
+    }
+    
+    /* Mobile-specific touch improvements */
+    .btn {
+        min-height: 48px;
+        font-size: 1rem;
+        padding: var(--spacing-md) var(--spacing-lg);
+    }
+    
+    .aim-item, .involvement-option {
+        margin-bottom: var(--spacing-lg);
+        padding: var(--spacing-lg);
+    }
+    
+    /* Mobile navigation improvements */
+    .mobile-nav {
+        width: 85%;
+        max-width: 320px;
+    }
+    
+    .mobile-nav-link {
+        padding: var(--spacing-lg);
+        font-size: 1.1rem;
+    }
+    
+    /* PWA install banner mobile */
+    .pwa-install-banner {
+        padding: var(--spacing-lg);
+    }
+    
+    .pwa-install-content {
+        flex-direction: column;
+        text-align: center;
+        gap: var(--spacing-md);
+    }
+    
+    .pwa-install-actions {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .pwa-install-btn {
+        flex: 1;
+        max-width: 120px;
+    }
+}
+
+/* Mobile landscape optimizations */
+@media (max-width: 768px) and (orientation: landscape) {
+    .hero {
+        min-height: 100vh;
+        padding: var(--spacing-md) 0;
+    }
+    
+    .hero-content h1 {
+        font-size: clamp(1.5rem, 4vw, 2rem);
+    }
+    
+    .hero-content p {
+        font-size: clamp(0.9rem, 2vw, 1.1rem);
+    }
+    
+    .mobile-nav {
+        width: 60%;
+        max-width: 280px;
+    }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+    /* Remove hover effects on touch devices */
+    .btn:hover,
+    .aim-item:hover,
+    .involvement-option:hover,
+    .social-icons a:hover {
+        transform: none;
+    }
+    
+    /* Enhanced touch feedback */
+    .btn:active,
+    .aim-item:active,
+    .involvement-option:active {
+        transform: scale(0.95);
+        transition: transform 0.1s ease;
+    }
+    
+    /* Larger touch targets */
+    .social-icons a {
+        padding: var(--spacing-sm);
+        margin: 0 var(--spacing-xs);
+    }
+    
+    .mobile-menu-toggle {
+        padding: var(--spacing-sm);
+    }
+    
+    /* Improved form interactions */
+    .form-control {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: var(--spacing-lg);
+    }
+    
+    .form-checkbox input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+    }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .logo img,
+    .footer-logo img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+    .page-transition,
+    .mobile-slide-in,
+    .mobile-fade-up,
+    .mobile-scale-in,
+    .swipe-handle,
+    .touch-feedback {
+        transition: none;
+        animation: none;
+    }
+    
+    .page-transition::before {
+        animation: none;
+    }
+    
+    .loading-spinner {
+        animation: none;
+    }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-dark: #0a0a0a;
+        --bg-medium: #1a1a1a;
+        --bg-light: #2a2a2a;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn {
+        border: 2px solid currentColor;
+    }
+    
+    .aim-item,
+    .involvement-option {
+        border: 2px solid var(--text-primary);
+    }
+    
+    .form-control {
+        border: 2px solid var(--text-primary);
     }
 }
 

@@ -7,12 +7,49 @@
   "background_color": "#1a1a1a",
   "theme_color": "#2A8D9C",
   "orientation": "portrait-primary",
+  "display_override": ["window-controls-overlay", "standalone"],
   "icons": [
+    {
+      "src": "./logo.webp",
+      "sizes": "72x72",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "./logo.webp",
+      "sizes": "96x96",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "./logo.webp",
+      "sizes": "128x128",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "./logo.webp",
+      "sizes": "144x144",
+      "type": "image/webp",
+      "purpose": "any"
+    },
+    {
+      "src": "./logo.webp",
+      "sizes": "152x152",
+      "type": "image/webp",
+      "purpose": "any"
+    },
     {
       "src": "./logo.webp",
       "sizes": "192x192",
       "type": "image/webp",
       "purpose": "any maskable"
+    },
+    {
+      "src": "./logo.webp",
+      "sizes": "384x384",
+      "type": "image/webp",
+      "purpose": "any"
     },
     {
       "src": "./logo.webp",
@@ -25,5 +62,48 @@
   "lang": "en",
   "dir": "ltr",
   "scope": "./",
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "screenshots": [
+    {
+      "src": "./hero_background.webp",
+      "sizes": "1280x720",
+      "type": "image/webp",
+      "form_factor": "wide",
+      "label": "Nashr Foundation Homepage"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Donate Now",
+      "short_name": "Donate",
+      "description": "Make a donation to support our cause",
+      "url": "./donate.html",
+      "icons": [
+        {
+          "src": "./logo.webp",
+          "sizes": "96x96",
+          "type": "image/webp"
+        }
+      ]
+    },
+    {
+      "name": "Admin Portal",
+      "short_name": "Admin",
+      "description": "Access admin dashboard",
+      "url": "./admin.html",
+      "icons": [
+        {
+          "src": "./logo.webp",
+          "sizes": "96x96",
+          "type": "image/webp"
+        }
+      ]
+    }
+  ],
+  "edge_side_panel": {
+    "preferred_width": 400
+  },
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }

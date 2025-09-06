@@ -1184,17 +1184,8 @@ async function sendNewsletter() {
         let headers = { 'Content-Type': 'application/json' };
         
         if (isSupabaseFunction) {
-            // Add Supabase authentication headers
-            const { data: { session } } = await supabase.auth.getSession();
-            if (session?.access_token) {
-                headers['Authorization'] = `Bearer ${session.access_token}`;
-                console.log('Using Supabase session token for authentication');
-            } else {
-                console.warn('No Supabase session found, using API key only');
-            }
-            // Also add the API key as fallback
-            headers['apikey'] = supabaseConfig.anonKey;
-            console.log('Headers for Supabase Edge Function:', headers);
+            // Your Edge Function doesn't require authentication, so just use basic headers
+            console.log('Using basic headers for Supabase Edge Function (no auth required)');
         }
         
         // Batch sending to avoid large payloads; retry with backoff
@@ -2247,6 +2238,26 @@ async function testEdgeFunctionResponse() {
         }
         
         console.log('Testing Edge Function response...');
+        console.log('Endpoint URL:', endpoint);
+        
+        // First, test basic connectivity
+        try {
+            console.log('Testing basic connectivity...');
+            const basicResponse = await fetch(endpoint, {
+                method: 'GET',
+                mode: 'cors',
+                credentials: 'omit'
+            });
+            console.log('Basic connectivity test:', {
+                status: basicResponse.status,
+                ok: basicResponse.ok,
+                statusText: basicResponse.statusText
+            });
+        } catch (basicError) {
+            console.error('Basic connectivity test failed:', basicError);
+            showError(`Cannot reach Edge Function: ${basicError.message}. Check if the function is deployed and accessible.`);
+            return;
+        }
         
         const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
         let headers = { 'Content-Type': 'application/json' };
@@ -2255,9 +2266,14 @@ async function testEdgeFunctionResponse() {
             const { data: { session } } = await supabase.auth.getSession();
             if (session?.access_token) {
                 headers['Authorization'] = `Bearer ${session.access_token}`;
+                console.log('Using session token for authentication');
+            } else {
+                console.warn('No session token available, using API key only');
             }
             headers['apikey'] = supabaseConfig.anonKey;
         }
+        
+        console.log('Request headers:', headers);
         
         const res = await fetch(endpoint, {
             method: 'POST',
@@ -2290,7 +2306,96 @@ async function testEdgeFunctionResponse() {
         
     } catch (error) {
         console.error('Edge Function test failed:', error);
-        showError(`Edge Function test failed: ${error.message}`);
+        
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            showError('Network error: Cannot reach the Edge Function. This could be due to:\n1. Edge Function not deployed\n2. CORS issues\n3. Network connectivity problems\n4. Incorrect URL');
+        } else {
+            showError(`Edge Function test failed: ${error.message}`);
+        }
+    }
+}
+
+// Test basic Supabase connectivity
+async function testSupabaseConnectivity() {
+    try {
+        console.log('Testing Supabase connectivity...');
+        
+        // Test basic Supabase API
+        const { data, error } = await supabase.from('settings').select('*').limit(1);
+        
+        if (error) {
+            console.error('Supabase connectivity test failed:', error);
+            showError(`Supabase connectivity failed: ${error.message}`);
+            return;
+        }
+        
+        console.log('Supabase connectivity test successful:', data);
+        showSuccess('Supabase connectivity is working!');
+        
+        // Test Edge Function URL format
+        const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
+        if (endpoint) {
+            console.log('Edge Function URL:', endpoint);
+            
+            if (endpoint.includes('supabase.co/functions/v1/')) {
+                showSuccess('Edge Function URL format looks correct');
+            } else {
+                showError('Edge Function URL format may be incorrect. Should contain "supabase.co/functions/v1/"');
+            }
+        } else {
+            showError('No Edge Function URL configured');
+        }
+        
+    } catch (error) {
+        console.error('Supabase connectivity test failed:', error);
+        showError(`Supabase connectivity test failed: ${error.message}`);
+    }
+}
+
+// Test Edge Function with minimal payload
+async function testEdgeFunctionMinimal() {
+    try {
+        const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
+        if (!endpoint) {
+            showError('No email service configured.');
+            return;
+        }
+        
+        console.log('Testing Edge Function with minimal payload...');
+        
+        // Test with just the basic headers (no authentication)
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                type: 'welcome',
+                to: 'test@example.com',
+                name: 'Test User'
+            })
+        });
+        
+        const responseText = await res.text().catch(() => '');
+        
+        console.log('Minimal test response:', {
+            status: res.status,
+            ok: res.ok,
+            statusText: res.statusText,
+            body: responseText
+        });
+        
+        if (res.ok) {
+            showSuccess(`Edge Function working! Status: ${res.status}, Response: ${responseText}`);
+        } else {
+            showError(`Edge Function error! Status: ${res.status}, Response: ${responseText}`);
+        }
+        
+    } catch (error) {
+        console.error('Minimal Edge Function test failed:', error);
+        showError(`Minimal test failed: ${error.message}`);
     }
 }
 

@@ -214,22 +214,8 @@ async function sendWelcomeEmail(email, name) {
             let headers = { 'Content-Type': 'application/json' };
             
             if (isSupabaseFunction) {
-                // Get Supabase client and session
-                const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-                const supabase = createClient(
-                    'https://jtuhnndwhotxjjolwcuz.supabase.co',
-                    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
-                );
-                
-                const { data: { session } } = await supabase.auth.getSession();
-                if (session?.access_token) {
-                    headers['Authorization'] = `Bearer ${session.access_token}`;
-                    console.log('Using Supabase session token for welcome email');
-                } else {
-                    console.warn('No Supabase session found for welcome email, using API key only');
-                }
-                // Also add the API key as fallback
-                headers['apikey'] = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc';
+                // Your Edge Function doesn't require authentication, so just use basic headers
+                console.log('Using basic headers for welcome email (no auth required)');
             }
             
             const res = await fetch(endpoint, {
