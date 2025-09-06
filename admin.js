@@ -40,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeSupabase();
     setupEventListeners();
     checkAuthState();
-    loadEmailConfig();
 });
 
 // Supabase Initialization
@@ -2056,87 +2055,6 @@ function configureEmailJS(serviceId, templateId, publicKey) {
     }
 }
 
-// Test EmailJS configuration
-async function testEmailJS() {
-    try {
-        if (!window.emailService) {
-            showError('Email service not loaded. Please refresh the page.');
-            return;
-        }
-        
-        console.log('Testing email service...');
-        
-        const result = await window.emailService.testService();
-        
-        if (result.success) {
-            console.log('Email service test successful:', result);
-            showSuccess('Email service is working correctly!');
-        } else {
-            console.error('Email service test failed:', result);
-            showError(`Email service test failed: ${result.message}`);
-        }
-        
-    } catch (error) {
-        console.error('Email service test failed:', error);
-        showError(`Email service test failed: ${error.message}`);
-    }
-}
-
-// Save email configuration
-function saveEmailConfig() {
-    try {
-        const serviceId = document.getElementById('emailjs-service-id').value.trim();
-        const templateId = document.getElementById('emailjs-template-id').value.trim();
-        const publicKey = document.getElementById('emailjs-public-key').value.trim();
-        
-        if (!serviceId || !templateId || !publicKey) {
-            showError('Please enter all EmailJS credentials.');
-            return;
-        }
-        
-        // Configure EmailJS
-        configureEmailJS(serviceId, templateId, publicKey);
-        
-        // Show success message
-        const statusDiv = document.getElementById('email-config-status');
-        const messageSpan = document.getElementById('email-config-message');
-        
-        messageSpan.textContent = 'EmailJS configuration saved successfully!';
-        statusDiv.style.display = 'block';
-        statusDiv.className = 'config-status success';
-        
-        // Hide after 3 seconds
-        setTimeout(() => {
-            statusDiv.style.display = 'none';
-        }, 3000);
-        
-        console.log('EmailJS configuration saved:', { 
-            serviceId, 
-            templateId, 
-            publicKey: publicKey.substring(0, 10) + '...' 
-        });
-        
-    } catch (error) {
-        console.error('Failed to save email configuration:', error);
-        showError('Failed to save email configuration. Please try again.');
-    }
-}
-
-// Load email configuration on page load
-function loadEmailConfig() {
-    try {
-        // Set default values if not already configured
-        if (window.emailJSService) {
-            document.getElementById('emailjs-service-id').value = window.emailJSService.serviceId || '';
-            document.getElementById('emailjs-template-id').value = window.emailJSService.templateId || '';
-            document.getElementById('emailjs-public-key').value = window.emailJSService.publicKey || '';
-        }
-        
-        console.log('Email configuration loaded');
-    } catch (error) {
-        console.error('Failed to load email configuration:', error);
-    }
-}
 
 // Test welcome email function
 async function testWelcomeEmail(email = 'test@example.com') {
