@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Service Test - Nashr Foundation</title>
+    <title>EmailJS Test - Nashr Foundation</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -67,33 +67,61 @@
             overflow-y: auto;
             white-space: pre-wrap;
         }
+        .credentials {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>📧 Email Service Test</h1>
-        <p>Test your Resend API configuration and email sending functionality.</p>
+        <h1>📧 EmailJS Test - Nashr Foundation</h1>
+        <p>Test your EmailJS configuration with your actual credentials.</p>
+        
+        <div class="credentials">
+            <strong>Your EmailJS Credentials:</strong><br>
+            Service ID: service_01wge0v<br>
+            Public Key: 8vdEHnT9o9ThMp3qc<br>
+            Template ID: template_newsletter (needs to be created)
+        </div>
         
         <div class="status info" id="status">
-            Ready to test email service...
+            Ready to test EmailJS...
         </div>
         
         <div>
-            <button class="btn" onclick="testEmailService()">Test Email Service</button>
+            <button class="btn" onclick="testEmailJS()">Test EmailJS Connection</button>
             <button class="btn" onclick="sendTestEmail()">Send Test Email</button>
             <button class="btn" onclick="clearLog()">Clear Log</button>
         </div>
         
         <h3>Test Log:</h3>
         <div class="log" id="log"></div>
+        
+        <div class="status info" style="margin-top: 20px;">
+            <strong>Next Steps:</strong><br>
+            1. If the test fails, you need to create an email template in EmailJS<br>
+            2. Go to your EmailJS dashboard → Email Templates<br>
+            3. Create a new template with ID: <code>template_newsletter</code><br>
+            4. Use this template content:<br>
+            <pre style="background: white; padding: 10px; border-radius: 3px; margin-top: 10px;">
+Subject: {{subject}}
+
+From: {{from_name}} &lt;{{from_email}}&gt;
+To: {{to_name}} &lt;{{to_email}}&gt;
+
+{{message}}
+            </pre>
+        </div>
     </div>
 
-    <!-- EmailJS Service -->
+    <!-- EmailJS -->
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
     <script src="emailjs-service.js"></script>
-    
-    <!-- Email Service -->
-    <script src="email-service.js"></script>
     
     <script>
         function log(message) {
@@ -109,33 +137,41 @@
             statusDiv.className = `status ${type}`;
         }
         
-        async function testEmailService() {
-            setStatus('Testing email service...', 'info');
-            log('Starting email service test...');
+        function clearLog() {
+            document.getElementById('log').textContent = '';
+            setStatus('Log cleared', 'info');
+        }
+        
+        async function testEmailJS() {
+            setStatus('Testing EmailJS connection...', 'info');
+            log('Starting EmailJS test...');
             
             try {
-                if (!window.emailService) {
-                    throw new Error('Email service not loaded');
+                if (!window.emailJSService) {
+                    throw new Error('EmailJS service not loaded');
                 }
                 
-                log('Email service loaded successfully');
-                log(`Resend API Key: ${window.emailService.resendApiKey ? 'Configured' : 'Not configured'}`);
-                log(`From Email: ${window.emailService.fromEmail || 'Not configured'}`);
+                log('EmailJS service loaded successfully');
+                log(`Service ID: ${window.emailJSService.serviceId}`);
+                log(`Template ID: ${window.emailJSService.templateId}`);
+                log(`Public Key: ${window.emailJSService.publicKey.substring(0, 10)}...`);
                 
-                const result = await window.emailService.testService();
+                const result = await window.emailJSService.testService();
                 
                 if (result.success) {
-                    setStatus('✅ Email service is working correctly!', 'success');
+                    setStatus('✅ EmailJS is working correctly!', 'success');
                     log('✅ Test successful: ' + result.message);
+                    log('🎉 Your email service is ready to use!');
                 } else {
-                    setStatus('❌ Email service test failed', 'error');
+                    setStatus('❌ EmailJS test failed', 'error');
                     log('❌ Test failed: ' + result.message);
+                    log('💡 You may need to create the email template in your EmailJS dashboard');
                 }
                 
             } catch (error) {
-                setStatus('❌ Email service test failed', 'error');
+                setStatus('❌ EmailJS test failed', 'error');
                 log('❌ Error: ' + error.message);
-                console.error('Email service test error:', error);
+                console.error('EmailJS test error:', error);
             }
         }
         
@@ -144,8 +180,8 @@
             log('Sending test email...');
             
             try {
-                if (!window.emailService) {
-                    throw new Error('Email service not loaded');
+                if (!window.emailJSService) {
+                    throw new Error('EmailJS service not loaded');
                 }
                 
                 const testEmail = prompt('Enter email address to send test to:', 'test@example.com');
@@ -156,10 +192,10 @@
                 
                 log(`Sending test email to: ${testEmail}`);
                 
-                const result = await window.emailService.sendEmail(
+                const result = await window.emailJSService.sendEmail(
                     testEmail,
                     'Test Email from Nashr Foundation',
-                    '<h2>Test Email</h2><p>This is a test email to verify your email service configuration.</p><p>If you received this, your email service is working correctly!</p>',
+                    '<h2>Test Email</h2><p>This is a test email to verify your EmailJS configuration.</p><p>If you received this, your email service is working correctly!</p>',
                     'test'
                 );
                 
@@ -174,15 +210,12 @@
             }
         }
         
-        function clearLog() {
-            document.getElementById('log').textContent = '';
-            setStatus('Log cleared', 'info');
-        }
-        
         // Initialize
         window.addEventListener('load', function() {
-            log('Email service test page loaded');
-            log('Email service status: ' + (window.emailService ? 'Loaded' : 'Not loaded'));
+            log('EmailJS test page loaded');
+            log('Service ID: service_01wge0v');
+            log('Public Key: 8vdEHnT9o9ThMp3qc');
+            log('Template ID: template_newsletter (needs to be created)');
         });
     </script>
 </body>

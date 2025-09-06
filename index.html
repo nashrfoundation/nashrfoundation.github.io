@@ -146,47 +146,6 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
         </div>
     </div>
     
-    <!-- Mobile Navigation Overlay -->
-    <div class="mobile-nav-overlay" id="mobileNavOverlay"></div>
-    
-    <!-- Mobile Navigation -->
-    <nav class="mobile-nav" id="mobileNav">
-        <div class="mobile-nav-header">
-            <div class="logo">
-                <img src="logo.webp" alt="Nashr Foundation Logo">
-            </div>
-            <button class="mobile-nav-close" id="mobileNavClose" aria-label="Close navigation">
-                ×
-            </button>
-        </div>
-        <div class="mobile-nav-menu">
-            <div class="mobile-nav-item">
-                <a href="#hero" class="mobile-nav-link">
-                    <span>Home</span>
-                </a>
-            </div>
-            <div class="mobile-nav-item">
-                <a href="#aims" class="mobile-nav-link">
-                    <span>Our Aims</span>
-                </a>
-            </div>
-            <div class="mobile-nav-item">
-                <a href="#leaderboard" class="mobile-nav-link">
-                    <span>Leaderboard</span>
-                </a>
-            </div>
-            <div class="mobile-nav-item">
-                <a href="#get-involved" class="mobile-nav-link">
-                    <span>Get Involved</span>
-                </a>
-            </div>
-            <div class="mobile-nav-item">
-                <a href="donate.html" class="mobile-nav-link">
-                    <span>Donate</span>
-                </a>
-            </div>
-        </div>
-    </nav>
     
     <!-- Google Tag Manager (noscript) -->
 <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-K5F6S4VV"
@@ -199,12 +158,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <img src="logo.webp" alt="Nashr Foundation Logo" decoding="async">
                 </a>
             </div>
-            <nav id="mobile-nav" aria-label="Main navigation">
-                <ul>
-                    <li><a href="index.html" class="active">Home</a></li>
-                    <li><a href="donate.html">Donate</a></li>
-                </ul>
-            </nav>
             <div class="social-icons">
                 <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" width="24" height="24" loading="lazy" decoding="async"></a>
                 <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" width="24" height="24" loading="lazy" decoding="async"></a>
@@ -215,11 +168,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             <div class="donate-button">
                 <a href="donate.html" class="btn">Donate Now</a>
             </div>
-            <button class="mobile-menu-toggle" aria-label="Toggle mobile menu" aria-expanded="false" aria-controls="mobile-nav">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
         </div>
     </header>
 
@@ -607,6 +555,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       window.EMAILJS_TEMPLATE_ID = window.EMAILJS_TEMPLATE_ID || '';
       window.EMAILJS_PUBLIC_KEY = window.EMAILJS_PUBLIC_KEY || '';
     </script>
+    <!-- EmailJS Service -->
+    <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <script src="emailjs-service.js" defer></script>
+    
     <!-- Email Service -->
     <script src="email-service.js" defer></script>
     

@@ -24,12 +24,17 @@ class EmailService {
     // Send email with multiple fallback methods
     async sendEmail(to, subject, html, type = 'newsletter') {
         try {
-            // Try Resend first (if configured)
+            // Try EmailJS first (most reliable for browser)
+            if (window.emailJSService) {
+                return await window.emailJSService.sendEmail(to, subject, html, type);
+            }
+            
+            // Fallback to Resend (if configured)
             if (this.resendApiKey) {
                 return await this.sendViaResend(to, subject, html);
             }
             
-            // Fallback to EmailJS
+            // Fallback to EmailJS config
             if (this.emailjsConfig) {
                 return await this.sendViaEmailJS(to, subject, html, type);
             }
@@ -42,32 +47,68 @@ class EmailService {
         }
     }
 
-    // Send via Resend API (with CORS proxy)
+    // Send via Resend API (using serverless function to bypass CORS)
     async sendViaResend(to, subject, html) {
-        const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-        const resendUrl = 'https://api.resend.com/emails';
+        // Use a serverless function to bypass CORS issues
+        const serverlessUrl = 'https://nashrfoundation-email.vercel.app/api/send-email';
         
-        const response = await fetch(proxyUrl + resendUrl, {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${this.resendApiKey}`,
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({
-                from: this.fromEmail,
-                to: Array.isArray(to) ? to : [to],
-                subject: subject,
-                html: html
-            })
-        });
-
-        if (!response.ok) {
-            const errorText = await response.text().catch(() => '');
-            throw new Error(`Resend API error: ${response.status} ${errorText}`);
+        try {
+            console.log('Sending email via serverless function...');
+            
+            const response = await fetch(serverlessUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    to: Array.isArray(to) ? to : [to],
+                    subject: subject,
+                    html: html,
+                    type: 'newsletter'
+                })
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text().catch(() => '');
+                throw new Error(`Serverless function error: ${response.status} ${errorText}`);
+            }
+            
+            const result = await response.json();
+            
+            if (!result.success) {
+                throw new Error(result.error || 'Unknown serverless function error');
+            }
+            
+            console.log('Email sent successfully via serverless function');
+            return result.data;
+            
+        } catch (error) {
+            console.error('Serverless function failed, trying fallback...', error);
+            
+            // Fallback: Try direct Resend API with a simple CORS proxy
+            const fallbackUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent('https://api.resend.com/emails');
+            
+            const response = await fetch(fallbackUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${this.resendApiKey}`,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    from: this.fromEmail,
+                    to: Array.isArray(to) ? to : [to],
+                    subject: subject,
+                    html: html
+                })
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text().catch(() => '');
+                throw new Error(`Resend API fallback error: ${response.status} ${errorText}`);
+            }
+            
+            return await response.json();
         }
-
-        return await response.json();
     }
 
     // Send via EmailJS (fallback)
@@ -110,5 +151,14 @@ window.emailService.configureResend(
     're_LPnRzAL8_CG6cby57HsRVguQGRYLgFCxE',
     'Nashr Foundation <no-reply@nashrfoundation.org>'
 );
+
+// Auto-configure EmailJS with your credentials
+if (window.emailJSService) {
+    window.emailJSService.configure(
+        'service_01wge0v',
+        'template_newsletter',
+        '8vdEHnT9o9ThMp3qc'
+    );
+}
 
 console.log('📧 Email Service initialized with Resend API');
