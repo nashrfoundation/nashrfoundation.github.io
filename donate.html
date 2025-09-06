@@ -396,6 +396,37 @@
             border-color: var(--accent) !important;
         }
         
+        /* Validation styles */
+        .form-control.invalid {
+            border-color: #e74c3c !important;
+            box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2) !important;
+        }
+        
+        .field-error {
+            color: #e74c3c;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+            display: block;
+        }
+        
+        .validation-message {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 0.375rem;
+            margin-bottom: 1rem;
+        }
+        
+        .validation-message ul {
+            margin: 0.5rem 0 0 1rem;
+            padding: 0;
+        }
+        
+        .validation-message li {
+            margin-bottom: 0.25rem;
+        }
+        
 
         
 
@@ -733,6 +764,53 @@
             stripeDetails.style.display = 'block';
         }
         
+        // Validation helper functions
+        function isValidEmail(email) {
+          const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          return emailRegex.test(email.trim());
+        }
+        
+        function isValidPhoneNumber(phone, countryCode) {
+          // Remove all non-digit characters
+          const cleanPhone = phone.replace(/\D/g, '');
+          
+          // Validation based on country code
+          switch (countryCode) {
+            case '+92': // Pakistan
+              return cleanPhone.length >= 10 && cleanPhone.length <= 11 && cleanPhone.startsWith('3');
+            case '+1': // USA/Canada
+              return cleanPhone.length === 10;
+            case '+44': // UK
+              return cleanPhone.length >= 10 && cleanPhone.length <= 11;
+            default:
+              return cleanPhone.length >= 7 && cleanPhone.length <= 15;
+          }
+        }
+        
+        function showValidationErrors(errors) {
+          // Remove existing validation messages
+          const existingMessages = document.querySelectorAll('.validation-message, .success-message, .error-message');
+          existingMessages.forEach(msg => msg.remove());
+
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'validation-message error-message';
+          errorDiv.innerHTML = '<strong>Please fix the following issues:</strong><ul>' + 
+            errors.map(error => `<li>${error}</li>`).join('') + 
+            '</ul>';
+
+          const form = document.getElementById('donation-form');
+          if (form) {
+            form.insertBefore(errorDiv, form.firstChild);
+          }
+
+          // Auto-remove after 15 seconds
+          setTimeout(() => {
+            if (errorDiv.parentNode) {
+              errorDiv.remove();
+            }
+          }, 15000);
+        }
+
         // Define error and success message functions
         function showErrorMessage(message) {
             // Remove existing messages
@@ -783,6 +861,93 @@
             showErrorMessage(errorMessage);
         }
 
+        // Add real-time validation feedback
+        function addFieldValidation() {
+          const nameField = document.getElementById('donor-name');
+          const emailField = document.getElementById('donor-email');
+          const phoneField = document.getElementById('donor-phone');
+          const countryCodeField = document.getElementById('country-code');
+          const anonymousCheckbox = document.getElementById('anonymous-donation');
+          
+          // Name field validation
+          if (nameField) {
+            nameField.addEventListener('blur', function() {
+              const anonymous = anonymousCheckbox.checked;
+              if (!anonymous && (!this.value || this.value.trim().length < 2)) {
+                this.classList.add('invalid');
+                showFieldError(this, 'Please enter your full name (at least 2 characters)');
+              } else {
+                this.classList.remove('invalid');
+                clearFieldError(this);
+              }
+            });
+          }
+          
+          // Email field validation
+          if (emailField) {
+            emailField.addEventListener('blur', function() {
+              if (this.value && !isValidEmail(this.value)) {
+                this.classList.add('invalid');
+                showFieldError(this, 'Please enter a valid email address');
+              } else {
+                this.classList.remove('invalid');
+                clearFieldError(this);
+              }
+            });
+          }
+          
+          // Phone field validation
+          if (phoneField && countryCodeField) {
+            phoneField.addEventListener('blur', function() {
+              const countryCode = countryCodeField.value;
+              if (this.value && !isValidPhoneNumber(this.value, countryCode)) {
+                this.classList.add('invalid');
+                showFieldError(this, 'Please enter a valid phone number');
+              } else {
+                this.classList.remove('invalid');
+                clearFieldError(this);
+              }
+            });
+            
+            // Re-validate phone when country code changes
+            countryCodeField.addEventListener('change', function() {
+              if (phoneField.value) {
+                phoneField.dispatchEvent(new Event('blur'));
+              }
+            });
+          }
+          
+          // Anonymous checkbox - clear name validation when checked
+          if (anonymousCheckbox) {
+            anonymousCheckbox.addEventListener('change', function() {
+              if (this.checked && nameField) {
+                nameField.classList.remove('invalid');
+                clearFieldError(nameField);
+              } else if (!this.checked && nameField) {
+                nameField.dispatchEvent(new Event('blur'));
+              }
+            });
+          }
+        }
+        
+        function showFieldError(field, message) {
+          clearFieldError(field);
+          const errorDiv = document.createElement('div');
+          errorDiv.className = 'field-error';
+          errorDiv.textContent = message;
+          field.parentNode.appendChild(errorDiv);
+        }
+        
+        function clearFieldError(field) {
+          const existingError = field.parentNode.querySelector('.field-error');
+          if (existingError) {
+            existingError.remove();
+          }
+        }
+        
+        // Initialize field validation
+        addFieldValidation();
+
         form.addEventListener("submit", async (e) => {
             // This is the most important line. It stops the page reload.
             e.preventDefault(); 
@@ -807,22 +972,42 @@
             const anonymous = document.getElementById("anonymous-donation").checked;
             const leaderboardConsent = document.getElementById("leaderboard-consent").checked;
 
-            // Enhanced validation with better user feedback
+            // Enhanced validation with comprehensive checks
             const validationErrors = [];
             
-            if (!email && !phone) {
-              validationErrors.push("Please provide either an email or phone number.");
+            // Name validation (required unless anonymous)
+            if (!anonymous && (!name || name.trim().length < 2)) {
+              validationErrors.push("Please enter your full name (at least 2 characters).");
             }
             
+            // Email validation (if provided)
+            if (email && !isValidEmail(email)) {
+              validationErrors.push("Please enter a valid email address.");
+            }
+            
+            // Phone validation (if provided)
+            if (phone && !isValidPhoneNumber(phone, countryCode)) {
+              validationErrors.push("Please enter a valid phone number.");
+            }
+            
+            // At least one contact method required
+            if (!email && !phone) {
+              validationErrors.push("Please provide either an email address or phone number for payment confirmation.");
+            }
+            
+            // Amount validation
             if (!amount || isNaN(amount) || Number(amount) <= 0) {
               validationErrors.push("Please enter a valid donation amount.");
+            } else if (Number(amount) < 100) {
+              validationErrors.push("Minimum donation amount is PKR 100.");
+            } else if (Number(amount) > 1000000) {
+              validationErrors.push("Maximum donation amount is PKR 1,000,000.");
             }
-            
-
             
             if (validationErrors.length > 0) {
               showValidationErrors(validationErrors);
               submitButton.disabled = false;
+              submitButton.classList.remove('loading');
               submitButton.textContent = "Complete Donation";
               return;
             }

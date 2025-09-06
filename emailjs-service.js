@@ -47,16 +47,42 @@ class EmailJSService {
                 await this.initialize();
             }
 
+            // Validate configuration
+            if (!this.serviceId || !this.templateId || !this.publicKey) {
+                throw new Error('EmailJS not properly configured. Please check service ID, template ID, and public key.');
+            }
+
+            // Try multiple template parameter formats to ensure compatibility
             const templateParams = {
+                // Standard EmailJS parameters
                 to_email: Array.isArray(to) ? to[0] : to,
                 subject: subject,
                 message: html,
                 type: type,
                 from_name: 'Nashr Foundation',
-                to_name: 'Friend'
+                to_name: 'Friend',
+                
+                // Alternative parameter names that might be expected
+                to: Array.isArray(to) ? to[0] : to,
+                email: Array.isArray(to) ? to[0] : to,
+                content: html,
+                body: html,
+                html_content: html,
+                recipient: Array.isArray(to) ? to[0] : to,
+                
+                // Additional context
+                organization: 'Nashr Foundation',
+                website: 'https://nashrfoundation.github.io',
+                timestamp: new Date().toISOString()
             };
 
-            console.log('Sending email via EmailJS:', { to, subject, type });
+            console.log('Sending email via EmailJS:', { 
+                to: Array.isArray(to) ? to[0] : to, 
+                subject, 
+                type,
+                serviceId: this.serviceId,
+                templateId: this.templateId
+            });
 
             const result = await emailjs.send(
                 this.serviceId,
@@ -69,7 +95,38 @@ class EmailJSService {
 
         } catch (error) {
             console.error('EmailJS sending failed:', error);
-            throw new Error(`EmailJS error: ${error.message}`);
+            console.error('Error details:', {
+                status: error.status,
+                statusText: error.statusText,
+                message: error.message,
+                text: error.text,
+                response: error.response
+            });
+            
+            // Provide more specific error messages
+            let errorMessage = 'EmailJS error: ';
+            
+            if (error.status === 400) {
+                errorMessage += 'Bad request - check template parameters';
+            } else if (error.status === 401) {
+                errorMessage += 'Unauthorized - check public key';
+            } else if (error.status === 404) {
+                errorMessage += 'Service or template not found - check IDs';
+            } else if (error.status === 403) {
+                errorMessage += 'Forbidden - check service permissions';
+            } else if (error.status === 429) {
+                errorMessage += 'Rate limit exceeded - too many requests';
+            } else if (error.text) {
+                errorMessage += error.text;
+            } else if (error.message) {
+                errorMessage += error.message;
+            } else if (error.response) {
+                errorMessage += JSON.stringify(error.response);
+            } else {
+                errorMessage += `Unknown error (Status: ${error.status || 'N/A'})`;
+            }
+            
+            throw new Error(errorMessage);
         }
     }
 
@@ -80,11 +137,30 @@ class EmailJSService {
                 await this.initialize();
             }
 
-            const result = await this.sendEmail(
-                'test@example.com',
-                'Test Email from Nashr Foundation',
-                '<p>This is a test email to verify EmailJS configuration.</p>',
-                'test'
+            // First check configuration
+            const configCheck = this.checkConfiguration();
+            if (!configCheck.valid) {
+                return {
+                    success: false,
+                    message: `Configuration error: ${configCheck.message}`
+                };
+            }
+
+            // Test with minimal parameters first
+            console.log('Testing EmailJS with minimal parameters...');
+            
+            const minimalParams = {
+                to_email: 'test@example.com',
+                subject: 'Test Email',
+                message: 'This is a test email.',
+                from_name: 'Nashr Foundation'
+            };
+
+            // Try sending with minimal parameters first
+            const result = await emailjs.send(
+                this.serviceId,
+                this.templateId,
+                minimalParams
             );
 
             return {
@@ -94,11 +170,41 @@ class EmailJSService {
             };
 
         } catch (error) {
+            console.error('EmailJS test error details:', error);
             return {
                 success: false,
-                message: `EmailJS test failed: ${error.message}`
+                message: `EmailJS test failed: ${error.message || 'Unknown error'}`
             };
         }
+    }
+
+    // Check EmailJS configuration
+    checkConfiguration() {
+        const issues = [];
+        
+        if (!this.serviceId || this.serviceId === 'service_nashrfoundation') {
+            issues.push('Service ID not configured or using placeholder');
+        }
+        
+        if (!this.templateId || this.templateId === 'template_newsletter') {
+            issues.push('Template ID not configured or using placeholder');
+        }
+        
+        if (!this.publicKey || this.publicKey === 'your_emailjs_public_key') {
+            issues.push('Public key not configured or using placeholder');
+        }
+        
+        if (issues.length > 0) {
+            return {
+                valid: false,
+                message: issues.join(', ')
+            };
+        }
+        
+        return {
+            valid: true,
+            message: 'Configuration looks good'
+        };
     }
 
     // Configure EmailJS
@@ -108,16 +214,60 @@ class EmailJSService {
         this.publicKey = publicKey;
         console.log('EmailJS configured:', { serviceId, templateId, publicKey: publicKey.substring(0, 10) + '...' });
     }
+
+    // Test different template IDs to find a working one
+    async findWorkingTemplate() {
+        const commonTemplateIds = [
+            'template_newsletter',
+            'template_contact',
+            'template_default',
+            'template_1',
+            'template_2',
+            'template_3'
+        ];
+
+        for (const templateId of commonTemplateIds) {
+            try {
+                console.log(`Testing template: ${templateId}`);
+                
+                const result = await emailjs.send(
+                    this.serviceId,
+                    templateId,
+                    {
+                        to_email: 'test@example.com',
+                        subject: 'Test',
+                        message: 'Test message',
+                        from_name: 'Nashr Foundation'
+                    }
+                );
+                
+                console.log(`✅ Template ${templateId} works!`);
+                return {
+                    success: true,
+                    templateId: templateId,
+                    result: result
+                };
+                
+            } catch (error) {
+                console.log(`❌ Template ${templateId} failed:`, error.message);
+            }
+        }
+        
+        return {
+            success: false,
+            message: 'No working template found'
+        };
+    }
 }
 
 // Create global email service instance
 window.emailJSService = new EmailJSService();
 
-// Auto-configure with default values (you'll need to replace these with your actual EmailJS credentials)
+// Auto-configure with actual EmailJS credentials
 window.emailJSService.configure(
-    'service_nashrfoundation',
+    'service_01wge0v',
     'template_newsletter', 
-    'your_emailjs_public_key'
+    '8vdEHnT9o9ThMp3qc'
 );
 
 console.log('📧 EmailJS Service initialized');

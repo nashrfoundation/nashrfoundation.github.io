@@ -30,16 +30,42 @@ class PaymentProcessor {
 
             console.log('📝 Donor info:', { donorName, donorEmail, donorPhone, anonymous, leaderboardConsent });
 
-            // Validate required fields
-            if (!donorEmail && !donorPhone) {
-                console.log('❌ Validation failed: No email or phone');
-                this.showErrorMessage('Please provide either an email or phone number for payment confirmation.');
-                return;
+            // Comprehensive validation before proceeding to Stripe
+            const validationErrors = [];
+            
+            // Name validation (required unless anonymous)
+            if (!anonymous && (!donorName || donorName.trim().length < 2)) {
+                validationErrors.push('Please enter your full name (at least 2 characters).');
             }
-
+            
+            // Email validation (if provided)
+            if (donorEmail && !this.isValidEmail(donorEmail)) {
+                validationErrors.push('Please enter a valid email address.');
+            }
+            
+            // Phone validation (if provided)
+            if (donorPhone && !this.isValidPhoneNumber(donorPhone, countryCode)) {
+                validationErrors.push('Please enter a valid phone number.');
+            }
+            
+            // At least one contact method required
+            if (!donorEmail && !donorPhone) {
+                validationErrors.push('Please provide either an email address or phone number for payment confirmation.');
+            }
+            
+            // Amount validation
             if (!amount || amount <= 0) {
-                console.log('❌ Validation failed: Invalid amount');
-                this.showErrorMessage('Please select a valid donation amount.');
+                validationErrors.push('Please enter a valid donation amount.');
+            } else if (amount < 100) {
+                validationErrors.push('Minimum donation amount is PKR 100.');
+            } else if (amount > 1000000) {
+                validationErrors.push('Maximum donation amount is PKR 1,000,000.');
+            }
+            
+            // If there are validation errors, show them and stop
+            if (validationErrors.length > 0) {
+                console.log('❌ Validation failed:', validationErrors);
+                this.showValidationErrors(validationErrors);
                 return;
             }
 
@@ -228,6 +254,53 @@ class PaymentProcessor {
                 successDiv.remove();
             }
         }, 10000);
+    }
+
+    // Validation helper methods
+    isValidEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email.trim());
+    }
+    
+    isValidPhoneNumber(phone, countryCode) {
+        // Remove all non-digit characters
+        const cleanPhone = phone.replace(/\D/g, '');
+        
+        // Validation based on country code
+        switch (countryCode) {
+            case '+92': // Pakistan
+                return cleanPhone.length >= 10 && cleanPhone.length <= 11 && cleanPhone.startsWith('3');
+            case '+1': // USA/Canada
+                return cleanPhone.length === 10;
+            case '+44': // UK
+                return cleanPhone.length >= 10 && cleanPhone.length <= 11;
+            default:
+                return cleanPhone.length >= 7 && cleanPhone.length <= 15;
+        }
+    }
+    
+    showValidationErrors(errors) {
+        // Remove existing validation messages
+        const existingMessages = document.querySelectorAll('.validation-message, .success-message, .error-message');
+        existingMessages.forEach(msg => msg.remove());
+
+        const errorDiv = document.createElement('div');
+        errorDiv.className = 'validation-message error-message';
+        errorDiv.innerHTML = '<strong>Please fix the following issues:</strong><ul>' + 
+            errors.map(error => `<li>${error}</li>`).join('') + 
+            '</ul>';
+
+        const form = document.getElementById('donation-form');
+        if (form) {
+            form.insertBefore(errorDiv, form.firstChild);
+        }
+
+        // Auto-remove after 15 seconds
+        setTimeout(() => {
+            if (errorDiv.parentNode) {
+                errorDiv.remove();
+            }
+        }, 15000);
     }
 
     resetForm() {
