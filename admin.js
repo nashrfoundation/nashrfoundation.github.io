@@ -1157,10 +1157,9 @@ async function sendNewsletter() {
             return;
         }
         
-        // Send via Resend API directly
-        const resendApiKey = window.RESEND_API_KEY || '';
-        if (!resendApiKey) {
-            showError('Resend API key not configured. Set window.RESEND_API_KEY in your admin settings.');
+        // Check if email service is available
+        if (!window.emailService) {
+            showError('Email service not loaded. Please refresh the page.');
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -2047,17 +2046,18 @@ function refreshNewsletterData() {
     showSuccess('Newsletter data refreshed!');
 }
 
-// Helper function to configure Resend API
-function configureResendAPI(apiKey, fromEmail = 'Nashr Foundation <no-reply@nashrfoundation.org>') {
-    window.RESEND_API_KEY = apiKey;
-    window.FROM_EMAIL = fromEmail;
-    console.log('Configured Resend API:', { apiKey: apiKey.substring(0, 10) + '...', fromEmail });
-    showSuccess('Resend API configured successfully!');
-    return { apiKey, fromEmail };
+// Helper function to configure EmailJS
+function configureEmailJS(serviceId, templateId, publicKey) {
+    if (window.emailJSService) {
+        window.emailJSService.configure(serviceId, templateId, publicKey);
+        showSuccess('EmailJS configured successfully!');
+    } else {
+        showError('EmailJS service not loaded. Please refresh the page.');
+    }
 }
 
-// Test Resend API configuration
-async function testResendAPI() {
+// Test EmailJS configuration
+async function testEmailJS() {
     try {
         if (!window.emailService) {
             showError('Email service not loaded. Please refresh the page.');
@@ -2085,33 +2085,23 @@ async function testResendAPI() {
 // Save email configuration
 function saveEmailConfig() {
     try {
-        const apiKey = document.getElementById('resend-api-key').value.trim();
-        const fromEmail = document.getElementById('from-email').value.trim();
+        const serviceId = document.getElementById('emailjs-service-id').value.trim();
+        const templateId = document.getElementById('emailjs-template-id').value.trim();
+        const publicKey = document.getElementById('emailjs-public-key').value.trim();
         
-        if (!apiKey) {
-            showError('Please enter your Resend API key.');
+        if (!serviceId || !templateId || !publicKey) {
+            showError('Please enter all EmailJS credentials.');
             return;
         }
         
-        if (!fromEmail) {
-            showError('Please enter your from email address.');
-            return;
-        }
-        
-        // Save to global variables
-        window.RESEND_API_KEY = apiKey;
-        window.FROM_EMAIL = fromEmail;
-        
-        // Configure the email service
-        if (window.emailService) {
-            window.emailService.configureResend(apiKey, fromEmail);
-        }
+        // Configure EmailJS
+        configureEmailJS(serviceId, templateId, publicKey);
         
         // Show success message
         const statusDiv = document.getElementById('email-config-status');
         const messageSpan = document.getElementById('email-config-message');
         
-        messageSpan.textContent = 'Configuration saved successfully!';
+        messageSpan.textContent = 'EmailJS configuration saved successfully!';
         statusDiv.style.display = 'block';
         statusDiv.className = 'config-status success';
         
@@ -2120,12 +2110,11 @@ function saveEmailConfig() {
             statusDiv.style.display = 'none';
         }, 3000);
         
-        console.log('Email configuration saved:', { 
-            apiKey: apiKey.substring(0, 10) + '...', 
-            fromEmail 
+        console.log('EmailJS configuration saved:', { 
+            serviceId, 
+            templateId, 
+            publicKey: publicKey.substring(0, 10) + '...' 
         });
-        
-        showSuccess('Email configuration saved successfully!');
         
     } catch (error) {
         console.error('Failed to save email configuration:', error);
@@ -2133,30 +2122,14 @@ function saveEmailConfig() {
     }
 }
 
-// Toggle API key visibility
-function toggleApiKeyVisibility() {
-    const input = document.getElementById('resend-api-key');
-    const button = event.target;
-    
-    if (input.type === 'password') {
-        input.type = 'text';
-        button.textContent = 'Hide';
-    } else {
-        input.type = 'password';
-        button.textContent = 'Show';
-    }
-}
-
 // Load email configuration on page load
 function loadEmailConfig() {
     try {
         // Set default values if not already configured
-        if (window.RESEND_API_KEY) {
-            document.getElementById('resend-api-key').value = window.RESEND_API_KEY;
-        }
-        
-        if (window.FROM_EMAIL) {
-            document.getElementById('from-email').value = window.FROM_EMAIL;
+        if (window.emailJSService) {
+            document.getElementById('emailjs-service-id').value = window.emailJSService.serviceId || '';
+            document.getElementById('emailjs-template-id').value = window.emailJSService.templateId || '';
+            document.getElementById('emailjs-public-key').value = window.emailJSService.publicKey || '';
         }
         
         console.log('Email configuration loaded');

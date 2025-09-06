@@ -512,7 +512,7 @@
                 <div class="section-header">
                     <h2>Email Configuration</h2>
                     <div class="header-actions">
-                        <button class="btn btn-outline" onclick="testResendAPI()">
+                        <button class="btn btn-outline" onclick="testEmailJS()">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M9 12l2 2 4-4"></path>
                                 <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
@@ -526,20 +526,22 @@
                 </div>
                 
                 <div class="setting-card">
-                    <h3>Resend API Configuration</h3>
-                    <p class="setting-description">Configure your Resend API key to enable email sending functionality.</p>
+                    <h3>EmailJS Configuration</h3>
+                    <p class="setting-description">Configure your EmailJS credentials to enable email sending functionality.</p>
                     
                     <div class="form-group">
-                        <label for="resend-api-key">Resend API Key</label>
-                        <div class="input-wrapper">
-                            <input type="password" id="resend-api-key" class="form-control" placeholder="re_..." value="re_LPnRzAL8_CG6cby57HsRVguQGRYLgFCxE">
-                            <button type="button" class="btn btn-outline btn-sm" onclick="toggleApiKeyVisibility()">Show</button>
-                        </div>
+                        <label for="emailjs-service-id">Service ID</label>
+                        <input type="text" id="emailjs-service-id" class="form-control" placeholder="service_..." value="service_01wge0v">
                     </div>
                     
                     <div class="form-group">
-                        <label for="from-email">From Email Address</label>
-                        <input type="email" id="from-email" class="form-control" placeholder="Nashr Foundation <no-reply@nashrfoundation.org>" value="Nashr Foundation <no-reply@nashrfoundation.org>">
+                        <label for="emailjs-template-id">Template ID</label>
+                        <input type="text" id="emailjs-template-id" class="form-control" placeholder="template_..." value="template_newsletter">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="emailjs-public-key">Public Key</label>
+                        <input type="password" id="emailjs-public-key" class="form-control" placeholder="Your public key..." value="8vdEHnT9o9ThMp3qc">
                     </div>
                     
                     <div class="form-actions">
@@ -551,7 +553,7 @@
                             </svg>
                             Save Configuration
                         </button>
-                        <button type="button" class="btn btn-outline" onclick="testResendAPI()">
+                        <button type="button" class="btn btn-outline" onclick="testEmailJS()">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M9 12l2 2 4-4"></path>
                                 <path d="M21 12c-1 0-3-1-3-3s2-3 3-3 3 1 3 3-2 3-3 3"></path>
