@@ -16,6 +16,9 @@ class UIEnhancements {
         this.setupLoadingStates();
         this.setupToastNotifications();
         this.setupSkeletonLoading();
+        this.setupPageLoading();
+        this.setupScrollAnimations();
+        this.setupEnhancedInteractions();
     }
 
     // Back to Top Button
@@ -309,6 +312,96 @@ class UIEnhancements {
 
         const progressFill = progressBar.querySelector('.progress-fill');
         progressFill.style.width = `${percentage}%`;
+    }
+
+    // Page Loading
+    setupPageLoading() {
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        if (!loadingOverlay) return;
+
+        // Show loading on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loadingOverlay.classList.remove('show');
+            }, 500);
+        });
+    }
+
+    // Scroll Animations
+    setupScrollAnimations() {
+        const observerOptions = {
+            root: null,
+            rootMargin: '0px 0px -50px 0px',
+            threshold: 0.1
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe elements for animation
+        const animateElements = document.querySelectorAll('.aim-item, .involvement-option, .leaderboard-table');
+        animateElements.forEach(el => observer.observe(el));
+    }
+
+    // Enhanced Interactions
+    setupEnhancedInteractions() {
+        // Add ripple effect to buttons
+        document.addEventListener('click', (e) => {
+            if (e.target.matches('.btn')) {
+                this.createRippleEffect(e);
+            }
+        });
+
+        // Enhanced form interactions
+        const forms = document.querySelectorAll('form');
+        forms.forEach(form => {
+            const inputs = form.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                input.addEventListener('focus', () => {
+                    input.parentElement.classList.add('focused');
+                });
+                input.addEventListener('blur', () => {
+                    if (!input.value) {
+                        input.parentElement.classList.remove('focused');
+                    }
+                });
+            });
+        });
+    }
+
+    createRippleEffect(e) {
+        const button = e.target;
+        const rect = button.getBoundingClientRect();
+        const size = Math.max(rect.width, rect.height);
+        const x = e.clientX - rect.left - size / 2;
+        const y = e.clientY - rect.top - size / 2;
+
+        const ripple = document.createElement('span');
+        ripple.style.cssText = `
+            position: absolute;
+            width: ${size}px;
+            height: ${size}px;
+            left: ${x}px;
+            top: ${y}px;
+            background: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        `;
+
+        button.style.position = 'relative';
+        button.style.overflow = 'hidden';
+        button.appendChild(ripple);
+
+        setTimeout(() => {
+            ripple.remove();
+        }, 600);
     }
 
     // Utility Methods

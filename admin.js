@@ -1206,7 +1206,14 @@ async function sendNewsletter() {
             let attempt = 0;
             while (true) {
                 try {
-                    console.log('Newsletter batch', { endpoint, start: i + 1, size: batch.length });
+                    console.log('Newsletter batch attempt', { 
+                        endpoint, 
+                        start: i + 1, 
+                        size: batch.length, 
+                        attempt: attempt + 1,
+                        maxRetries: maxRetries + 1
+                    });
+                    
                     const res = await fetch(endpoint, {
                         method: 'POST',
                         mode: 'cors',
@@ -1225,12 +1232,20 @@ async function sendNewsletter() {
                         ok: res.ok, 
                         statusText: res.statusText,
                         batchSize: batch.length,
-                        batchIndex: i + 1
+                        batchIndex: i + 1,
+                        attempt: attempt + 1
                     });
                     
                     if (!res.ok) {
                         const errText = await res.text().catch(() => '');
-                        console.error('Newsletter send failed', { status: res.status, errText, batch });
+                        console.error('Newsletter send failed', { 
+                            status: res.status, 
+                            errText, 
+                            batch,
+                            attempt: attempt + 1,
+                            willRetry: attempt < maxRetries
+                        });
+                        
                         let message = `Send failed for batch starting ${i + 1}`;
                         
                         if (res.status === 401) {
@@ -1249,12 +1264,26 @@ async function sendNewsletter() {
                     console.log('Newsletter batch sent successfully:', { 
                         batchIndex: i + 1, 
                         recipients: batch.length,
+                        attempt: attempt + 1,
                         response: responseText.substring(0, 200) // First 200 chars of response
                     });
                     break;
                 } catch (err) {
-                    if (attempt >= maxRetries) throw err;
-                    await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
+                    console.log('Newsletter batch error:', { 
+                        error: err.message, 
+                        attempt: attempt + 1, 
+                        maxRetries: maxRetries + 1,
+                        willRetry: attempt < maxRetries
+                    });
+                    
+                    if (attempt >= maxRetries) {
+                        console.error('Max retries reached, giving up on this batch');
+                        throw err;
+                    }
+                    
+                    const delay = 500 * (attempt + 1);
+                    console.log(`Retrying in ${delay}ms...`);
+                    await new Promise(r => setTimeout(r, delay));
                     attempt++;
                 }
             }
@@ -2151,21 +2180,6 @@ async function testNewsletterFunction() {
         
         console.log('Testing endpoint:', endpoint);
         
-        // First, try a simple HEAD request to check if the endpoint is reachable
-        try {
-            const headResponse = await fetch(endpoint, {
-                method: 'HEAD',
-                mode: 'cors',
-                credentials: 'omit'
-            });
-            console.log('Endpoint reachability test:', { 
-                status: headResponse.status, 
-                ok: headResponse.ok 
-            });
-        } catch (headError) {
-            console.warn('HEAD request failed, but continuing with POST test:', headError);
-        }
-        
         // Check if it's a Supabase Edge Function and add authentication headers
         const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
         let headers = { 'Content-Type': 'application/json' };
@@ -2220,6 +2234,63 @@ async function testNewsletterFunction() {
         } else {
             showError(`Test newsletter failed: ${error.message}`);
         }
+    }
+}
+
+// Simple test to check Edge Function response
+async function testEdgeFunctionResponse() {
+    try {
+        const endpoint = (window.RESEND_FUNCTION_URL || '').trim();
+        if (!endpoint) {
+            showError('No email service configured.');
+            return;
+        }
+        
+        console.log('Testing Edge Function response...');
+        
+        const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
+        let headers = { 'Content-Type': 'application/json' };
+        
+        if (isSupabaseFunction) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
+            }
+            headers['apikey'] = supabaseConfig.anonKey;
+        }
+        
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            mode: 'cors',
+            credentials: 'omit',
+            headers: headers,
+            body: JSON.stringify({
+                type: 'newsletter',
+                subject: 'Test',
+                content: 'Test',
+                to: ['test@example.com']
+            })
+        });
+        
+        const responseText = await res.text().catch(() => '');
+        
+        console.log('Edge Function Response:', {
+            status: res.status,
+            ok: res.ok,
+            statusText: res.statusText,
+            headers: Object.fromEntries(res.headers.entries()),
+            body: responseText
+        });
+        
+        if (res.ok) {
+            showSuccess(`Edge Function working! Status: ${res.status}`);
+        } else {
+            showError(`Edge Function error! Status: ${res.status}, Response: ${responseText}`);
+        }
+        
+    } catch (error) {
+        console.error('Edge Function test failed:', error);
+        showError(`Edge Function test failed: ${error.message}`);
     }
 }
 

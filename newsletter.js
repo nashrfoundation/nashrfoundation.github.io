@@ -174,24 +174,27 @@ async function handleNewsletterSignup(e) {
 }
 
 function showNewsletterMessage(message, type, container) {
-    if (!container) return;
+    // Find the newsletter message container
+    const messageContainer = document.getElementById('newsletter-message');
+    if (!messageContainer) return;
     
-    // Remove existing messages
-    const existingMessages = container.querySelectorAll('.newsletter-message');
-    existingMessages.forEach(msg => msg.remove());
+    // Clear existing content and classes
+    messageContainer.innerHTML = message;
+    messageContainer.className = `newsletter-message ${type}`;
     
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `newsletter-message ${type}`;
-    messageDiv.textContent = message;
-    
-    container.appendChild(messageDiv);
+    // Show the message with animation
+    setTimeout(() => {
+        messageContainer.classList.add('show');
+    }, 100);
     
     // Auto-remove after 5 seconds for success messages
     if (type === 'success') {
         setTimeout(() => {
-            if (messageDiv.parentNode) {
-                messageDiv.remove();
-            }
+            messageContainer.classList.remove('show');
+            setTimeout(() => {
+                messageContainer.innerHTML = '';
+                messageContainer.className = 'newsletter-message';
+            }, 300);
         }, 5000);
     }
 }
