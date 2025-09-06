@@ -52,6 +52,14 @@ async function initializeSupabase() {
                 storageKey: 'nf_admin',
                 persistSession: true,
                 autoRefreshToken: true
+            },
+            db: {
+                schema: 'public'
+            },
+            global: {
+                headers: {
+                    'apikey': supabaseConfig.anonKey
+                }
             }
         });
         
@@ -84,6 +92,19 @@ async function initializeSupabase() {
         }
         
         console.log('Supabase initialized successfully');
+        
+        // Add debugging wrapper for all queries
+        const originalFrom = supabase.from.bind(supabase);
+        supabase.from = function(table) {
+            const query = originalFrom(table);
+            const originalSelect = query.select.bind(query);
+            query.select = function(columns) {
+                console.log(`🔍 Supabase Query: ${table}.select(${columns})`);
+                return originalSelect(columns);
+            };
+            return query;
+        };
+        
         // Initialize realtime subscriptions
         setupSubscribersSubscription();
         setupDonationsSubscription();
@@ -1028,6 +1049,22 @@ async function loadNewsletterData() {
         console.log('Newsletter subscribers query result:', { subscribers, error: subscribersError, count: subscribers?.length });
             
         if (subscribersError) {
+            console.error('Newsletter subscribers query error:', subscribersError);
+            // If table doesn't exist or permission denied, show zero counts
+            if (subscribersError.code === 'PGRST116' || subscribersError.code === '42501' || 
+                subscribersError.message.includes('relation') || subscribersError.message.includes('does not exist') ||
+                subscribersError.message.includes('permission denied') || subscribersError.message.includes('Forbidden') ||
+                subscribersError.message.includes('row-level security policy')) {
+                console.log('Newsletter subscribers table not accessible due to RLS policies, showing zero counts');
+                const totalEl = document.getElementById('total-subscribers');
+                const activeEl = document.getElementById('active-subscribers');
+                const unsubEl = document.getElementById('unsubscribed');
+                if (totalEl) totalEl.textContent = '0';
+                if (activeEl) activeEl.textContent = '0';
+                if (unsubEl) unsubEl.textContent = '0';
+                hideSectionLoading('.newsletter-editor .stats-grid');
+                return;
+            }
             throw new Error(`Failed to fetch subscribers: ${subscribersError.message}`);
         }
         
@@ -1110,9 +1147,12 @@ async function sendNewsletter() {
             console.log('Database query result:', { subs, error, count: subs?.length });
             if (error) {
                 console.error('Newsletter subscribers query error:', error);
-                // If table doesn't exist, show helpful message
-                if (error.code === 'PGRST116' || error.message.includes('relation') || error.message.includes('does not exist')) {
-                    showError('Newsletter subscribers table not found. Please add emails manually or create the table in Supabase.');
+                // If table doesn't exist or permission denied, show helpful message
+                if (error.code === 'PGRST116' || error.code === '42501' || 
+                    error.message.includes('relation') || error.message.includes('does not exist') ||
+                    error.message.includes('permission denied') || error.message.includes('Forbidden') ||
+                    error.message.includes('row-level security policy')) {
+                    showError('Newsletter subscribers table not accessible due to RLS policies. Please run the SQL commands in Supabase to create the necessary policies, or add emails manually.');
                     if (sendButton) {
                         sendButton.innerHTML = originalText;
                         sendButton.disabled = false;
@@ -1605,18 +1645,22 @@ async function loadSubscribersData() {
         console.log('Loading subscribers data...');
         showSectionLoading('#subscribers-table-body', 'Loading subscribers...');
 
+        // Use explicit query to avoid any client-side issues
         const { data: subscribers, error } = await supabase
             .from('newsletter_subscribers')
-            .select('*')
+            .select('email, name, status, source, created_at, updated_at')
             .order('created_at', { ascending: false });
 
         console.log('Subscribers query result:', { subscribers, error, count: subscribers?.length });
 
         if (error) {
             console.error('Subscribers query error:', error);
-            // If table doesn't exist, show empty state instead of throwing
-            if (error.code === 'PGRST116' || error.message.includes('relation') || error.message.includes('does not exist')) {
-                console.log('Newsletter subscribers table does not exist, showing empty state');
+            // If table doesn't exist or permission denied, show empty state instead of throwing
+            if (error.code === 'PGRST116' || error.code === '42501' || 
+                error.message.includes('relation') || error.message.includes('does not exist') ||
+                error.message.includes('permission denied') || error.message.includes('Forbidden') ||
+                error.message.includes('row-level security policy')) {
+                console.log('Newsletter subscribers table not accessible due to RLS policies, showing empty state');
                 window._subscribers = [];
                 displaySubscribersTable([]);
                 setupSubscribersPagination([]);
@@ -1677,7 +1721,17 @@ async function addTestSubscribers() {
             .from('newsletter_subscribers')
             .insert(subscribers);
             
-        if (error) throw error;
+        if (error) {
+            console.error('Failed to insert test subscribers:', error);
+            if (error.code === 'PGRST116' || error.code === '42501' || 
+                error.message.includes('relation') || error.message.includes('does not exist') ||
+                error.message.includes('permission denied') || error.message.includes('Forbidden') ||
+                error.message.includes('row-level security policy')) {
+                showError('Cannot add test subscribers. Row Level Security (RLS) policies are blocking access. Please run the SQL commands in Supabase to create the necessary policies, or contact your database administrator.');
+                return;
+            }
+            throw error;
+        }
         
         showSuccess(`Added ${testEmails.length} test subscribers!`);
         await loadSubscribersData();
@@ -1798,7 +1852,17 @@ async function toggleSubscriberStatus(subscriber) {
             .from('newsletter_subscribers')
             .update({ status: newStatus, updated_at: new Date().toISOString() })
             .eq('email', subscriber.email);
-        if (error) throw error;
+        if (error) {
+            console.error('Failed to update subscriber status:', error);
+            if (error.code === 'PGRST116' || error.code === '42501' || 
+                error.message.includes('relation') || error.message.includes('does not exist') ||
+                error.message.includes('permission denied') || error.message.includes('Forbidden') ||
+                error.message.includes('row-level security policy')) {
+                showError('Cannot update subscriber status. Row Level Security (RLS) policies are blocking access. Please run the SQL commands in Supabase to create the necessary policies.');
+                return;
+            }
+            throw error;
+        }
         showSuccess(`Subscriber ${newStatus === 'active' ? 'activated' : 'deactivated'}.`);
         await loadSubscribersData();
         logActivity('subscriber_status_change', `${subscriber.email} -> ${newStatus}`);
@@ -1815,7 +1879,17 @@ async function deleteSubscriber(email) {
             .from('newsletter_subscribers')
             .delete()
             .eq('email', email);
-        if (error) throw error;
+        if (error) {
+            console.error('Failed to delete subscriber:', error);
+            if (error.code === 'PGRST116' || error.code === '42501' || 
+                error.message.includes('relation') || error.message.includes('does not exist') ||
+                error.message.includes('permission denied') || error.message.includes('Forbidden') ||
+                error.message.includes('row-level security policy')) {
+                showError('Cannot delete subscriber. Row Level Security (RLS) policies are blocking access. Please run the SQL commands in Supabase to create the necessary policies.');
+                return;
+            }
+            throw error;
+        }
         showSuccess('Subscriber deleted.');
         await loadSubscribersData();
         logActivity('subscriber_deleted', email);
