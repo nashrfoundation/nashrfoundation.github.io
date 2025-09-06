@@ -45,38 +45,38 @@ async function handleNewsletterSignup(e) {
     submitButton.disabled = true;
     
     try {
-        // Check if Brevo service is available
-        if (!window.brevoService || !window.brevoService.initialized) {
-            console.warn('Brevo service not configured, falling back to local storage only');
+        // Check if MailerLite service is available
+        if (!window.mailerLiteService || !window.mailerLiteService.initialized) {
+            console.warn('MailerLite service not configured, falling back to local storage only');
             // Fallback to local storage or show error
             showNewsletterMessage('Newsletter service is temporarily unavailable. Please try again later.', 'error', newsletterMessage);
             return;
         }
 
-        // Check if subscriber already exists in Brevo
+        // Check if subscriber already exists in MailerLite
         let existingSubscriber = null;
         try {
-            existingSubscriber = await window.brevoService.getSubscriber(email);
+            existingSubscriber = await window.mailerLiteService.getSubscriber(email);
         } catch (error) {
             console.log('Error checking existing subscriber:', error);
             // Continue with subscription process
         }
 
         if (existingSubscriber) {
-            // Subscriber already exists in Brevo
+            // Subscriber already exists in MailerLite
             showNewsletterMessage('✅ You\'re already part of our community! Thank you for being a valued subscriber. You\'ll continue to receive our updates.', 'success', newsletterMessage);
             form.reset();
             return;
         }
 
-        // Add new subscriber to Brevo
-        const brevoResult = await window.brevoService.addSubscriber(email, name, {
-            SOURCE: window.location.pathname,
-            SUBSCRIBED_AT: new Date().toISOString(),
-            CONSENT: 'yes'
+        // Add new subscriber to MailerLite
+        const mailerLiteResult = await window.mailerLiteService.addSubscriber(email, name, {
+            source: window.location.pathname,
+            subscribed_at: new Date().toISOString(),
+            consent: 'yes'
         });
 
-        console.log('✅ Subscriber added to Brevo:', brevoResult);
+        console.log('✅ Subscriber added to MailerLite:', mailerLiteResult);
         
         // Send welcome email via EmailJS (always attempt this)
         try {
@@ -94,7 +94,7 @@ async function handleNewsletterSignup(e) {
             window.adminNotifications.addNotification({
                 type: 'success',
                 title: 'New Subscriber',
-                message: `${email} subscribed to the newsletter via Brevo`,
+                message: `${email} subscribed to the newsletter via MailerLite`,
                 action: () => {
                     const link = document.querySelector('[data-section="subscribers"]');
                     if (link) link.click();

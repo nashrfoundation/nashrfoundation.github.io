@@ -562,14 +562,60 @@ nav ul li a.active::after {
     width: 100% !important;
     height: 100vh !important;
     background-color: #2a8d9c !important;
-    background-image: url('hero_background.webp') !important;
-    background-size: cover !important;
-    background-position: center !important;
-    background-repeat: no-repeat !important;
-    background-attachment: fixed !important;
     z-index: -1 !important;
     min-height: 100vh !important;
-    display: block !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    overflow: hidden !important;
+}
+
+.hero-bg-image {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover !important;
+    z-index: -1 !important;
+}
+
+.hero-background .hero-content {
+    max-width: 800px;
+    padding: var(--spacing-md);
+    padding-top: calc(var(--spacing-md) + 120px);
+    z-index: 1;
+    text-align: center;
+    color: var(--white);
+}
+
+.hero-background .hero-content h1 {
+    font-size: 3.5rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--white);
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+.hero-background .hero-content p {
+    font-size: 1.4rem;
+    margin-bottom: var(--spacing-md);
+    color: var(--white);
+    text-shadow: 0 1px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Mobile responsive hero content */
+@media (max-width: 768px) {
+    .hero-background .hero-content {
+        padding-top: calc(var(--spacing-md) + 100px);
+    }
+    
+    .hero-background .hero-content h1 {
+        font-size: 2.5rem;
+    }
+    
+    .hero-background .hero-content p {
+        font-size: 1.1rem;
+    }
 }
 
 /* Remove hero-image to prevent dots/indicators */

@@ -1156,9 +1156,9 @@ async function sendNewsletter() {
             return;
         }
         
-        // Check if Brevo newsletter service is available
-        if (!window.brevoNewsletterService || !window.brevoNewsletterService.initialized) {
-            showError('Brevo newsletter service not loaded. Please refresh the page.');
+        // Check if MailerLite service is available
+        if (!window.mailerLiteService || !window.mailerLiteService.initialized) {
+            showError('MailerLite service not loaded. Please refresh the page.');
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -1166,25 +1166,21 @@ async function sendNewsletter() {
             return;
         }
         
-        console.log('Sending newsletter via Brevo...');
+        console.log('Sending newsletter via MailerLite...');
         console.log('Recipients:', recipients.length);
         
-        // Send newsletter via Brevo
-        const result = await window.brevoNewsletterService.sendNewsletter(
-            recipients,
+        // Send newsletter via MailerLite
+        const result = await window.mailerLiteService.sendNewsletter(
             subject,
             content,
-            {
-                senderName: 'Nashr Foundation',
-                senderEmail: 'nashrfoundationpk@gmail.com'
-            }
+            recipients
         );
         
         console.log('Newsletter sending result:', result);
         
         if (result.success) {
             showSuccess(`Newsletter sent to ${result.totalSent} recipients!${result.totalErrors > 0 ? ` (${result.totalErrors} failed)` : ''}`);
-            await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${result.totalSent} recipients via Brevo`);
+            await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${result.totalSent} recipients via MailerLite`);
         } else {
             throw new Error(result.message || 'Failed to send newsletter');
         }
