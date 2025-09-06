@@ -1184,8 +1184,17 @@ async function sendNewsletter() {
         let headers = { 'Content-Type': 'application/json' };
         
         if (isSupabaseFunction) {
-            // Your Edge Function doesn't require authentication, so just use basic headers
-            console.log('Using basic headers for Supabase Edge Function (no auth required)');
+            // Supabase Edge Functions require authentication
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
+                console.log('Using Supabase session token for authentication');
+            } else {
+                console.warn('No Supabase session found, using API key only');
+            }
+            // Also add the API key as fallback
+            headers['apikey'] = supabaseConfig.anonKey;
+            console.log('Headers for Supabase Edge Function:', headers);
         }
         
         // Batch sending to avoid large payloads; retry with backoff
@@ -2363,14 +2372,26 @@ async function testEdgeFunctionMinimal() {
         
         console.log('Testing Edge Function with minimal payload...');
         
-        // Test with just the basic headers (no authentication)
+        // Test with authentication headers
+        const isSupabaseFunction = endpoint.includes('supabase.co/functions/v1/');
+        let headers = { 'Content-Type': 'application/json' };
+        
+        if (isSupabaseFunction) {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session?.access_token) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
+                console.log('Using session token for minimal test');
+            } else {
+                console.warn('No session token available for minimal test');
+            }
+            headers['apikey'] = supabaseConfig.anonKey;
+        }
+        
         const res = await fetch(endpoint, {
             method: 'POST',
             mode: 'cors',
             credentials: 'omit',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: headers,
             body: JSON.stringify({
                 type: 'welcome',
                 to: 'test@example.com',

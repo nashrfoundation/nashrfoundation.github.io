@@ -349,6 +349,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="swipe-dot"></div>
         <div class="swipe-dot"></div>
     </div>
+    
+    <!-- Desktop Scroll Progress Indicator -->
+    <div class="scroll-indicator" id="scrollIndicator">
+        <div class="scroll-progress" id="scrollProgress"></div>
+    </div>
+    
+    <!-- Desktop Loading Overlay -->
+    <div class="desktop-loading" id="desktopLoading">
+        <div class="desktop-loading-content">
+            <div class="desktop-loading-spinner"></div>
+            <h3>Loading Nashr Foundation</h3>
+            <p>Preparing your experience...</p>
+        </div>
+    </div>
+    
+    <!-- Keyboard Shortcuts Help -->
+    <div class="keyboard-shortcuts" id="keyboardShortcuts">
+        <h4>Keyboard Shortcuts</h4>
+        <ul>
+            <li><kbd>?</kbd> Toggle this help</li>
+            <li><kbd>H</kbd> Go to Home</li>
+            <li><kbd>A</kbd> Go to Aims</li>
+            <li><kbd>L</kbd> Go to Leaderboard</li>
+            <li><kbd>G</kbd> Go to Get Involved</li>
+            <li><kbd>D</kbd> Go to Donate</li>
+            <li><kbd>↑</kbd> Back to top</li>
+        </ul>
+    </div>
 
     <!-- Consent Banner -->
     <div id="consent-banner" style="position:fixed!important;left:12px;right:12px;bottom:calc(env(safe-area-inset-bottom, 0px) + 12px);z-index:10000;background:rgba(26,26,26,0.98);color:#fff;padding:12px 16px;display:none;border:1px solid #444;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,0.4);box-sizing:border-box;contain:none!important;">
@@ -450,6 +478,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js" defer></script>
     <script src="ui-enhancements.js" defer></script>
     <script src="mobile-pwa.js" defer></script>
+    <script src="desktop-enhancements.js" defer></script>
     <script src="leaderboard.js" defer></script>
     <script src="performance.js" defer></script>
     <script defer>
