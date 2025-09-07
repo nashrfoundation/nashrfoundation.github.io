@@ -4,7 +4,7 @@
 class EmailJSService {
     constructor() {
         this.serviceId = 'service_01wge0v';
-        this.templateId = 'template_sxvpxid'; // default to provided newsletter template
+        this.templateId = 'template_qcyrnos'; // default to current newsletter template
         this.publicKey = '8vdEHnT9o9ThMp3qc';
         this.initialized = false;
     }
@@ -290,7 +290,7 @@ window.emailJSService = new EmailJSService();
 // Auto-configure with actual EmailJS credentials
 window.emailJSService.configure(
     'service_01wge0v',
-    'template_7pk902j', 
+    'template_qcyrnos', 
     '8vdEHnT9o9ThMp3qc'
 );
 
