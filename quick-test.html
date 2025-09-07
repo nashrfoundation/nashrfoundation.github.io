@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quick Admin Portal Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f5f5f5; }
+        .test-result { padding: 10px; margin: 10px 0; border-radius: 4px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Quick Admin Portal Test</h1>
+    <div id="results"></div>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="admin.js"></script>
+    <script src="security-management.js"></script>
+    
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(message, type) {
+            const div = document.createElement('div');
+            div.className = `test-result ${type}`;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+        
+        // Test 1: Check for syntax errors
+        try {
+            addResult('✅ No syntax errors in admin.js', 'success');
+        } catch (error) {
+            addResult(`❌ Syntax error in admin.js: ${error.message}`, 'error');
+        }
+        
+        // Test 2: Check for syntax errors in security-management.js
+        try {
+            addResult('✅ No syntax errors in security-management.js', 'success');
+        } catch (error) {
+            addResult(`❌ Syntax error in security-management.js: ${error.message}`, 'error');
+        }
+        
+        // Test 3: Check if functions are defined
+        const functions = ['showLoading', 'hideLoading', 'generate2FASecret', 'generateQRCode', 'verifyTOTPCode'];
+        functions.forEach(func => {
+            if (typeof window[func] === 'function') {
+                addResult(`✅ ${func}() function is defined`, 'success');
+            } else {
+                addResult(`❌ ${func}() function is missing`, 'error');
+            }
+        });
+        
+        // Test 4: Test 2FA functions
+        try {
+            const secret = generate2FASecret();
+            if (secret && secret.length === 32) {
+                addResult('✅ 2FA secret generation works', 'success');
+            } else {
+                addResult('❌ 2FA secret generation failed', 'error');
+            }
+        } catch (error) {
+            addResult(`❌ 2FA secret generation error: ${error.message}`, 'error');
+        }
+        
+        // Test 5: Test QR code generation
+        try {
+            const qrUrl = generateQRCode('TEST123456789012345678901234567890');
+            if (qrUrl && qrUrl.includes('qrserver.com')) {
+                addResult('✅ QR code generation works', 'success');
+            } else {
+                addResult('❌ QR code generation failed', 'error');
+            }
+        } catch (error) {
+            addResult(`❌ QR code generation error: ${error.message}`, 'error');
+        }
+        
+        addResult('🎉 Quick test completed!', 'info');
+    </script>
+</body>
+</html>

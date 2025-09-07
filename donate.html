@@ -111,8 +111,48 @@
                 padding: var(--spacing-lg) var(--spacing-md);
             }
             
+            .fund-tracker h2 {
+                font-size: 2rem;
+            }
+            
+            .progress-bar-container {
+                height: 50px;
+                margin: 30px auto;
+            }
+            
+            .progress-bar {
+                height: 46px;
+                line-height: 46px;
+                font-size: 16px;
+            }
+            
+            .fund-details {
+                font-size: 1.2em;
+            }
+            
             .impact {
                 padding: var(--spacing-lg) 0;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .fund-tracker h2 {
+                font-size: 1.8rem;
+            }
+            
+            .progress-bar-container {
+                height: 45px;
+                margin: 25px auto;
+            }
+            
+            .progress-bar {
+                height: 41px;
+                line-height: 41px;
+                font-size: 14px;
+            }
+            
+            .fund-details {
+                font-size: 1.1em;
             }
         }
     </style>
@@ -131,37 +171,101 @@
     
     <!-- Custom Styles -->
     <style>
-        .fund-tracker { padding: 40px 20px; background: #000000; color: #f0f0f0; text-align: center; }
-        .fund-tracker h2, .fund-tracker p { color: #ffffff; }
+        .fund-tracker { 
+            padding: 60px 20px; 
+            background: linear-gradient(135deg, #0a0a0a, #1a1a1a); 
+            color: #f0f0f0; 
+            text-align: center; 
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .fund-tracker::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(42, 141, 156, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        
+        .fund-tracker h2, .fund-tracker p { color: #ffffff; position: relative; z-index: 1; }
+        .fund-tracker h2 { 
+            font-size: 2.5rem; 
+            margin-bottom: 1rem; 
+            background: linear-gradient(135deg, #ffffff, #2A8D9C);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
         .progress-bar-container { 
             background: linear-gradient(135deg, #1a1a1a, #2a2a2a); 
-            border: 3px solid #555; 
-            border-radius: 50px; 
+            border: 2px solid #333; 
+            border-radius: 25px; 
             overflow: hidden; 
-            max-width: 800px; 
-            margin: 30px auto; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+            max-width: 900px; 
+            margin: 40px auto; 
+            box-shadow: 
+                0 10px 40px rgba(0, 0, 0, 0.8), 
+                inset 0 2px 4px rgba(255, 255, 255, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.05);
             position: relative;
-            height: 50px;
+            height: 60px;
+            backdrop-filter: blur(10px);
         }
-        .fund-details { font-size: 1.2em; font-weight: bold; font-family: 'Merriweather', serif; color: #f0f0f0; }
+        
+        .progress-bar-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.03), transparent);
+            animation: shimmer 3s infinite;
+        }
+        
+        .fund-details { 
+            font-size: 1.4em; 
+            font-weight: 600; 
+            font-family: 'Merriweather', serif; 
+            color: #f0f0f0; 
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .fund-details span { 
+            color: #2A8D9C; 
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(42, 141, 156, 0.5);
+        }
+        
         .progress-bar { 
-            background: linear-gradient(90deg, #ffb52e 0%, #ffd700 30%, #ffed4e 60%, #ffd700 100%); 
-            height: 44px; 
+            background: linear-gradient(135deg, #2A8D9C 0%, #3AA7B8 25%, #FFB52E 50%, #FFD700 75%, #2A8D9C 100%); 
+            height: 56px; 
             width: 0; 
             text-align: center; 
-            line-height: 44px; 
+            line-height: 56px; 
             color: #000; 
-            transition: width 3s cubic-bezier(0.4, 0, 0.2, 1); 
-            border-radius: 50px; 
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); 
+            border-radius: 25px; 
             font-weight: 700; 
-            box-shadow: 0 0 30px rgba(255, 181, 46, 0.8), inset 0 2px 0 rgba(255, 255, 255, 0.4); 
+            box-shadow: 
+                0 0 40px rgba(42, 141, 156, 0.6), 
+                inset 0 2px 0 rgba(255, 255, 255, 0.3),
+                0 4px 20px rgba(0, 0, 0, 0.3); 
             position: relative; 
             overflow: hidden; 
-            font-size: 16px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+            font-size: 18px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
             border: 2px solid rgba(255, 255, 255, 0.2);
-            margin: 3px;
+            margin: 2px;
+            background-size: 200% 100%;
+            animation: gradientShift 3s ease-in-out infinite;
         }
         
         .progress-bar::after {
@@ -171,8 +275,8 @@
             left: -100%;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
-            animation: shimmer 3s infinite;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6), transparent);
+            animation: shimmer 2.5s infinite;
         }
         
         .progress-bar::before {
@@ -182,8 +286,8 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.1), transparent, rgba(255, 255, 255, 0.1));
-            animation: pulse 2s infinite;
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.2), transparent, rgba(255, 255, 255, 0.2));
+            animation: pulse 3s infinite;
         }
         
         @keyframes shimmer {
@@ -192,17 +296,88 @@
         }
         
         @keyframes pulse {
-            0%, 100% { opacity: 0.3; }
-            50% { opacity: 0.7; }
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+        
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         .progress-bar.loading {
-            animation: progressGlow 2s infinite;
+            animation: progressGlow 2s infinite, gradientShift 3s ease-in-out infinite;
         }
         
         @keyframes progressGlow {
-            0%, 100% { box-shadow: 0 0 30px rgba(255, 181, 46, 0.8), inset 0 2px 0 rgba(255, 255, 255, 0.4); }
-            50% { box-shadow: 0 0 40px rgba(255, 181, 46, 1), inset 0 2px 0 rgba(255, 255, 255, 0.6); }
+            0%, 100% { 
+                box-shadow: 
+                    0 0 40px rgba(42, 141, 156, 0.6), 
+                    inset 0 2px 0 rgba(255, 255, 255, 0.3),
+                    0 4px 20px rgba(0, 0, 0, 0.3);
+            }
+            50% { 
+                box-shadow: 
+                    0 0 60px rgba(42, 141, 156, 0.9), 
+                    inset 0 2px 0 rgba(255, 255, 255, 0.5),
+                    0 6px 30px rgba(0, 0, 0, 0.4);
+            }
+        }
+        
+        /* Milestone celebrations */
+        .progress-bar.milestone-25 {
+            animation: milestoneCelebration 1s ease-out;
+        }
+        
+        .progress-bar.milestone-50 {
+            animation: milestoneCelebration 1.5s ease-out;
+        }
+        
+        .progress-bar.milestone-75 {
+            animation: milestoneCelebration 2s ease-out;
+        }
+        
+        .progress-bar.milestone-100 {
+            animation: milestoneCelebration 2.5s ease-out;
+        }
+        
+        @keyframes milestoneCelebration {
+            0% { transform: scale(1); }
+            25% { transform: scale(1.05); }
+            50% { transform: scale(1.1); }
+            75% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .progress-status {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: #ffffff;
+            font-size: 14px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+            z-index: 2;
+            pointer-events: none;
+            opacity: 0.9;
+        }
+        
+        .progress-status.loading {
+            animation: pulse 1.5s infinite;
+        }
+        
+        .progress-status.success {
+            color: #4CAF50;
+        }
+        
+        .progress-status.warning {
+            color: #FF9800;
+        }
+        
+        .progress-status.danger {
+            color: #F44336;
         }
         .fund-details span { color: var(--accent); }
         #qr-code-details img { max-width: 200px; margin: 20px auto; display: block; }
@@ -652,9 +827,10 @@
     <!-- Hero Background -->
     <div class="hero-background">
         <img src="hero_background.webp" alt="Hero Background" class="hero-bg-image">
-        <div class="hero-content" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1rem;">
+        <div class="hero-content">
             <h1 id="donate-hero-title">Make a Difference Today</h1>
             <p id="donate-hero-description">Your donation helps provide education, food, water, and basic necessities to those in need</p>
+            <a href="#main-content" class="btn btn-large">Donate Now</a>
         </div>
     </div>
 
@@ -664,7 +840,10 @@
                 <h2 id="donate-progress-title">Track Our Progress</h2>
                 <p id="donate-progress-description">Help us reach our goal to support more communities in need.</p>
                 <div class="fund-details" id="donate-fund-details"> <span>PKR 70,000</span> raised of a PKR 200,000 goal </div>
-                <div class="progress-bar-container"> <div class="progress-bar" id="fund-progress-bar"></div> </div>
+                <div class="progress-bar-container"> 
+                    <div class="progress-bar" id="fund-progress-bar"></div>
+                    <div class="progress-status" id="progress-status">Loading...</div>
+                </div>
             </div>
         </section>
         
@@ -913,22 +1092,73 @@
                   // Add loading animation
                   bar.classList.add('loading');
                   
-                  // Animate progress bar
+                  // Update progress status
+                  const statusEl = document.getElementById('progress-status');
+                  if (statusEl) {
+                    statusEl.textContent = 'Updating...';
+                    statusEl.className = 'progress-status loading';
+                  }
+                  
+                  // Animate progress bar with enhanced effects
                   setTimeout(() => { 
                     bar.style.width = pct + '%'; 
                     bar.textContent = pct + '%';
                     console.log('Progress bar updated to:', pct + '%');
+                    
+                    // Update status based on progress
+                    if (statusEl) {
+                      if (pct >= 100) {
+                        statusEl.textContent = 'Goal Reached! 🎉';
+                        statusEl.className = 'progress-status success';
+                      } else if (pct >= 75) {
+                        statusEl.textContent = 'Almost There!';
+                        statusEl.className = 'progress-status warning';
+                      } else if (pct >= 50) {
+                        statusEl.textContent = 'Halfway There!';
+                        statusEl.className = 'progress-status warning';
+                      } else if (pct >= 25) {
+                        statusEl.textContent = 'Great Start!';
+                        statusEl.className = 'progress-status success';
+                      } else {
+                        statusEl.textContent = 'Getting Started';
+                        statusEl.className = 'progress-status';
+                      }
+                    }
+                    
+                    // Add milestone celebrations
+                    if (pct >= 25 && pct < 50) {
+                      bar.classList.add('milestone-25');
+                      setTimeout(() => bar.classList.remove('milestone-25'), 1000);
+                    } else if (pct >= 50 && pct < 75) {
+                      bar.classList.add('milestone-50');
+                      setTimeout(() => bar.classList.remove('milestone-50'), 1500);
+                    } else if (pct >= 75 && pct < 100) {
+                      bar.classList.add('milestone-75');
+                      setTimeout(() => bar.classList.remove('milestone-75'), 2000);
+                    } else if (pct >= 100) {
+                      bar.classList.add('milestone-100');
+                      setTimeout(() => bar.classList.remove('milestone-100'), 2500);
+                    }
+                    
+                    // Enhanced visual effects for different milestones
+                    if (pct >= 25) {
+                      bar.style.boxShadow = '0 0 50px rgba(42, 141, 156, 0.8), inset 0 2px 0 rgba(255, 255, 255, 0.4)';
+                    }
+                    if (pct >= 50) {
+                      bar.style.boxShadow = '0 0 60px rgba(42, 141, 156, 1), inset 0 2px 0 rgba(255, 255, 255, 0.6)';
+                    }
+                    if (pct >= 75) {
+                      bar.style.boxShadow = '0 0 70px rgba(42, 141, 156, 1), inset 0 2px 0 rgba(255, 255, 255, 0.8)';
+                    }
+                    if (pct >= 100) {
+                      bar.style.boxShadow = '0 0 80px rgba(42, 141, 156, 1), inset 0 2px 0 rgba(255, 255, 255, 1)';
+                    }
                     
                     // Remove loading animation after completion
                     setTimeout(() => {
                       bar.classList.remove('loading');
                     }, 3000);
                   }, 500);
-                  
-                  // Add celebration effect for milestones
-                  if (pct >= 50) {
-                    bar.style.boxShadow = '0 0 50px rgba(255, 181, 46, 1), inset 0 2px 0 rgba(255, 255, 255, 0.6)';
-                  }
                 }
               } else {
                 // Fallback when data loading fails
@@ -1040,6 +1270,60 @@
                 progressBar.textContent = '35%';
                 console.log('Progress bar initialized with default value');
             }
+            
+            // Real-time progress bar updates (every 30 seconds)
+            setInterval(async () => {
+                try {
+                    const sb = await ensureSupabase();
+                    if (sb) {
+                        const { data: donations } = await sb
+                            .from('donations')
+                            .select('amount, payment_status');
+                        
+                        if (donations) {
+                            const totalRaised = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                            const goal = 200000; // Default goal
+                            const pct = Math.max(0, Math.min(100, Math.round((totalRaised / goal) * 100)));
+                            
+                            if (progressBar && pct !== parseInt(progressBar.style.width)) {
+                                progressBar.style.width = pct + '%';
+                                progressBar.textContent = pct + '%';
+                                
+                                // Update fund details
+                                const fundDetailsEl = document.getElementById('donate-fund-details');
+                                if (fundDetailsEl) {
+                                    fundDetailsEl.innerHTML = `<span>PKR ${totalRaised.toLocaleString()}</span> raised of a PKR ${goal.toLocaleString()} goal`;
+                                }
+                                
+                                // Update status
+                                const statusEl = document.getElementById('progress-status');
+                                if (statusEl) {
+                                    if (pct >= 100) {
+                                        statusEl.textContent = 'Goal Reached! 🎉';
+                                        statusEl.className = 'progress-status success';
+                                    } else if (pct >= 75) {
+                                        statusEl.textContent = 'Almost There!';
+                                        statusEl.className = 'progress-status warning';
+                                    } else if (pct >= 50) {
+                                        statusEl.textContent = 'Halfway There!';
+                                        statusEl.className = 'progress-status warning';
+                                    } else if (pct >= 25) {
+                                        statusEl.textContent = 'Great Start!';
+                                        statusEl.className = 'progress-status success';
+                                    } else {
+                                        statusEl.textContent = 'Getting Started';
+                                        statusEl.className = 'progress-status';
+                                    }
+                                }
+                                
+                                console.log('Progress bar updated in real-time:', pct + '%');
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.log('Real-time update failed:', error);
+                }
+            }, 30000); // Update every 30 seconds
             // Enhanced validation and user feedback functions
             // Note: showValidationErrors is now handled by the Stripe payment processor
             

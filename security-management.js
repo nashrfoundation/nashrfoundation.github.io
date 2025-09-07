@@ -223,7 +223,7 @@ async function loadActiveSessions() {
         const { data, error } = await supabase
             .from('user_sessions')
             .select('*')
-            .eq('user_id', currentUser?.id)
+            .eq('user_id', (typeof currentUser !== 'undefined' && currentUser?.id) || '')
             .eq('active', true)
             .order('last_activity', { ascending: false });
             
@@ -328,7 +328,7 @@ async function terminateAllSessions() {
         await supabase
             .from('user_sessions')
             .update({ active: false, ended_at: new Date().toISOString() })
-            .eq('user_id', currentUser?.id)
+            .eq('user_id', (typeof currentUser !== 'undefined' && currentUser?.id) || '')
             .eq('active', true);
             
         await loadActiveSessions();
@@ -653,7 +653,7 @@ function generate2FASecret() {
 
 function generateQRCode(secret) {
     const issuer = 'Nashr Foundation';
-    const account = currentUser?.email || 'admin';
+    const account = (typeof currentUser !== 'undefined' && currentUser?.email) || 'admin';
     const url = `otpauth://totp/${issuer}:${account}?secret=${secret}&issuer=${issuer}`;
     return `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(url)}`;
 }
@@ -766,7 +766,7 @@ function logSecurityEvent(eventType, details) {
     const logEntry = {
         event_type: eventType,
         details: details,
-        user_id: currentUser?.id,
+        user_id: (typeof currentUser !== 'undefined' && currentUser?.id) || null,
         ip_address: '0.0.0.0', // In production, get actual IP
         severity: getEventSeverity(eventType),
         created_at: new Date().toISOString()
@@ -824,7 +824,14 @@ function generateRecoveryCodes() {
 
 // Initialize security management when admin loads
 document.addEventListener('DOMContentLoaded', () => {
-    if (currentUser) {
-        initializeSecurityManagement();
-    }
+    // Wait for currentUser to be available
+    const checkUser = () => {
+        if (typeof currentUser !== 'undefined' && currentUser) {
+            initializeSecurityManagement();
+        } else {
+            // Check again in 100ms
+            setTimeout(checkUser, 100);
+        }
+    };
+    checkUser();
 });
