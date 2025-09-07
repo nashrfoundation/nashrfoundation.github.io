@@ -53,26 +53,33 @@ class EmailJSService {
             }
 
             // Try multiple template parameter formats to ensure compatibility
+            const recipientEmail = Array.isArray(to) ? to[0] : to;
+            const defaultName = (typeof recipientEmail === 'string' && recipientEmail.includes('@'))
+                ? recipientEmail.split('@')[0]
+                : 'Friend';
+
             const templateParams = {
                 // Standard EmailJS parameters
-                to_email: Array.isArray(to) ? to[0] : to,
+                to_email: recipientEmail,
                 subject: subject,
                 message: html,
                 type: type,
                 from_name: 'Nashr Foundation',
-                to_name: 'Friend',
+                to_name: defaultName,
+                name: defaultName,
                 
                 // Alternative parameter names that might be expected
-                to: Array.isArray(to) ? to[0] : to,
-                email: Array.isArray(to) ? to[0] : to,
+                to: recipientEmail,
+                email: recipientEmail,
                 content: html,
                 body: html,
                 html_content: html,
-                recipient: Array.isArray(to) ? to[0] : to,
+                recipient: recipientEmail,
                 
                 // Additional context
                 organization: 'Nashr Foundation',
                 website: 'https://nashrfoundation.github.io',
+                logo_url: 'https://nashrfoundation.github.io/logo.png',
                 timestamp: new Date().toISOString()
             };
 
