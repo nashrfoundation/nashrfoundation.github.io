@@ -580,7 +580,7 @@ nav ul li a.active::after {
     width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
-    object-position: center 40% !important;
+    object-position: center center !important;
     z-index: -1 !important;
     transform: none !important;
     will-change: transform !important;
@@ -623,7 +623,7 @@ nav ul li a.active::after {
 @media (max-width: 768px) {
     .hero-background { position: relative !important; width: 100vw !important; height: calc(100vh - 96px) !important; z-index: 1 !important; pointer-events: none !important; margin-top: 96px; }
     
-    .hero-bg-image { top: 0 !important; height: 100% !important; object-position: center 45% !important; }
+    .hero-bg-image { top: 0 !important; height: 100% !important; object-position: center center !important; }
     
     .hero-background .hero-content { padding-top: 0; pointer-events: auto !important; }
     
