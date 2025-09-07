@@ -1091,7 +1091,7 @@ async function sendNewsletter() {
         const recipientsInput = document.getElementById('newsletter-recipients').value;
         
         if (!subject || !content) {
-            showError('Please enter both subject and content for the newsletter.');
+            showError('Subject and content required');
             return;
         }
         
@@ -1436,7 +1436,7 @@ async function handleLeaderboardSubmit(e) {
     const editId = document.getElementById('edit-entry-id').value;
     
     if (!name || isNaN(amount) || amount <= 0) {
-        showError('Please enter a valid name and amount.');
+        showError('Invalid name or amount');
         return;
     }
     

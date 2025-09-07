@@ -139,7 +139,7 @@ class UIEnhancements {
         if (field.type === 'email' && value) {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(value)) {
-                this.showFieldError(field, validationMessage, 'Please enter a valid email address');
+                this.showFieldError(field, validationMessage, 'Invalid email');
                 return false;
             }
         }
@@ -147,7 +147,7 @@ class UIEnhancements {
         if (field.type === 'tel' && value) {
             const phoneRegex = /^[\+]?[1-9][\d]{0,15}$/;
             if (!phoneRegex.test(value.replace(/\s/g, ''))) {
-                this.showFieldError(field, validationMessage, 'Please enter a valid phone number');
+                this.showFieldError(field, validationMessage, 'Invalid phone');
                 return false;
             }
         }

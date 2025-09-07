@@ -1974,19 +1974,15 @@ footer {
     transform: translateY(-1px);
 }
 
-/* Enhanced Form Field Validation States */
+/* Subtle Form Field Validation States */
 .form-control.error {
-    border-color: var(--error);
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.05));
-    animation: shake 0.5s ease-in-out;
+    border-color: rgba(239, 68, 68, 0.5);
+    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
 }
 
 .form-control.success {
-    border-color: var(--success);
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(5, 150, 105, 0.05));
-    animation: successPulse 0.6s ease-in-out;
+    border-color: rgba(16, 185, 129, 0.5);
+    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
 }
 
 .form-control.validating {
@@ -1996,41 +1992,9 @@ footer {
     animation: pulse 1s infinite;
 }
 
-/* Form field validation icons */
-.form-group {
-    position: relative;
-}
+/* Form field validation icons - removed to prevent red/green lines */
 
-.form-group::after {
-    content: '';
-    position: absolute;
-    right: var(--spacing-md);
-    top: 50%;
-    transform: translateY(-50%);
-    width: 20px;
-    height: 20px;
-    opacity: 0;
-    transition: all 0.3s ease;
-    pointer-events: none;
-}
-
-.form-group.success::after {
-    content: '✅';
-    opacity: 1;
-    animation: bounceIn 0.5s ease;
-}
-
-.form-group.error::after {
-    content: '❌';
-    opacity: 1;
-    animation: bounceIn 0.5s ease;
-}
-
-.form-group.validating::after {
-    content: '⏳';
-    opacity: 1;
-    animation: spin 1s linear infinite;
-}
+/* Validation icons removed */
 
 /* Validation animations */
 @keyframes shake {
@@ -4293,16 +4257,7 @@ footer::before {
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
 }
 
-/* Improved Form Validation Messages */
-.validation-errors,
-.success-message,
-.error-message {
-    position: relative;
-    padding: 1rem 1.5rem;
-    border-radius: var(--border-radius-md);
-    margin-bottom: var(--spacing-md);
-    animation: slideInDown 0.3s ease;
-}
+/* Improved Form Validation Messages - using compact styles above */
 
 @keyframes slideInDown {
     from {

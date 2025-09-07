@@ -217,10 +217,13 @@ class EmailJSService {
         this.serviceId = serviceId;
         this.templateId = templateId;
         this.publicKey = publicKey;
+        
+        // Debug logging
+        console.log('EmailJS configure called with:', { serviceId, templateId, publicKey: publicKey ? 'provided' : 'not provided' });
         console.log('EmailJS configured:', {
-            serviceId: serviceId,
-            templateId: templateId,
-            publicKey: publicKey ? publicKey.substring(0, 10) + '...' : 'not set'
+            serviceId: this.serviceId,
+            templateId: this.templateId,
+            publicKey: this.publicKey ? this.publicKey.substring(0, 10) + '...' : 'not set'
         });
     }
 

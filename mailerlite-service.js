@@ -182,18 +182,17 @@ class MailerLiteService {
             const campaignData = {
                 name: `Newsletter - ${subject} - ${new Date().toISOString()}`,
                 type: 'regular',
-                subject: subject,
-                from: {
-                    name: 'Nashr Foundation',
-                    email: 'nashrfoundationpk@gmail.com'
-                },
-                content: {
-                    html: content,
-                    text: this.stripHtml(content)
-                },
-                recipients: {
-                    groups: this.groupId ? [this.groupId] : ['newsletter']
-                }
+                language_id: 1, // English
+                emails: [{
+                    subject: subject,
+                    from_name: 'Nashr Foundation',
+                    from: 'nashrfoundationpk@gmail.com',
+                    content: content
+                }],
+                filter: this.groupId ? [{
+                    type: 'group',
+                    value: this.groupId
+                }] : []
             };
 
             console.log('Creating campaign with data:', campaignData);

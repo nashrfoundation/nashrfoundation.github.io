@@ -25,12 +25,12 @@ async function handleNewsletterSignup(e) {
     
     // Validate form
     if (!email) {
-        showNewsletterMessage('Please enter your email address.', 'error', newsletterMessage);
+        showNewsletterMessage('Email required', 'error', newsletterMessage);
         return;
     }
     
     if (!isValidEmail(email)) {
-        showNewsletterMessage('Please enter a valid email address.', 'error', newsletterMessage);
+        showNewsletterMessage('Invalid email', 'error', newsletterMessage);
         return;
     }
     
