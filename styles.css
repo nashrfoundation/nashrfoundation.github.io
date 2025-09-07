@@ -3642,6 +3642,122 @@ section::before {
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
 }
 
+/* Enhanced Activity Logs UI/UX */
+.no-data-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: linear-gradient(135deg, #1a1a1a, #2a2a2a);
+    border-radius: 12px;
+    border: 1px solid #444;
+}
+
+.no-data-content {
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.no-data-icon {
+    font-size: 4rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+}
+
+.no-data-content h3 {
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+
+.no-data-content p {
+    color: var(--text-secondary);
+    margin-bottom: 2rem;
+    line-height: 1.6;
+}
+
+.log-row {
+    animation: slideInFromLeft 0.5s ease-out forwards;
+    opacity: 0;
+}
+
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.log-relative.recent {
+    color: var(--accent);
+    font-weight: 600;
+    animation: pulse 2s infinite;
+}
+
+.status-indicator {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-left: 8px;
+    display: inline-block;
+}
+
+.status-indicator.new {
+    background: var(--accent);
+    animation: pulse 1.5s infinite;
+}
+
+.action-meta {
+    display: flex;
+    gap: 12px;
+    margin-top: 8px;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+.action-source {
+    background: rgba(255, 181, 46, 0.2);
+    color: var(--accent);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.action-ip {
+    background: rgba(100, 100, 100, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.log-row:hover .action-meta {
+    opacity: 1;
+}
+
+.log-row .action-meta {
+    opacity: 0.7;
+    transition: opacity 0.3s ease;
+}
+
+/* Real-time update indicators */
+.log-row.updating {
+    background: linear-gradient(135deg, rgba(255, 181, 46, 0.1), #1a1a1a);
+    border-left-color: var(--accent);
+}
+
+.log-row.updating::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background: var(--accent);
+    animation: pulse 1s infinite;
+}
+
 /* Consistent Admin Portal Button Theme */
 .admin-portal .btn,
 .admin-portal button {

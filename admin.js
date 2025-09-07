@@ -1789,12 +1789,48 @@ async function loadLogsData() {
         
         hideSectionLoading('#logs-table-body');
         
+        // Set up auto-refresh for activity logs
+        setupLogsAutoRefresh();
+        
     } catch (error) {
         console.error('Failed to load logs data:', error);
         displayLogsTable([]);
         setupLogsPagination([]);
         hideSectionLoading('#logs-table-body');
     }
+}
+
+// Auto-refresh activity logs every 30 seconds
+function setupLogsAutoRefresh() {
+    // Clear existing interval
+    if (window.logsRefreshInterval) {
+        clearInterval(window.logsRefreshInterval);
+    }
+    
+    // Set up new interval
+    window.logsRefreshInterval = setInterval(async () => {
+        try {
+            const { data: newLogs, error } = await supabase
+                .from('activity_logs')
+                .select('*')
+                .order('timestamp', { ascending: false })
+                .limit(10); // Only get recent logs for updates
+                
+            if (!error && newLogs && newLogs.length > 0) {
+                // Check if there are new logs
+                const latestLog = newLogs[0];
+                const lastKnownLog = logsData[0];
+                
+                if (!lastKnownLog || new Date(latestLog.timestamp) > new Date(lastKnownLog.timestamp)) {
+                    console.log('🔄 New activity logs detected, refreshing...');
+                    await loadLogsData();
+                    showNotification('New activity detected', 'info');
+                }
+            }
+        } catch (error) {
+            console.warn('Auto-refresh logs failed:', error);
+        }
+    }, 30000); // 30 seconds
 }
 
 // Enhanced logs display with modern UI/UX
