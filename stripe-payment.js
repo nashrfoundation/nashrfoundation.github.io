@@ -19,6 +19,11 @@ class PaymentProcessor {
         setTimeout(() => {
             this.setupRealTimeValidation();
         }, 100);
+        
+        // Test payment links in the background
+        setTimeout(() => {
+            this.testStripeLinks();
+        }, 1000);
     }
 
     validatePaymentLinks() {
@@ -50,6 +55,129 @@ class PaymentProcessor {
         }
         
         return testResults;
+    }
+
+    // Robust redirection method with multiple fallbacks
+    redirectToPayment(paymentLink) {
+        console.log('🚀 Starting redirection process...');
+        
+        // Method 1: Try window.location.href (most common)
+        try {
+            console.log('📍 Method 1: Using window.location.href');
+            window.location.href = paymentLink;
+            return;
+        } catch (error) {
+            console.warn('⚠️ Method 1 failed:', error);
+        }
+        
+        // Method 2: Try window.location.assign
+        try {
+            console.log('📍 Method 2: Using window.location.assign');
+            window.location.assign(paymentLink);
+            return;
+        } catch (error) {
+            console.warn('⚠️ Method 2 failed:', error);
+        }
+        
+        // Method 3: Try window.open (for popup blockers)
+        try {
+            console.log('📍 Method 3: Using window.open');
+            const newWindow = window.open(paymentLink, '_blank', 'noopener,noreferrer');
+            if (newWindow) {
+                console.log('✅ Opened in new window');
+                return;
+            }
+        } catch (error) {
+            console.warn('⚠️ Method 3 failed:', error);
+        }
+        
+        // Method 4: Try creating a temporary link and clicking it
+        try {
+            console.log('📍 Method 4: Using temporary link');
+            const tempLink = document.createElement('a');
+            tempLink.href = paymentLink;
+            tempLink.target = '_blank';
+            tempLink.rel = 'noopener noreferrer';
+            document.body.appendChild(tempLink);
+            tempLink.click();
+            document.body.removeChild(tempLink);
+            console.log('✅ Clicked temporary link');
+            return;
+        } catch (error) {
+            console.warn('⚠️ Method 4 failed:', error);
+        }
+        
+        // Method 5: Try form submission
+        try {
+            console.log('📍 Method 5: Using form submission');
+            const form = document.createElement('form');
+            form.method = 'GET';
+            form.action = paymentLink;
+            form.target = '_blank';
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+            console.log('✅ Form submitted');
+            return;
+        } catch (error) {
+            console.warn('⚠️ Method 5 failed:', error);
+        }
+        
+        // If all methods fail, show error message
+        console.error('❌ All redirection methods failed');
+        this.showErrorMessage('Unable to redirect to payment page. Please try clicking this link: ' + paymentLink);
+        
+        // Show manual link as fallback
+        this.showManualPaymentLink(paymentLink);
+    }
+
+    // Show manual payment link as fallback
+    showManualPaymentLink(paymentLink) {
+        const manualDiv = document.createElement('div');
+        manualDiv.className = 'manual-payment-link';
+        manualDiv.innerHTML = `
+            <div style="background: linear-gradient(135deg, #4A90E2, #357ABD); color: white; padding: 1rem; border-radius: 8px; margin: 1rem 0; text-align: center;">
+                <h4>Manual Payment Link</h4>
+                <p>If the automatic redirect didn't work, please click the link below:</p>
+                <a href="${paymentLink}" target="_blank" rel="noopener noreferrer" 
+                   style="color: white; text-decoration: underline; font-weight: bold; font-size: 1.1rem;">
+                    Complete Payment Here
+                </a>
+            </div>
+        `;
+        
+        const form = document.getElementById('donation-form');
+        if (form) {
+            form.insertBefore(manualDiv, form.firstChild);
+        }
+    }
+
+    // Debug method for troubleshooting redirection issues
+    debugRedirection(amount = 2500) {
+        console.log('🔧 Debug Redirection Test');
+        console.log('Amount:', amount);
+        console.log('Payment Links:', this.paymentLinks);
+        
+        const paymentLink = this.paymentLinks[amount];
+        console.log('Selected Link:', paymentLink);
+        
+        if (!paymentLink) {
+            console.error('❌ No payment link found for amount:', amount);
+            return;
+        }
+        
+        // Test the link
+        console.log('🧪 Testing link accessibility...');
+        fetch(paymentLink, { method: 'HEAD', mode: 'no-cors' })
+            .then(() => {
+                console.log('✅ Link is accessible');
+                console.log('🚀 Attempting redirection...');
+                this.redirectToPayment(paymentLink);
+            })
+            .catch(error => {
+                console.error('❌ Link test failed:', error);
+                console.log('🔗 Manual link:', paymentLink);
+            });
     }
 
     async processDonation(amount) {
@@ -146,15 +274,8 @@ class PaymentProcessor {
             console.log('🔄 Redirecting to payment page...');
             console.log('🔗 Payment link:', paymentLink);
             
-            // Add a small delay to ensure user sees the processing state
-            setTimeout(() => {
-                try {
-                    window.location.href = paymentLink;
-                } catch (redirectError) {
-                    console.error('❌ Redirect failed:', redirectError);
-                    this.showErrorMessage('Unable to redirect to payment page. Please try again or contact us.');
-                }
-            }, 500);
+            // Try multiple redirection methods for better compatibility
+            this.redirectToPayment(paymentLink);
 
         } catch (error) {
             console.error('❌ Donation processing failed:', error);
@@ -476,6 +597,9 @@ if (document.readyState === 'loading') {
         
         // Add event listeners for donation buttons
         setupDonationEventListeners();
+        
+        // Expose debug function globally
+        window.debugStripeRedirection = (amount) => window.stripePaymentProcessor.debugRedirection(amount);
     });
 } else {
     // Document is already loaded
@@ -486,6 +610,9 @@ if (document.readyState === 'loading') {
     
     // Add event listeners for donation buttons
     setupDonationEventListeners();
+    
+    // Expose debug function globally
+    window.debugStripeRedirection = (amount) => window.stripePaymentProcessor.debugRedirection(amount);
 }
 
 function setupDonationEventListeners() {

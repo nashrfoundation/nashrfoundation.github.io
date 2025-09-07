@@ -45,42 +45,57 @@ async function handleNewsletterSignup(e) {
     submitButton.disabled = true;
     
     try {
-        // Check if MailerLite service is available
+        // Check if MailerLite service is available and properly initialized
         if (!window.mailerLiteService || !window.mailerLiteService.initialized) {
-            console.warn('MailerLite service not configured, using fallback method');
+            console.warn('MailerLite service not configured, attempting to initialize...');
             
-            // Fallback: Store in localStorage and show success message
-            try {
-                const subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
-                const existingSubscriber = subscribers.find(sub => sub.email === email);
+            // Try to initialize MailerLite if API key is available
+            if (window.MAILERLITE_API_KEY && window.MAILERLITE_API_KEY !== 'YOUR_MAILERLITE_API_KEY_HERE') {
+                try {
+                    window.mailerLiteService.initialize(window.MAILERLITE_API_KEY);
+                    console.log('✅ MailerLite service initialized successfully');
+                } catch (initError) {
+                    console.error('Failed to initialize MailerLite:', initError);
+                }
+            }
+            
+            // If still not initialized, use fallback method
+            if (!window.mailerLiteService || !window.mailerLiteService.initialized) {
+                console.warn('MailerLite service still not available, using fallback method');
                 
-                if (existingSubscriber) {
-                    showNewsletterMessage('✅ You\'re already part of our community! Thank you for being a valued subscriber.', 'success', newsletterMessage);
-                } else {
-                    subscribers.push({
-                        email: email,
-                        name: name,
-                        subscribed_at: new Date().toISOString(),
-                        source: window.location.pathname
-                    });
-                    localStorage.setItem('newsletter_subscribers', JSON.stringify(subscribers));
+                // Fallback: Store in localStorage and show success message
+                try {
+                    const subscribers = JSON.parse(localStorage.getItem('newsletter_subscribers') || '[]');
+                    const existingSubscriber = subscribers.find(sub => sub.email === email);
                     
-                    // Send welcome email via EmailJS
-                    try {
-                        await sendWelcomeEmail(email, name);
-                    } catch (e) {
-                        console.warn('Welcome email failed:', e);
+                    if (existingSubscriber) {
+                        showNewsletterMessage('✅ You\'re already part of our community! Thank you for being a valued subscriber.', 'success', newsletterMessage);
+                    } else {
+                        subscribers.push({
+                            email: email,
+                            name: name,
+                            subscribed_at: new Date().toISOString(),
+                            source: window.location.pathname
+                        });
+                        localStorage.setItem('newsletter_subscribers', JSON.stringify(subscribers));
+                        
+                        // Send welcome email via EmailJS
+                        try {
+                            await sendWelcomeEmail(email, name);
+                        } catch (e) {
+                            console.warn('Welcome email failed:', e);
+                        }
+                        
+                        showNewsletterMessage('🎉 Welcome to our community! Thank you for subscribing to our newsletter. You\'ll receive updates about our impact and how your support makes a difference.', 'success', newsletterMessage);
                     }
                     
-                    showNewsletterMessage('🎉 Welcome to our community! Thank you for subscribing to our newsletter. You\'ll receive updates about our impact and how your support makes a difference.', 'success', newsletterMessage);
+                    form.reset();
+                    return;
+                } catch (error) {
+                    console.error('Fallback subscription failed:', error);
+                    showNewsletterMessage('Sorry, there was an error subscribing. Please try again later.', 'error', newsletterMessage);
+                    return;
                 }
-                
-                form.reset();
-                return;
-            } catch (error) {
-                console.error('Fallback subscription failed:', error);
-                showNewsletterMessage('Sorry, there was an error subscribing. Please try again later.', 'error', newsletterMessage);
-                return;
             }
         }
 

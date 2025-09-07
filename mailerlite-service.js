@@ -6,6 +6,7 @@ class MailerLiteService {
         this.apiKey = '';
         this.baseUrl = 'https://connect.mailerlite.com/api';
         this.initialized = false;
+        this.groupId = null; // Cache the newsletter group ID
     }
 
     // Initialize with API key
@@ -22,6 +23,9 @@ class MailerLiteService {
                 throw new Error('MailerLite service not initialized');
             }
 
+            // Ensure newsletter group exists and get its ID
+            await this.ensureNewsletterGroup();
+
             const subscriberData = {
                 email: email,
                 name: name,
@@ -29,11 +33,11 @@ class MailerLiteService {
                     name: name,
                     ...fields
                 },
-                groups: ['newsletter'], // Add to newsletter group
+                groups: this.groupId ? [this.groupId] : [], // Use group ID if available
                 status: 'active'
             };
 
-            console.log('Adding subscriber to MailerLite:', { email, name });
+            console.log('Adding subscriber to MailerLite:', { email, name, groupId: this.groupId });
 
             const response = await fetch(`${this.baseUrl}/subscribers`, {
                 method: 'POST',
@@ -285,6 +289,11 @@ class MailerLiteService {
     // Create newsletter group if it doesn't exist
     async ensureNewsletterGroup() {
         try {
+            // If we already have the group ID cached, return early
+            if (this.groupId) {
+                return;
+            }
+
             // Check if newsletter group exists
             const response = await fetch(`${this.baseUrl}/groups`, {
                 method: 'GET',
@@ -321,14 +330,19 @@ class MailerLiteService {
                     // If group already exists, that's fine
                     if (createResult.message && createResult.message.includes('already been taken')) {
                         console.log('✅ Newsletter group already exists (detected during creation)');
+                        // Try to fetch the group again to get its ID
+                        await this.ensureNewsletterGroup();
                         return;
                     }
                     throw new Error(`Failed to create newsletter group: ${createResult.message}`);
                 }
 
-                console.log('✅ Newsletter group created');
+                const createResult = await createResponse.json();
+                this.groupId = createResult.data?.id;
+                console.log('✅ Newsletter group created with ID:', this.groupId);
             } else {
-                console.log('✅ Newsletter group already exists');
+                this.groupId = newsletterGroup.id;
+                console.log('✅ Newsletter group already exists with ID:', this.groupId);
             }
 
         } catch (error) {
