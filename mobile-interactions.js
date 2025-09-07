@@ -197,6 +197,14 @@ class MobileEnhancements {
             });
             drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
         }
+
+        // Ensure hamburger only visible on mobile & at right side
+        if (toggle) {
+            const container = document.querySelector('header .container');
+            if (container && !container.contains(toggle)) {
+                container.appendChild(toggle);
+            }
+        }
     }
     
     // Performance optimizations

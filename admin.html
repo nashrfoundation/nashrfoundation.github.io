@@ -28,9 +28,7 @@
     <!-- Email Service -->
     <script src="email-service.js" defer></script>
     
-    <!-- MailerLite Services -->
-    <script src="mailerlite-service.js" defer></script>
-    <script src="mailerlite-config.js" defer></script>
+    
     
     <!-- Firebase SDKs will be dynamically imported by admin.js -->
     <script src="admin-notifications.js" defer></script>
@@ -465,12 +463,7 @@
                 <div class="section-header">
                     <h2>Newsletter Management</h2>
                     <div class="header-actions">
-                        <button class="btn btn-outline btn-sm" onclick="testMailerLiteService()" style="margin-right: 10px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polyline points="22,12 18,12 15,21 9,3 6,12 2,12"></polyline>
-                            </svg>
-                            Test MailerLite
-                        </button>
+                        
                         <button class="btn btn-primary" onclick="sendNewsletter()">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                 <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -573,6 +566,10 @@
                         <div class="form-group">
                             <label for="goal-description">Goal Description</label>
                             <textarea id="goal-description" class="form-control" rows="2" placeholder="Describe your fundraising goal"></textarea>
+                        </div>
+                        <div class="form-group">
+                            <label for="total-raised-amount">Total Raised (PKR)</label>
+                            <input type="number" id="total-raised-amount" class="form-control" min="0" placeholder="Enter total raised to date">
                         </div>
                     </div>
                     

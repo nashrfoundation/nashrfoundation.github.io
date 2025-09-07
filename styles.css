@@ -1976,16 +1976,9 @@ footer {
     transform: translateY(-1px);
 }
 
-/* Subtle Form Field Validation States */
-.form-control.error {
-    border-color: rgba(239, 68, 68, 0.5);
-    box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.2);
-}
-
-.form-control.success {
-    border-color: rgba(16, 185, 129, 0.5);
-    box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2);
-}
+/* Subtle Form Field Validation States - no fill, tiny border only */
+.form-control.error { border-color: rgba(239, 68, 68, 0.6); box-shadow: none; background: transparent; }
+.form-control.success { border-color: rgba(16, 185, 129, 0.6); box-shadow: none; background: transparent; }
 
 .form-control.validating {
     border-color: var(--warning);
@@ -1994,9 +1987,12 @@ footer {
     animation: pulse 1s infinite;
 }
 
-/* Form field validation icons - removed to prevent red/green lines */
-
-/* Validation icons removed */
+/* Right-side compact validation icons */
+.form-group { position: relative; }
+.form-group .validation-icon { position:absolute; right:10px; top:50%; transform:translateY(-50%); font-size:14px; opacity:.9; pointer-events:none; }
+/* Utility classes for icons */
+.has-success .validation-icon{ color:#059669; content:'✓'; }
+.has-error .validation-icon{ color:#dc2626; content:'✕'; }
 
 /* Validation animations */
 @keyframes shake {
@@ -2445,6 +2441,9 @@ body.donate-page section {
     .mobile-menu-toggle{display:flex}
     .desktop-nav{display:none}
 }
+
+/* Ensure no horizontal scroll globally */
+html { overflow-x: hidden; }
 
 
 /* Mobile-Specific Animations */

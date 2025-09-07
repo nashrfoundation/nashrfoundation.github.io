@@ -371,9 +371,10 @@ async function loadOverviewData() {
             throw new Error(`Failed to fetch leaderboard for overview: ${donationsError.message}`);
         }
         
-        // Get fundraising goal from cached settings
+        // Get fundraising goal and optional total override from cached settings
         const settings = await getCachedSettings();
         const goalAmount = settings?.fundraising_goal || 200000;
+        const totalRaisedOverride = settings?.total_raised != null ? Number(settings.total_raised) : undefined;
         
         const overviewDonations = (leaderboardRows || []).map(row => ({
             name: row.name || 'Anonymous',
@@ -382,7 +383,7 @@ async function loadOverviewData() {
             payment_method: row.payment_method || 'Unknown'
         }));
 
-        updateOverviewStats(overviewDonations, goalAmount);
+        updateOverviewStats(overviewDonations, goalAmount, totalRaisedOverride);
         updateRecentActivity(overviewDonations);
         
         // Charts disabled by default; enable by setting window.ENABLE_ADMIN_CHARTS = true
@@ -400,7 +401,7 @@ async function loadOverviewData() {
         console.error('Failed to load overview data:', error);
         showError('Failed to load overview data. Please refresh the page.');
         // Empty states
-        updateOverviewStats([], 200000);
+        updateOverviewStats([], 200000, undefined);
         updateRecentActivity([]);
         hideSectionLoading('#overview .activity-list');
         hideSectionLoading('#overview .stats-grid');
@@ -465,8 +466,9 @@ async function loadChartData() {
     }
 }
 
-function updateOverviewStats(donations, goalAmount) {
-    const totalRaised = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
+function updateOverviewStats(donations, goalAmount, totalRaisedOverride) {
+    const computedTotal = donations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
+    const totalRaised = (typeof totalRaisedOverride === 'number' && !Number.isNaN(totalRaisedOverride)) ? totalRaisedOverride : computedTotal;
     const today = new Date().toISOString().split('T')[0];
     const todayDonations = donations.filter(donation => {
         const d = donation.created_at ? new Date(donation.created_at) : new Date();
@@ -1282,6 +1284,7 @@ async function loadSettingsData() {
             if (document.getElementById('youtube-url')) document.getElementById('youtube-url').value = s.youtube || '';
             if (document.getElementById('fundraising-goal-amount')) document.getElementById('fundraising-goal-amount').value = (s.fundraising_goal != null ? s.fundraising_goal : '');
             if (document.getElementById('goal-description')) document.getElementById('goal-description').value = s.goal_description || '';
+            if (document.getElementById('total-raised-amount')) document.getElementById('total-raised-amount').value = (s.total_raised != null ? s.total_raised : '');
             if (document.getElementById('admin-email-notifications')) document.getElementById('admin-email-notifications').value = s.admin_email_notifications || 'all';
             if (document.getElementById('backup-frequency')) document.getElementById('backup-frequency').value = s.backup_frequency || 'daily';
             // Auto-configure newsletter endpoint if provided in settings and not already set
@@ -1316,7 +1319,8 @@ function saveSettings() {
         
         const fundraisingSettings = {
             goal: document.getElementById('fundraising-goal-amount').value,
-            description: document.getElementById('goal-description').value
+            description: document.getElementById('goal-description').value,
+            totalRaised: document.getElementById('total-raised-amount') ? document.getElementById('total-raised-amount').value : ''
         };
         
         const securitySettings = {
@@ -1336,6 +1340,7 @@ function saveSettings() {
                     youtube: socialSettings.youtube,
                     fundraising_goal: parseInt(fundraisingSettings.goal, 10) || 0,
                     goal_description: fundraisingSettings.description,
+                    total_raised: parseInt(fundraisingSettings.totalRaised, 10) || 0,
                     admin_email_notifications: securitySettings.notifications,
                     backup_frequency: securitySettings.backup,
                     updated_at: new Date().toISOString()

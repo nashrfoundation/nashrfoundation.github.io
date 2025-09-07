@@ -23,21 +23,21 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Donate - Nashr Foundation</title>
-    <meta name="description" content="Make a difference today by donating to Nashr Foundation. Your contribution helps provide education, food, clean water, and basic necessities to vulnerable communities across Pakistan.">
+    <title id="meta-title">Donate - Nashr Foundation</title>
+    <meta name="description" content="Make a difference today by donating to Nashr Foundation. Your contribution helps provide education, food, clean water, and basic necessities to vulnerable communities across Pakistan." id="meta-description">
     <meta name="keywords" content="donate, charity, foundation, Pakistan, education, food, clean water, donations, nonprofit, community support">
     <meta name="author" content="Nashr Foundation">
     <meta name="robots" content="index, follow">
-    <meta property="og:title" content="Donate - Nashr Foundation">
-    <meta property="og:description" content="Make a difference today by donating to Nashr Foundation. Your contribution helps provide essential services to communities in need.">
+    <meta property="og:title" content="Donate - Nashr Foundation" id="og-title">
+    <meta property="og:description" content="Make a difference today by donating to Nashr Foundation. Your contribution helps provide essential services to communities in need." id="og-description">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://nashrfoundation.github.io/donate.html">
     <meta property="og:image" content="https://nashrfoundation.github.io/logo.webp">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Donate - Nashr Foundation">
-    <meta name="twitter:description" content="Make a difference today by donating to Nashr Foundation.">
+    <meta name="twitter:title" content="Donate - Nashr Foundation" id="tw-title">
+    <meta name="twitter:description" content="Make a difference today by donating to Nashr Foundation." id="tw-description">
     <meta name="twitter:image" content="https://nashrfoundation.github.io/logo.webp">
     <link rel="icon" href="/logo.webp" sizes="any" type="image/webp">
     <link rel="apple-touch-icon" href="/logo.webp">
@@ -447,11 +447,11 @@
             </aside>
             <div class="drawer-overlay" aria-hidden="true"></div>
             <div class="social-icons">
-                <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"> <img src="instagram_icon.webp" alt="Instagram" width="24" height="24" loading="lazy" decoding="async"> </a>
-                <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"> <img src="facebook_icon.webp" alt="Facebook" width="24" height="24" loading="lazy" decoding="async"> </a>
-                <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"> <img src="twitter_icon.webp" alt="X" width="24" height="24" loading="lazy" decoding="async"> </a>
-                <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"> <img src="tik-tok.webp" alt="TikTok" width="24" height="24" loading="lazy" decoding="async"> </a>
-                <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"> <img src="youtube.webp" alt="YouTube" width="24" height="24" loading="lazy" decoding="async"> </a>
+                <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram" data-social="instagram"> <img src="instagram_icon.webp" alt="Instagram" width="24" height="24" loading="lazy" decoding="async"> </a>
+                <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook" data-social="facebook"> <img src="facebook_icon.webp" alt="Facebook" width="24" height="24" loading="lazy" decoding="async"> </a>
+                <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)" data-social="twitter"> <img src="twitter_icon.webp" alt="X" width="24" height="24" loading="lazy" decoding="async"> </a>
+                <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok" data-social="tiktok"> <img src="tik-tok.webp" alt="TikTok" width="24" height="24" loading="lazy" decoding="async"> </a>
+                <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube" data-social="youtube"> <img src="youtube.webp" alt="YouTube" width="24" height="24" loading="lazy" decoding="async"> </a>
             </div>
             <div class="donate-button"> <a href="donate.html" class="btn">Donate Now</a> </div>
         </div>
@@ -460,18 +460,18 @@
     <!-- Hero Background -->
     <div class="hero-background">
         <img src="hero_background.webp" alt="Hero Background" class="hero-bg-image">
-        <div class="hero-content">
-            <h1>Make a Difference Today</h1>
-            <p>Your donation helps provide education, food, water, and basic necessities to those in need</p>
+        <div class="hero-content" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 1rem;">
+            <h1 id="donate-hero-title">Make a Difference Today</h1>
+            <p id="donate-hero-description">Your donation helps provide education, food, water, and basic necessities to those in need</p>
         </div>
     </div>
 
     <main id="main-content">
         <section class="fund-tracker">
             <div class="container">
-                <h2>Track Our Progress</h2>
-                <p>Help us reach our goal to support more communities in need.</p>
-                <div class="fund-details"> <span>PKR 70,000</span> raised of a PKR 200,000 goal </div>
+                <h2 id="donate-progress-title">Track Our Progress</h2>
+                <p id="donate-progress-description">Help us reach our goal to support more communities in need.</p>
+                <div class="fund-details" id="donate-fund-details"> <span>PKR 70,000</span> raised of a PKR 200,000 goal </div>
                 <div class="progress-bar-container"> <div class="progress-bar" id="fund-progress-bar"></div> </div>
             </div>
         </section>
@@ -538,7 +538,7 @@
 
     <footer>
         <div class="container">
-            <div class="footer-content"> <div class="footer-logo"><img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" decoding="async"></div> <div class="footer-info"> <p>Nashr Foundation</p><p>Established 2025</p> <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p> </div> <div class="footer-social"> <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"></a> <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"></a> <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)"><img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async"></a> <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok"><img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async"></a> <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube"><img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"></a> </div> </div>
+            <div class="footer-content"> <div class="footer-logo"><img src="logo.webp" alt="Nashr Foundation Logo" loading="lazy" decoding="async"></div> <div class="footer-info"> <p>Nashr Foundation</p><p>Established 2025</p> <p>Email: <a href="mailto:nashrfoundationpk@gmail.com">nashrfoundationpk@gmail.com</a></p> </div> <div class="footer-social"> <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram" data-social="instagram"><img src="instagram_icon.webp" alt="Instagram" loading="lazy" decoding="async"></a> <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook" data-social="facebook"><img src="facebook_icon.webp" alt="Facebook" loading="lazy" decoding="async"></a> <a href="https://x.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="X (formerly Twitter)" data-social="twitter"><img src="twitter_icon.webp" alt="X" loading="lazy" decoding="async"></a> <a href="https://www.tiktok.com/@nashr756" target="_blank" rel="noopener noreferrer" aria-label="TikTok" data-social="tiktok"><img src="tik-tok.webp" alt="TikTok" loading="lazy" decoding="async"></a> <a href="https://www.youtube.com/@nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="YouTube" data-social="youtube"><img src="youtube.webp" alt="YouTube" loading="lazy" decoding="async"></a> </div> </div>
             <div class="footer-bottom">
                 <p>© 2025 Nashr Foundation. All rights reserved.</p>
                 <div class="footer-legal">
@@ -567,6 +567,68 @@
     <script>
       (function(){
         try {
+          // Dynamic SEO, social links, and content from Supabase settings/content
+          const ogTitle = document.getElementById('og-title');
+          const ogDesc = document.getElementById('og-description');
+          const twTitle = document.getElementById('tw-title');
+          const twDesc = document.getElementById('tw-description');
+          const metaTitle = document.getElementById('meta-title');
+          const metaDescription = document.getElementById('meta-description');
+          const heroTitleEl = document.getElementById('donate-hero-title');
+          const heroDescEl = document.getElementById('donate-hero-description');
+          const progressTitleEl = document.getElementById('donate-progress-title');
+          const progressDescEl = document.getElementById('donate-progress-description');
+          const fundDetailsEl = document.getElementById('donate-fund-details');
+
+          const ensureSupabase = async () => {
+            try {
+              if (window.supabase) return window.supabase;
+              const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+              const url = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.url) || 'https://jtuhnndwhotxjjolwcuz.supabase.co';
+              const key = (window.SUPABASE_CONFIG && window.SUPABASE_CONFIG.anonKey) || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc';
+              window.supabase = createClient(url, key);
+              return window.supabase;
+            } catch (e) { return null; }
+          };
+
+          (async () => {
+            const sb = await ensureSupabase();
+            if (!sb) return;
+            const { data: settingsRows } = await sb.from('settings').select('*').limit(1);
+            const s = Array.isArray(settingsRows) ? settingsRows[0] : null;
+            if (s) {
+              if (metaTitle) metaTitle.textContent = s.title ? `${s.title} — Donate` : metaTitle.textContent;
+              if (metaDescription && s.description) metaDescription.setAttribute('content', s.description);
+              if (ogTitle && s.title) ogTitle.setAttribute('content', `${s.title} — Donate`);
+              if (ogDesc && s.description) ogDesc.setAttribute('content', s.description);
+              if (twTitle && s.title) twTitle.setAttribute('content', `${s.title} — Donate`);
+              if (twDesc && s.description) twDesc.setAttribute('content', s.description);
+              const setSocial = (selector, value) => { const el = document.querySelector(selector); if (el && value) el.href = value; };
+              setSocial('a[data-social="instagram"]', s.instagram);
+              setSocial('a[data-social="facebook"]', s.facebook);
+              setSocial('a[data-social="twitter"]', s.twitter);
+              setSocial('a[data-social="youtube"]', s.youtube);
+              const goal = s.fundraising_goal != null ? Number(s.fundraising_goal) : 200000;
+              const totalRaised = s.total_raised != null ? Number(s.total_raised) : undefined;
+              if (typeof totalRaised === 'number' && fundDetailsEl) {
+                fundDetailsEl.innerHTML = `<span>PKR ${totalRaised.toLocaleString()}</span> raised of a PKR ${goal.toLocaleString()} goal`;
+                const bar = document.getElementById('fund-progress-bar');
+                if (bar) {
+                  const pct = Math.max(0, Math.min(100, Math.round((totalRaised / (goal || 1)) * 100)));
+                  setTimeout(() => { bar.style.width = pct + '%'; bar.textContent = pct + '%'; }, 300);
+                }
+              }
+            }
+
+            const { data: contentRows } = await sb.from('content').select('*').limit(1);
+            const c = Array.isArray(contentRows) ? contentRows[0] : null;
+            if (c) {
+              if (heroTitleEl && c.donation_title) heroTitleEl.textContent = c.donation_title;
+              if (heroDescEl && c.donation_description) heroDescEl.textContent = c.donation_description;
+              if (progressTitleEl && c.donation_impact_title) progressTitleEl.textContent = c.donation_impact_title;
+            }
+          })();
+
           var decided = localStorage.getItem('consentDecision');
           var banner = document.getElementById('consent-banner');
           var lockInterval = null;
