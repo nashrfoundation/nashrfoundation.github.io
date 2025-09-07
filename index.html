@@ -563,8 +563,39 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
           const supabase = createClient('https://jtuhnndwhotxjjolwcuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc');
           // Load settings for SEO/meta
-          const { data: settingsRows } = await supabase.from('settings').select('*').limit(1);
-          const s = Array.isArray(settingsRows) ? settingsRows[0] : null;
+          const { data: settingsRows } = await supabase.from('settings').select('*');
+          // Handle hybrid format: key-value rows + direct columns
+          const s = {};
+          if (Array.isArray(settingsRows)) {
+            // First, get direct column values from the first row
+            const firstRow = settingsRows[0];
+            if (firstRow) {
+              s.title = firstRow.title || '';
+              s.description = firstRow.description || '';
+              s.keywords = firstRow.keywords || '';
+              s.facebook = firstRow.facebook || '';
+              s.instagram = firstRow.instagram || '';
+              s.twitter = firstRow.twitter || '';
+              s.youtube = firstRow.youtube || '';
+              s.fundraising_goal = Number(firstRow.fundraising_goal) || 0;
+              s.goal_description = firstRow.goal_description || '';
+              s.total_raised = Number(firstRow.total_raised) || 0;
+              s.admin_email_notifications = firstRow.admin_email_notifications || 'all';
+              s.backup_frequency = firstRow.backup_frequency || 'daily';
+            }
+            
+            // Then override with key-value rows if they exist
+            settingsRows.forEach(row => {
+              if (row.key && row.value !== null) {
+                // Convert numeric values
+                if (['fundraising_goal', 'total_raised'].includes(row.key)) {
+                  s[row.key] = Number(row.value) || 0;
+                } else {
+                  s[row.key] = row.value;
+                }
+              }
+            });
+          }
           if (s) {
             if (s.title) document.title = s.title;
             const metaDesc = document.querySelector('meta[name="description"]');
@@ -596,7 +627,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                 .from('donations')
                 .select('amount, payment_status');
               if (!donationsErr && Array.isArray(donations)) {
-                totalRaised = donations.filter(d => d.payment_status === 'completed').reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                // Include all donations, not just completed ones
+                totalRaised = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
               }
             }
             window.NF_TOTAL_RAISED = totalRaised;

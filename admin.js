@@ -325,17 +325,51 @@ async function getCachedSettings() {
     }
     
     try {
+        // Fetch all settings rows (key-value format)
         const { data: settingsRows, error } = await supabase
             .from('settings')
-            .select('*')
-            .limit(1);
+            .select('*');
             
         if (error) {
             console.error('Settings fetch error:', error);
             return null;
         }
         
-        settingsCache = Array.isArray(settingsRows) ? settingsRows[0] : null;
+        // Convert key-value rows to object format, but also check direct columns
+        const settingsObj = {};
+        if (Array.isArray(settingsRows)) {
+            // First, check if we have direct columns (hybrid format)
+            const firstRow = settingsRows[0];
+            if (firstRow && firstRow.title !== undefined) {
+                // Direct column format - use the first row
+                settingsObj.title = firstRow.title || '';
+                settingsObj.description = firstRow.description || '';
+                settingsObj.keywords = firstRow.keywords || '';
+                settingsObj.facebook = firstRow.facebook || '';
+                settingsObj.instagram = firstRow.instagram || '';
+                settingsObj.twitter = firstRow.twitter || '';
+                settingsObj.youtube = firstRow.youtube || '';
+                settingsObj.fundraising_goal = Number(firstRow.fundraising_goal) || 0;
+                settingsObj.goal_description = firstRow.goal_description || '';
+                settingsObj.total_raised = Number(firstRow.total_raised) || 0;
+                settingsObj.admin_email_notifications = firstRow.admin_email_notifications || 'all';
+                settingsObj.backup_frequency = firstRow.backup_frequency || 'daily';
+            } else {
+                // Key-value format
+                settingsRows.forEach(row => {
+                    if (row.key && row.value !== null) {
+                        // Convert numeric values
+                        if (['fundraising_goal', 'total_raised'].includes(row.key)) {
+                            settingsObj[row.key] = Number(row.value) || 0;
+                        } else {
+                            settingsObj[row.key] = row.value;
+                        }
+                    }
+                });
+            }
+        }
+        
+        settingsCache = settingsObj;
         settingsCacheTime = now;
         
         return settingsCache;
@@ -1293,8 +1327,8 @@ async function loadSettingsData() {
                             .from('donations')
                             .select('amount, payment_status');
                         if (!donationsErr && Array.isArray(donations)) {
+                            // Include all donations, not just completed ones
                             totalRaisedValue = donations
-                                .filter(d => d.payment_status === 'completed')
                                 .reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
                         }
                     }
@@ -1320,96 +1354,113 @@ async function loadSettingsData() {
 function saveSettings() {
     try {
         // Get settings values
-        const seoSettings = {
+        const settingsData = {
             title: document.getElementById('site-title').value,
             description: document.getElementById('site-description').value,
-            keywords: document.getElementById('keywords').value
-        };
-        
-        const socialSettings = {
+            keywords: document.getElementById('keywords').value,
             facebook: document.getElementById('facebook-url').value,
             instagram: document.getElementById('instagram-url').value,
             twitter: document.getElementById('twitter-url').value,
-            youtube: document.getElementById('youtube-url').value
-        };
-        
-        const fundraisingSettings = {
-            goal: document.getElementById('fundraising-goal-amount').value,
-            description: document.getElementById('goal-description').value,
-            totalRaised: document.getElementById('total-raised-amount') ? document.getElementById('total-raised-amount').value : ''
-        };
-        
-        const securitySettings = {
-            notifications: document.getElementById('admin-email-notifications').value,
-            backup: document.getElementById('backup-frequency').value
+            youtube: document.getElementById('youtube-url').value,
+            fundraising_goal: document.getElementById('fundraising-goal-amount').value,
+            goal_description: document.getElementById('goal-description').value,
+            total_raised: document.getElementById('total-raised-amount') ? document.getElementById('total-raised-amount').value : '',
+            admin_email_notifications: document.getElementById('admin-email-notifications').value,
+            backup_frequency: document.getElementById('backup-frequency').value
         };
         
         (async () => {
             try {
-                const payload = {
-                    title: seoSettings.title,
-                    description: seoSettings.description,
-                    keywords: seoSettings.keywords,
-                    facebook: socialSettings.facebook,
-                    instagram: socialSettings.instagram,
-                    twitter: socialSettings.twitter,
-                    youtube: socialSettings.youtube,
-                    fundraising_goal: parseInt(fundraisingSettings.goal, 10) || 0,
-                    goal_description: fundraisingSettings.description,
-                    total_raised: parseInt(fundraisingSettings.totalRaised, 10) || 0,
-                    admin_email_notifications: securitySettings.notifications,
-                    backup_frequency: securitySettings.backup,
-                    updated_at: new Date().toISOString()
-                };
-                const { data: existing, error: fetchErr } = await supabase
+                // Check if we have direct columns or key-value format
+                const { data: existingSettings, error: fetchErr } = await supabase
                     .from('settings')
-                    .select('id')
+                    .select('*')
                     .limit(1);
                 if (fetchErr) throw fetchErr;
-                if (Array.isArray(existing) && existing[0]?.id) {
-                    let { error: updateErr } = await supabase
+                
+                const firstRow = Array.isArray(existingSettings) ? existingSettings[0] : null;
+                const now = new Date().toISOString();
+                
+                if (firstRow && firstRow.title !== undefined) {
+                    // Direct column format - update the first row
+                    const payload = {
+                        title: settingsData.title,
+                        description: settingsData.description,
+                        keywords: settingsData.keywords,
+                        facebook: settingsData.facebook,
+                        instagram: settingsData.instagram,
+                        twitter: settingsData.twitter,
+                        youtube: settingsData.youtube,
+                        fundraising_goal: parseInt(settingsData.fundraising_goal, 10) || 0,
+                        goal_description: settingsData.goal_description,
+                        total_raised: parseInt(settingsData.total_raised, 10) || 0,
+                        admin_email_notifications: settingsData.admin_email_notifications,
+                        backup_frequency: settingsData.backup_frequency,
+                        updated_at: now
+                    };
+                    
+                    const { error: updateErr } = await supabase
                         .from('settings')
                         .update(payload)
-                        .eq('id', existing[0].id);
-                    if (updateErr) {
-                        // Retry without total_raised if column missing
-                        if ((updateErr.message || '').includes('total_raised')) {
-                            const retryPayload = { ...payload };
-                            delete retryPayload.total_raised;
-                            const { error: retryErr } = await supabase
-                                .from('settings')
-                                .update(retryPayload)
-                                .eq('id', existing[0].id);
-                            if (retryErr) throw retryErr;
-                            showInfo('Saved without total raised (add column in Supabase to enable this setting).');
-                        } else {
-                            throw updateErr;
-                        }
-                    }
+                        .eq('id', firstRow.id);
+                    
+                    if (updateErr) throw updateErr;
                 } else {
-                    let { error: insertErr } = await supabase
-                        .from('settings')
-                        .insert([payload]);
-                    if (insertErr) {
-                        if ((insertErr.message || '').includes('total_raised')) {
-                            const retryPayload = { ...payload };
-                            delete retryPayload.total_raised;
-                            const { error: retryErr } = await supabase
-                                .from('settings')
-                                .insert([retryPayload]);
-                            if (retryErr) throw retryErr;
-                            showInfo('Saved without total raised (add column in Supabase to enable this setting).');
-                        } else {
-                            throw insertErr;
+                    // Key-value format - upsert each setting
+                    const existingMap = {};
+                    const { data: allSettings } = await supabase.from('settings').select('*');
+                    if (Array.isArray(allSettings)) {
+                        allSettings.forEach(row => {
+                            existingMap[row.key] = row.id;
+                        });
+                    }
+                    
+                    const upsertPromises = [];
+                    Object.entries(settingsData).forEach(([key, value]) => {
+                        if (value !== null && value !== undefined && value !== '') {
+                            const upsertData = {
+                                key: key,
+                                value: String(value),
+                                updated_at: now
+                            };
+                            
+                            if (existingMap[key]) {
+                                upsertPromises.push(
+                                    supabase
+                                        .from('settings')
+                                        .update(upsertData)
+                                        .eq('id', existingMap[key])
+                                );
+                            } else {
+                                upsertPromises.push(
+                                    supabase
+                                        .from('settings')
+                                        .insert([{
+                                            ...upsertData,
+                                            created_at: now
+                                        }])
+                                );
+                            }
                         }
+                    });
+                    
+                    const results = await Promise.all(upsertPromises);
+                    const errors = results.filter(r => r.error);
+                    if (errors.length > 0) {
+                        console.error('Some settings failed to save:', errors);
+                        showError('Some settings failed to save. Please try again.');
+                        return;
                     }
                 }
+                
                 showSuccess('Settings saved successfully!');
                 logActivity('settings_update', 'System settings updated');
-                // Ensure fresh values across app
-                try { invalidateSettingsCache(); } catch(e) {}
-                try { await loadSettingsData(); } catch(e) {}
-                try { await loadOverviewData(); } catch(e) {}
+                
+                // Invalidate cache and reload
+                invalidateSettingsCache();
+                await loadSettingsData();
+                await loadOverviewData();
+                
             } catch (err) {
                 console.error('Failed to save settings:', err);
                 showError('Failed to save settings. Please try again.');
