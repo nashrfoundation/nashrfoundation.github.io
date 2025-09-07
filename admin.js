@@ -42,6 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeSupabase();
     setupEventListeners();
     checkAuthState();
+    // Initialize real-time features after Supabase is ready
+    setTimeout(() => {
+        setupRealtimeUpdates();
+        setupLivePreview();
+    }, 1000);
 });
 
 // Supabase Initialization
@@ -72,7 +77,12 @@ async function initializeSupabase() {
                 showDashboard();
                 loadDashboardData();
                 if (!hasLoggedLoginEvent) {
-                    logActivity('admin_login', `User ${session.user.email} logged in`);
+                    logActivity('admin_login', `User ${session.user.email} logged in`, {
+                        login_method: 'email',
+                        user_agent: navigator.userAgent,
+                        login_time: new Date().toISOString(),
+                        session_duration: 'ongoing'
+                    });
                     hasLoggedLoginEvent = true;
                 }
             } else if (event === 'SIGNED_OUT') {
@@ -190,7 +200,12 @@ async function handleLogin(e) {
         
     } catch (err) {
         showLoginError('Login failed. Check your email and password.');
-        logActivity('admin_login_failed', `Failed login attempt for ${email}`);
+        logActivity('admin_login_failed', `Failed login attempt for ${email}`, {
+            login_method: 'email',
+            user_agent: navigator.userAgent,
+            attempt_time: new Date().toISOString(),
+            security_risk: 'medium'
+        });
     } finally {
         if (submitBtn) {
             submitBtn.disabled = false;
@@ -398,6 +413,215 @@ async function getCachedSettings() {
 function invalidateSettingsCache() {
     settingsCache = null;
     settingsCacheTime = null;
+    // Also clear localStorage cache
+    localStorage.removeItem('lastSettingsUpdate');
+    localStorage.removeItem('lastContentUpdate');
+}
+
+// Real-time updates setup
+function setupRealtimeUpdates() {
+    try {
+        // Settings real-time subscription
+        supabase
+            .channel('settings-changes')
+            .on('postgres_changes', 
+                { event: '*', schema: 'public', table: 'settings' },
+                (payload) => {
+                    console.log('Settings changed:', payload);
+                    invalidateSettingsCache();
+                    loadSettingsData();
+                    showNotification('Settings updated in real-time', 'info');
+                }
+            )
+            .subscribe();
+
+        // Content real-time subscription
+        supabase
+            .channel('content-changes')
+            .on('postgres_changes', 
+                { event: '*', schema: 'public', table: 'content' },
+                (payload) => {
+                    console.log('Content changed:', payload);
+                    loadContentData();
+                    showNotification('Content updated in real-time', 'info');
+                }
+            )
+            .subscribe();
+
+        // Donations real-time subscription
+        supabase
+            .channel('donations-changes')
+            .on('postgres_changes', 
+                { event: '*', schema: 'public', table: 'donations' },
+                (payload) => {
+                    console.log('Donations changed:', payload);
+                    loadOverviewData();
+                    loadDonationsData();
+                    showNotification('New donation received!', 'success');
+                }
+            )
+            .subscribe();
+
+        console.log('✅ Real-time subscriptions established');
+    } catch (error) {
+        console.error('Failed to set up real-time updates:', error);
+    }
+}
+
+// Live preview functionality
+function setupLivePreview() {
+    // Add preview buttons to forms
+    const settingsForm = document.querySelector('#settings form');
+    const contentForm = document.querySelector('#content form');
+    
+    if (settingsForm) {
+        const previewBtn = document.createElement('button');
+        previewBtn.type = 'button';
+        previewBtn.className = 'btn btn-outline';
+        previewBtn.innerHTML = '👁️ Live Preview';
+        previewBtn.onclick = () => previewSettings();
+        settingsForm.appendChild(previewBtn);
+    }
+    
+    if (contentForm) {
+        const previewBtn = document.createElement('button');
+        previewBtn.type = 'button';
+        previewBtn.className = 'btn btn-outline';
+        previewBtn.innerHTML = '👁️ Live Preview';
+        previewBtn.onclick = () => previewContent();
+        contentForm.appendChild(previewBtn);
+    }
+}
+
+function previewSettings() {
+    const settingsData = {
+        title: document.getElementById('site-title').value,
+        description: document.getElementById('site-description').value,
+        keywords: document.getElementById('keywords').value,
+        facebook: document.getElementById('facebook-url').value,
+        instagram: document.getElementById('instagram-url').value,
+        twitter: document.getElementById('twitter-url').value,
+        youtube: document.getElementById('youtube-url').value,
+        fundraising_goal: document.getElementById('fundraising-goal-amount').value,
+        total_raised: document.getElementById('total-raised-amount')?.value || ''
+    };
+    
+    // Open preview in new window
+    const previewWindow = window.open('', '_blank', 'width=1200,height=800');
+    previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>${settingsData.title || 'Preview'}</title>
+            <meta name="description" content="${settingsData.description || ''}">
+            <meta name="keywords" content="${settingsData.keywords || ''}">
+            <style>
+                body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                .preview-header { background: #2A8D9C; color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+                .preview-content { background: #f5f5f5; padding: 20px; border-radius: 8px; }
+                .social-links { margin-top: 20px; }
+                .social-links a { margin-right: 15px; color: #2A8D9C; }
+            </style>
+        </head>
+        <body>
+            <div class="preview-header">
+                <h1>${settingsData.title || 'Site Title'}</h1>
+                <p>${settingsData.description || 'Site description'}</p>
+            </div>
+            <div class="preview-content">
+                <h2>Fundraising Progress</h2>
+                <p>Goal: PKR ${Number(settingsData.fundraising_goal || 0).toLocaleString()}</p>
+                <p>Raised: PKR ${Number(settingsData.total_raised || 0).toLocaleString()}</p>
+                <div class="social-links">
+                    ${settingsData.facebook ? `<a href="${settingsData.facebook}">Facebook</a>` : ''}
+                    ${settingsData.instagram ? `<a href="${settingsData.instagram}">Instagram</a>` : ''}
+                    ${settingsData.twitter ? `<a href="${settingsData.twitter}">Twitter</a>` : ''}
+                    ${settingsData.youtube ? `<a href="${settingsData.youtube}">YouTube</a>` : ''}
+                </div>
+            </div>
+        </body>
+        </html>
+    `);
+}
+
+function previewContent() {
+    const contentData = {
+        homepage_title: document.getElementById('homepage-title').value,
+        homepage_description: document.getElementById('homepage-description').value,
+        homepage_hero_title: document.getElementById('homepage-hero-title').value,
+        homepage_hero_description: document.getElementById('homepage-hero-description').value,
+        donation_title: document.getElementById('donation-title').value,
+        donation_description: document.getElementById('donation-description').value
+    };
+    
+    const previewWindow = window.open('', '_blank', 'width=1200,height=800');
+    previewWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>Content Preview</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 0; padding: 20px; }
+                .hero-section { background: linear-gradient(135deg, #2A8D9C, #1A6E7C); color: white; padding: 60px 20px; text-align: center; border-radius: 8px; margin-bottom: 20px; }
+                .content-section { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+            </style>
+        </head>
+        <body>
+            <div class="hero-section">
+                <h1>${contentData.homepage_hero_title || 'Hero Title'}</h1>
+                <p>${contentData.homepage_hero_description || 'Hero description'}</p>
+            </div>
+            <div class="content-section">
+                <h2>${contentData.homepage_title || 'Homepage Title'}</h2>
+                <p>${contentData.homepage_description || 'Homepage description'}</p>
+            </div>
+            <div class="content-section">
+                <h2>${contentData.donation_title || 'Donation Title'}</h2>
+                <p>${contentData.donation_description || 'Donation description'}</p>
+            </div>
+        </body>
+        </html>
+    `);
+}
+
+// Notification system
+function showNotification(message, type = 'success') {
+    // Remove existing notifications
+    const existing = document.querySelectorAll('.admin-notification');
+    existing.forEach(n => n.remove());
+
+    const notification = document.createElement('div');
+    notification.className = `admin-notification admin-notification-${type}`;
+    notification.innerHTML = `
+        <div class="notification-content">
+            <span class="notification-message">${message}</span>
+            <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+        </div>
+    `;
+    
+    // Add styles
+    notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${type === 'success' ? '#10B981' : type === 'error' ? '#EF4444' : '#3B82F6'};
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        max-width: 300px;
+        animation: slideIn 0.3s ease-out;
+    `;
+    
+    document.body.appendChild(notification);
+    
+    // Auto-remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
 }
 
 // Overview Section
@@ -1109,7 +1333,12 @@ function saveContentChanges() {
                     if (insertErr) throw insertErr;
                 }
                 showSuccess('Content changes saved successfully!');
-                logActivity('content_update', 'Website content updated');
+                showNotification('Content updated successfully!', 'success');
+                logActivity('content_update', 'Website content updated', {
+                    content_sections: ['homepage', 'donation'],
+                    fields_updated: Object.keys(payload).filter(key => payload[key])
+                });
+                localStorage.setItem('lastContentUpdate', new Date().toISOString());
             } catch (err) {
                 console.error('Failed to save content:', err);
                 showError('Failed to save content changes. Please try again.');
@@ -1510,10 +1739,15 @@ function saveSettings() {
                 }
                 
                 showSuccess('Settings saved successfully!');
-                logActivity('settings_update', 'System settings updated');
+                showNotification('Settings updated successfully!', 'success');
+                logActivity('settings_update', 'System settings updated', {
+                    settings_changed: Object.keys(settingsData).filter(key => settingsData[key]),
+                    total_changes: Object.keys(settingsData).length
+                });
                 
                 // Invalidate cache and reload
                 invalidateSettingsCache();
+                localStorage.setItem('lastSettingsUpdate', now);
                 await loadSettingsData();
                 await loadOverviewData();
                 
@@ -1533,12 +1767,12 @@ async function loadLogsData() {
     try {
         showSectionLoading('#logs-table-body', 'Loading activity logs...');
         
-        // Fetch real-time activity logs from Supabase
+        // Fetch real-time activity logs from Supabase with enhanced data
         const { data: logs, error } = await supabase
             .from('activity_logs')
             .select('*')
             .order('timestamp', { ascending: false })
-            .limit(100);
+            .limit(200); // Increased limit for more detailed logs
             
         if (error) {
             console.warn('Logs table not available or fetch failed:', error);
@@ -1551,6 +1785,7 @@ async function loadLogsData() {
         logsData = logs || [];
         displayLogsTable(logsData);
         setupLogsPagination(logsData);
+        setupLogsFilters(logsData);
         
         hideSectionLoading('#logs-table-body');
         
@@ -1560,6 +1795,346 @@ async function loadLogsData() {
         setupLogsPagination([]);
         hideSectionLoading('#logs-table-body');
     }
+}
+
+// Enhanced logs display with more details
+function displayLogsTable(logs) {
+    const tableBody = document.getElementById('logs-table-body');
+    if (!tableBody) return;
+    
+    tableBody.innerHTML = '';
+    
+    if (logs.length === 0) {
+        tableBody.innerHTML = '<tr><td colspan="6" class="loading">No activity logs found</td></tr>';
+        return;
+    }
+    
+    logs.forEach(log => {
+        const row = document.createElement('tr');
+        row.className = `log-row log-${log.severity || 'info'}`;
+        
+        // Timestamp with relative time
+        const timestampCell = document.createElement('td');
+        const date = new Date(log.timestamp);
+        const relativeTime = getRelativeTime(date);
+        timestampCell.innerHTML = `
+            <div class="log-timestamp">
+                <div class="log-time">${date.toLocaleTimeString()}</div>
+                <div class="log-date">${date.toLocaleDateString()}</div>
+                <div class="log-relative">${relativeTime}</div>
+            </div>
+        `;
+        
+        // User with avatar
+        const userCell = document.createElement('td');
+        userCell.innerHTML = `
+            <div class="log-user">
+                <div class="user-avatar">${getUserInitials(log.user)}</div>
+                <div class="user-info">
+                    <div class="user-name">${log.user}</div>
+                    <div class="user-session">${log.metadata?.session_id ? log.metadata.session_id.substring(0, 8) + '...' : 'N/A'}</div>
+                </div>
+            </div>
+        `;
+        
+        // Action with category and severity
+        const actionCell = document.createElement('td');
+        const severityIcon = getSeverityIcon(log.severity || 'info');
+        const categoryBadge = getCategoryBadge(log.category || 'general');
+        actionCell.innerHTML = `
+            <div class="log-action">
+                <div class="action-header">
+                    <span class="severity-icon">${severityIcon}</span>
+                    <span class="action-name">${log.action}</span>
+                    ${categoryBadge}
+                </div>
+                <div class="action-details">${log.details}</div>
+            </div>
+        `;
+        
+        // Metadata with expandable details
+        const metadataCell = document.createElement('td');
+        const metadata = log.metadata || {};
+        metadataCell.innerHTML = `
+            <div class="log-metadata">
+                <div class="metadata-summary">
+                    <span class="metadata-item">${metadata.user_agent ? metadata.user_agent.split(' ')[0] : 'Unknown'}</span>
+                    <span class="metadata-item">${metadata.screen_resolution || 'N/A'}</span>
+                </div>
+                <button class="btn btn-sm btn-outline metadata-toggle" onclick="toggleMetadata(this)">
+                    <span class="toggle-text">Show Details</span>
+                    <span class="toggle-icon">▼</span>
+                </button>
+                <div class="metadata-details" style="display: none;">
+                    <div class="metadata-grid">
+                        <div class="metadata-item"><strong>IP:</strong> ${log.ip}</div>
+                        <div class="metadata-item"><strong>Referrer:</strong> ${metadata.referrer || 'Direct'}</div>
+                        <div class="metadata-item"><strong>Viewport:</strong> ${metadata.viewport_size || 'N/A'}</div>
+                        <div class="metadata-item"><strong>Timezone:</strong> ${metadata.timezone || 'N/A'}</div>
+                        <div class="metadata-item"><strong>Language:</strong> ${metadata.language || 'N/A'}</div>
+                        <div class="metadata-item"><strong>Page URL:</strong> ${metadata.page_url || 'N/A'}</div>
+                        ${metadata.element_id ? `<div class="metadata-item"><strong>Element ID:</strong> ${metadata.element_id}</div>` : ''}
+                        ${metadata.element_class ? `<div class="metadata-item"><strong>Element Class:</strong> ${metadata.element_class}</div>` : ''}
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Actions
+        const actionsCell = document.createElement('td');
+        actionsCell.innerHTML = `
+            <div class="log-actions">
+                <button class="btn btn-sm btn-outline" onclick="copyLogDetails('${JSON.stringify(log).replace(/'/g, "\\'")}')" title="Copy Details">
+                    📋
+                </button>
+                <button class="btn btn-sm btn-outline" onclick="exportLogEntry('${log.id || ''}')" title="Export">
+                    📤
+                </button>
+                ${log.severity === 'error' ? `<button class="btn btn-sm btn-danger" onclick="markAsResolved('${log.id || ''}')" title="Mark as Resolved">✓</button>` : ''}
+            </div>
+        `;
+        
+        row.appendChild(timestampCell);
+        row.appendChild(userCell);
+        row.appendChild(actionCell);
+        row.appendChild(metadataCell);
+        row.appendChild(actionsCell);
+        
+        tableBody.appendChild(row);
+    });
+}
+
+// Helper functions for enhanced logs display
+function getRelativeTime(date) {
+    const now = new Date();
+    const diff = now - date;
+    const seconds = Math.floor(diff / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    const days = Math.floor(hours / 24);
+    
+    if (days > 0) return `${days}d ago`;
+    if (hours > 0) return `${hours}h ago`;
+    if (minutes > 0) return `${minutes}m ago`;
+    return `${seconds}s ago`;
+}
+
+function getUserInitials(user) {
+    return user.split('@')[0].substring(0, 2).toUpperCase();
+}
+
+function getSeverityIcon(severity) {
+    const icons = {
+        'success': '✅',
+        'info': 'ℹ️',
+        'warning': '⚠️',
+        'error': '❌'
+    };
+    return icons[severity] || 'ℹ️';
+}
+
+function getCategoryBadge(category) {
+    const colors = {
+        'authentication': '#3B82F6',
+        'configuration': '#8B5CF6',
+        'content': '#10B981',
+        'donations': '#F59E0B',
+        'user_management': '#EF4444',
+        'system': '#6B7280',
+        'security': '#DC2626',
+        'backup': '#059669',
+        'data_management': '#7C3AED',
+        'general': '#6B7280'
+    };
+    
+    const color = colors[category] || '#6B7280';
+    return `<span class="category-badge" style="background-color: ${color}">${category}</span>`;
+}
+
+// Enhanced filtering and utility functions
+function setupLogsFilters(logs) {
+    // Add filter controls to the logs section
+    const logsSection = document.querySelector('#logs');
+    if (!logsSection) return;
+    
+    // Check if filters already exist
+    if (document.querySelector('.logs-filters')) return;
+    
+    const filterContainer = document.createElement('div');
+    filterContainer.className = 'logs-filters';
+    filterContainer.innerHTML = `
+        <div class="filter-row">
+            <div class="filter-group">
+                <label>Severity:</label>
+                <select id="severity-filter" onchange="filterLogs()">
+                    <option value="">All</option>
+                    <option value="success">✅ Success</option>
+                    <option value="info">ℹ️ Info</option>
+                    <option value="warning">⚠️ Warning</option>
+                    <option value="error">❌ Error</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Category:</label>
+                <select id="category-filter" onchange="filterLogs()">
+                    <option value="">All</option>
+                    <option value="authentication">Authentication</option>
+                    <option value="configuration">Configuration</option>
+                    <option value="content">Content</option>
+                    <option value="donations">Donations</option>
+                    <option value="user_management">User Management</option>
+                    <option value="system">System</option>
+                    <option value="security">Security</option>
+                    <option value="backup">Backup</option>
+                    <option value="data_management">Data Management</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>User:</label>
+                <input type="text" id="user-filter" placeholder="Filter by user..." onkeyup="filterLogs()">
+            </div>
+            <div class="filter-group">
+                <label>Date Range:</label>
+                <input type="date" id="date-from" onchange="filterLogs()">
+                <input type="date" id="date-to" onchange="filterLogs()">
+            </div>
+            <div class="filter-actions">
+                <button class="btn btn-outline" onclick="clearFilters()">Clear</button>
+                <button class="btn btn-primary" onclick="exportLogs()">Export All</button>
+            </div>
+        </div>
+    `;
+    
+    // Insert filters before the table
+    const table = logsSection.querySelector('table');
+    if (table) {
+        table.parentNode.insertBefore(filterContainer, table);
+    }
+}
+
+function filterLogs() {
+    const severityFilter = document.getElementById('severity-filter')?.value || '';
+    const categoryFilter = document.getElementById('category-filter')?.value || '';
+    const userFilter = document.getElementById('user-filter')?.value.toLowerCase() || '';
+    const dateFrom = document.getElementById('date-from')?.value || '';
+    const dateTo = document.getElementById('date-to')?.value || '';
+    
+    let filteredLogs = logsData.filter(log => {
+        // Severity filter
+        if (severityFilter && log.severity !== severityFilter) return false;
+        
+        // Category filter
+        if (categoryFilter && log.category !== categoryFilter) return false;
+        
+        // User filter
+        if (userFilter && !log.user.toLowerCase().includes(userFilter)) return false;
+        
+        // Date range filter
+        if (dateFrom || dateTo) {
+            const logDate = new Date(log.timestamp);
+            if (dateFrom && logDate < new Date(dateFrom)) return false;
+            if (dateTo && logDate > new Date(dateTo + 'T23:59:59')) return false;
+        }
+        
+        return true;
+    });
+    
+    displayLogsTable(filteredLogs);
+    setupLogsPagination(filteredLogs);
+}
+
+function clearFilters() {
+    document.getElementById('severity-filter').value = '';
+    document.getElementById('category-filter').value = '';
+    document.getElementById('user-filter').value = '';
+    document.getElementById('date-from').value = '';
+    document.getElementById('date-to').value = '';
+    filterLogs();
+}
+
+function exportLogs() {
+    const logsToExport = logsData.map(log => ({
+        timestamp: log.timestamp,
+        user: log.user,
+        action: log.action,
+        details: log.details,
+        severity: log.severity,
+        category: log.category,
+        ip: log.ip,
+        metadata: log.metadata
+    }));
+    
+    const csv = convertToCSV(logsToExport);
+    downloadCSV(csv, `activity_logs_${new Date().toISOString().split('T')[0]}.csv`);
+}
+
+function convertToCSV(data) {
+    const headers = ['Timestamp', 'User', 'Action', 'Details', 'Severity', 'Category', 'IP', 'User Agent', 'Screen Resolution', 'Referrer'];
+    const rows = data.map(log => [
+        log.timestamp,
+        log.user,
+        log.action,
+        log.details,
+        log.severity,
+        log.category,
+        log.ip,
+        log.metadata?.user_agent || '',
+        log.metadata?.screen_resolution || '',
+        log.metadata?.referrer || ''
+    ]);
+    
+    return [headers, ...rows].map(row => 
+        row.map(field => `"${String(field).replace(/"/g, '""')}"`).join(',')
+    ).join('\n');
+}
+
+function downloadCSV(csv, filename) {
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    a.click();
+    window.URL.revokeObjectURL(url);
+}
+
+// Utility functions for log actions
+function toggleMetadata(button) {
+    const details = button.nextElementSibling;
+    const toggleText = button.querySelector('.toggle-text');
+    const toggleIcon = button.querySelector('.toggle-icon');
+    
+    if (details.style.display === 'none') {
+        details.style.display = 'block';
+        toggleText.textContent = 'Hide Details';
+        toggleIcon.textContent = '▲';
+    } else {
+        details.style.display = 'none';
+        toggleText.textContent = 'Show Details';
+        toggleIcon.textContent = '▼';
+    }
+}
+
+function copyLogDetails(logJson) {
+    navigator.clipboard.writeText(logJson).then(() => {
+        showNotification('Log details copied to clipboard', 'success');
+    }).catch(() => {
+        showNotification('Failed to copy log details', 'error');
+    });
+}
+
+function exportLogEntry(logId) {
+    const log = logsData.find(l => l.id === logId);
+    if (log) {
+        const csv = convertToCSV([log]);
+        downloadCSV(csv, `log_entry_${logId}_${new Date().toISOString().split('T')[0]}.csv`);
+    }
+}
+
+function markAsResolved(logId) {
+    // This would typically update the log entry in the database
+    showNotification('Log entry marked as resolved', 'success');
+    logActivity('log_resolved', `Log entry ${logId} marked as resolved`);
 }
 
 function displayLogsTable(logs) {
@@ -2746,25 +3321,134 @@ function hideSectionLoading(selector) {
 }
 
 // Utility function to log activity to Supabase
-async function logActivity(action, details) {
+// Enhanced activity logging system
+async function logActivity(action, details, metadata = {}) {
     try {
         const userEmail = currentUser ? currentUser.email : 'anonymous';
+        const timestamp = new Date().toISOString();
+        const userAgent = navigator.userAgent;
+        const referrer = document.referrer || 'direct';
+        
+        // Get more detailed information
+        const logEntry = {
+            user: userEmail,
+            action: action,
+            details: details,
+            metadata: {
+                ...metadata,
+                user_agent: userAgent,
+                referrer: referrer,
+                screen_resolution: `${screen.width}x${screen.height}`,
+                viewport_size: `${window.innerWidth}x${window.innerHeight}`,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                language: navigator.language,
+                session_id: getSessionId(),
+                page_url: window.location.href
+            },
+            ip: '0.0.0.0', // In a real implementation, get actual IP
+            timestamp: timestamp,
+            severity: getActionSeverity(action),
+            category: getActionCategory(action)
+        };
         
         await supabase
             .from('activity_logs')
-            .insert([{
-                user: userEmail,
-                action: action,
-                details: details,
-                ip: '0.0.0.0', // In a real implementation, get actual IP
-                timestamp: new Date().toISOString()
-            }]);
+            .insert([logEntry]);
             
-        console.log('Activity logged:', { action, details });
+        console.log('Activity logged:', logEntry);
+        
+        // Also log to browser console with more detail
+        console.group(`📝 Activity Log: ${action}`);
+        console.log('User:', userEmail);
+        console.log('Details:', details);
+        console.log('Metadata:', logEntry.metadata);
+        console.log('Timestamp:', timestamp);
+        console.groupEnd();
+        
     } catch (error) {
         console.error('Failed to log activity:', error);
         // Continue without throwing - logging shouldn't break the app
     }
+}
+
+// Helper functions for enhanced logging
+function getSessionId() {
+    let sessionId = sessionStorage.getItem('admin_session_id');
+    if (!sessionId) {
+        sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        sessionStorage.setItem('admin_session_id', sessionId);
+    }
+    return sessionId;
+}
+
+function getActionSeverity(action) {
+    const severityMap = {
+        'login': 'info',
+        'logout': 'info',
+        'settings_update': 'warning',
+        'content_update': 'warning',
+        'donation_received': 'success',
+        'donation_updated': 'info',
+        'donation_deleted': 'error',
+        'user_created': 'success',
+        'user_updated': 'info',
+        'user_deleted': 'error',
+        'system_error': 'error',
+        'security_alert': 'error',
+        'backup_created': 'info',
+        'backup_restored': 'warning',
+        'export_data': 'info',
+        'import_data': 'warning'
+    };
+    return severityMap[action] || 'info';
+}
+
+function getActionCategory(action) {
+    const categoryMap = {
+        'login': 'authentication',
+        'logout': 'authentication',
+        'settings_update': 'configuration',
+        'content_update': 'content',
+        'donation_received': 'donations',
+        'donation_updated': 'donations',
+        'donation_deleted': 'donations',
+        'user_created': 'user_management',
+        'user_updated': 'user_management',
+        'user_deleted': 'user_management',
+        'system_error': 'system',
+        'security_alert': 'security',
+        'backup_created': 'backup',
+        'backup_restored': 'backup',
+        'export_data': 'data_management',
+        'import_data': 'data_management'
+    };
+    return categoryMap[action] || 'general';
+}
+
+// Enhanced logging functions for specific actions
+function logUserAction(action, details, element = null) {
+    const metadata = {
+        element_id: element ? element.id : null,
+        element_class: element ? element.className : null,
+        element_tag: element ? element.tagName : null
+    };
+    logActivity(action, details, metadata);
+}
+
+function logSystemEvent(event, details, severity = 'info') {
+    logActivity(event, details, { 
+        system_event: true, 
+        severity: severity,
+        component: 'admin_portal'
+    });
+}
+
+function logSecurityEvent(event, details, risk_level = 'medium') {
+    logActivity(event, details, { 
+        security_event: true, 
+        risk_level: risk_level,
+        component: 'security'
+    });
 }
 
 // UI Helpers

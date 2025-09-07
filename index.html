@@ -129,7 +129,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
 </head>
 <body>
     <!-- Skip Navigation for Accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#main-content" class="skip-link" tabindex="1">Skip to main content</a>
     
     <!-- PWA Status Bar -->
     <div class="pwa-status-bar"></div>
@@ -562,7 +562,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         try {
           const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
           const supabase = createClient('https://jtuhnndwhotxjjolwcuz.supabase.co', 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc');
-          // Load settings for SEO/meta
+          // Load settings for SEO/meta with cache invalidation
+          const lastUpdate = localStorage.getItem('lastSettingsUpdate');
+          const cacheVersion = Date.now();
           const { data: settingsRows } = await supabase.from('settings').select('*');
           // Handle hybrid format: key-value rows + direct columns
           const s = {};
