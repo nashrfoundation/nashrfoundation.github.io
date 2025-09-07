@@ -17,6 +17,7 @@ class MobileEnhancements {
         this.setupNavigationImprovements();
         this.setupPerformanceOptimizations();
         this.setupAccessibilityFeatures();
+        this.ensureHeroAtTopOnMobile();
         
         console.log('✅ Mobile enhancements initialized');
     }
@@ -51,6 +52,19 @@ class MobileEnhancements {
                 control.parentElement.classList.remove('focused');
             });
         });
+    }
+
+    // Make sure hero is visible on initial load on mobile
+    ensureHeroAtTopOnMobile() {
+        if (!this.isMobile) return;
+        // Scroll to top after small delay to avoid any previous scroll restoration
+        setTimeout(() => {
+            window.scrollTo({ top: 0, left: 0, behavior: 'instant' in window ? 'instant' : 'auto' });
+        }, 50);
+        // If parallax exists, reduce intensity on mobile
+        if (window.setParallaxSpeed) {
+            try { window.setParallaxSpeed(0.2); } catch (_) {}
+        }
     }
     
     // Smooth scrolling with momentum
@@ -129,9 +143,12 @@ class MobileEnhancements {
     setupNavigationImprovements() {
         if (!this.isMobile) return;
         
-        // Enhanced existing navigation
+        // Enhanced existing navigation and mobile drawer
         const nav = document.querySelector('nav');
         const navLinks = document.querySelectorAll('.nav-btn');
+        const toggle = document.querySelector('.mobile-menu-toggle');
+        const drawer = document.getElementById('mobile-drawer');
+        const overlay = document.querySelector('.drawer-overlay');
         
         if (nav) {
             // Add haptic feedback to navigation
@@ -156,6 +173,29 @@ class MobileEnhancements {
                     }, 100);
                 });
             });
+        }
+
+        // Drawer toggle
+        if (toggle && drawer && overlay) {
+            const open = () => {
+                document.documentElement.classList.add('drawer-open');
+                toggle.setAttribute('aria-expanded', 'true');
+                drawer.setAttribute('aria-hidden', 'false');
+            };
+            const close = () => {
+                document.documentElement.classList.remove('drawer-open');
+                toggle.setAttribute('aria-expanded', 'false');
+                drawer.setAttribute('aria-hidden', 'true');
+            };
+            toggle.addEventListener('click', () => {
+                const expanded = toggle.getAttribute('aria-expanded') === 'true';
+                if (expanded) close(); else open();
+            });
+            overlay.addEventListener('click', close);
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') close();
+            });
+            drawer.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
         }
     }
     

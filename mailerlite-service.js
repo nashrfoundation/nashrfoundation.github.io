@@ -178,7 +178,14 @@ class MailerLiteService {
                 console.log(`Added ${addedCount} recipients to newsletter group, ${errorCount} errors`);
             }
 
-            // Create a campaign in MailerLite using default sender
+            // Determine a verified sender (required by API for type "regular")
+            const verifiedSenders = await this.getVerifiedSenders();
+            if (!Array.isArray(verifiedSenders) || verifiedSenders.length === 0) {
+                throw new Error('No verified sender configured in MailerLite. Please verify a sender email in your MailerLite account.');
+            }
+            const senderEmail = verifiedSenders[0]?.email;
+
+            // Create a campaign in MailerLite using a verified sender and groups as recipients
             const campaignData = {
                 name: `Newsletter - ${subject} - ${new Date().toISOString()}`,
                 type: 'regular',
@@ -186,13 +193,10 @@ class MailerLiteService {
                 emails: [{
                     subject: subject,
                     from_name: 'Nashr Foundation',
-                    // No 'from' field - let MailerLite use default sender
+                    from: senderEmail,
                     content: content
                 }],
-                filter: this.groupId ? [{
-                    type: ['group'], // Must be array
-                    value: [this.groupId] // Must be array
-                }] : []
+                recipients: this.groupId ? { groups: [this.groupId] } : undefined
             };
 
             console.log('Creating campaign with data:', campaignData);

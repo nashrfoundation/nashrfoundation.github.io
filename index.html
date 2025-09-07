@@ -157,10 +157,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
                     <img src="logo.webp" alt="Nashr Foundation Logo" decoding="async">
                 </a>
             </div>
+            <button class="mobile-menu-toggle" aria-label="Open menu" aria-controls="mobile-drawer" aria-expanded="false">
+                <span></span><span></span><span></span>
+            </button>
             <nav class="desktop-nav">
                 <a href="index.html" class="nav-btn active">Home</a>
                 <a href="donate.html" class="nav-btn">Donate</a>
             </nav>
+            <aside id="mobile-drawer" class="mobile-drawer" aria-hidden="true">
+                <nav class="mobile-nav">
+                    <a href="index.html" class="nav-btn">Home</a>
+                    <a href="donate.html" class="nav-btn">Donate</a>
+                </nav>
+            </aside>
+            <div class="drawer-overlay" aria-hidden="true"></div>
             <div class="social-icons">
                 <a href="https://www.instagram.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Instagram"><img src="instagram_icon.webp" alt="Instagram" width="24" height="24" loading="lazy" decoding="async"></a>
                 <a href="https://www.facebook.com/nashrfoundation" target="_blank" rel="noopener noreferrer" aria-label="Facebook"><img src="facebook_icon.webp" alt="Facebook" width="24" height="24" loading="lazy" decoding="async"></a>

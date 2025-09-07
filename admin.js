@@ -1191,9 +1191,9 @@ async function sendNewsletter() {
             return;
         }
         
-        // Check if MailerLite service is available
-        if (!window.mailerLiteService || !window.mailerLiteService.initialized) {
-            showError('MailerLite service not loaded or not initialized. Please refresh the page and check your MailerLite configuration.');
+        // Ensure EmailJS service is available
+        if (!window.emailService) {
+            showError('Email service not loaded. Please refresh the page.');
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -1201,26 +1201,45 @@ async function sendNewsletter() {
             return;
         }
         
-        console.log('Sending newsletter via MailerLite...');
+        console.log('Sending newsletter via EmailJS...');
         console.log('Recipients:', recipients.length);
         
-        try {
-            // Send newsletter using MailerLite service
-            const result = await window.mailerLiteService.sendNewsletter(
-                subject,
-                content,
-                recipients
-            );
-            
-            console.log('Newsletter sent successfully via MailerLite:', result);
-            
-            showSuccess(`Newsletter sent to ${result.totalSent || recipients.length} recipients via MailerLite!`);
-            await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${result.totalSent || recipients.length} recipients via MailerLite`);
-            
-        } catch (error) {
-            console.error('MailerLite newsletter sending failed:', error);
-            throw new Error(`Failed to send newsletter via MailerLite: ${error.message}`);
+        // Send per-recipient via EmailJS (handles template variables)
+        let sentCount = 0;
+        const maxRetries = 2;
+        for (let i = 0; i < recipients.length; i++) {
+            const recipient = recipients[i];
+            let attempt = 0;
+            while (true) {
+                try {
+                    console.log(`Sending to ${recipient} (${i + 1}/${recipients.length})`);
+                    const result = await window.emailService.sendEmail(
+                        recipient,
+                        subject,
+                        content,
+                        'newsletter'
+                    );
+                    console.log('Email sent successfully:', { recipient, result, attempt: attempt + 1 });
+                    sentCount++;
+                    break;
+                } catch (err) {
+                    console.log('Email send error:', { error: err.message, recipient, attempt: attempt + 1, maxRetries: maxRetries + 1, willRetry: attempt < maxRetries });
+                    if (attempt >= maxRetries) {
+                        console.error('Max retries reached for recipient:', recipient);
+                        throw new Error(`Failed to send to ${recipient}: ${err.message}`);
+                    }
+                    const delay = 1000 * Math.pow(2, attempt);
+                    await new Promise(r => setTimeout(r, delay));
+                    attempt++;
+                }
+            }
+            if (i < recipients.length - 1) {
+                await new Promise(r => setTimeout(r, 100));
+            }
         }
+        
+        showSuccess(`Newsletter sent to ${sentCount} recipients via EmailJS!`);
+        await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${sentCount} recipients via EmailJS`);
         
         // Clear form
         document.getElementById('newsletter-subject').value = '';

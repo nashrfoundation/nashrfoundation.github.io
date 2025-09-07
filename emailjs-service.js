@@ -4,7 +4,7 @@
 class EmailJSService {
     constructor() {
         this.serviceId = 'service_01wge0v';
-        this.templateId = 'template_newsletter';
+        this.templateId = 'template_sxvpxid'; // default to provided newsletter template
         this.publicKey = '8vdEHnT9o9ThMp3qc';
         this.initialized = false;
     }

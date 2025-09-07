@@ -5,6 +5,8 @@
 */
 
 /* ===== Base Styles ===== */
+/* Remove mobile tap highlight */
+* { -webkit-tap-highlight-color: transparent; }
 :root {
     /* Dark Theme Color Palette */
     --bg-dark: #1a1a1a;
@@ -2427,6 +2429,21 @@ body.donate-page section {
     height: 2px;
     background: var(--accent);
     border-radius: 1px;
+}
+
+/* Mobile drawer styles */
+.mobile-menu-toggle{display:none;position:relative;width:40px;height:40px;border:none;background:transparent;align-items:center;justify-content:center;margin-right:var(--spacing-sm)}
+.mobile-menu-toggle span{display:block;width:22px;height:2px;background:var(--text-primary);margin:3px 0;transition:all .2s ease;border-radius:2px}
+.mobile-drawer{position:fixed;top:0;left:0;height:100vh;width:74%;max-width:320px;background:rgba(44,44,44,.98);backdrop-filter:blur(10px);transform:translateX(-100%);transition:transform .25s ease;z-index:9999;padding:16px 12px}
+.mobile-drawer .mobile-nav{display:flex;flex-direction:column;gap:8px;margin-top:52px}
+.mobile-drawer .nav-btn{padding:12px 14px;border-radius:10px;background:rgba(255,255,255,.04)}
+.drawer-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);opacity:0;pointer-events:none;transition:opacity .25s ease;z-index:9998}
+.drawer-open .mobile-drawer{transform:translateX(0)}
+.drawer-open .drawer-overlay{opacity:1;pointer-events:auto}
+
+@media (max-width:768px){
+    .mobile-menu-toggle{display:flex}
+    .desktop-nav{display:none}
 }
 
 
