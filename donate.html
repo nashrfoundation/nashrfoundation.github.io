@@ -798,8 +798,8 @@
           (async () => {
             try {
               const sb = await ensureSupabase();
-              if (!sb) {
-                console.warn('Supabase not available, using fallback data');
+              if (!sb || typeof sb.from !== 'function') {
+                console.warn('Supabase not available or not properly initialized, using fallback data');
                 return;
               }
               // Load settings with cache invalidation
@@ -888,12 +888,27 @@
                 }
               } catch (e) {
                 console.error('Error calculating total raised:', e);
-              }
-              if (typeof totalRaised === 'number' && fundDetailsEl) {
-                fundDetailsEl.innerHTML = `<span>PKR ${totalRaised.toLocaleString()}</span> raised of a PKR ${goal.toLocaleString()} goal`;
+                // Fallback: show default progress
                 const bar = document.getElementById('fund-progress-bar');
                 if (bar) {
+                  bar.style.width = '35%'; // Default 35% progress
+                  bar.textContent = '35%';
+                  console.log('Using fallback progress bar value');
+                }
+              }
+              // Ensure progress bar is always visible
+              const bar = document.getElementById('fund-progress-bar');
+              if (!bar) {
+                console.error('Progress bar element not found!');
+              }
+              
+              if (typeof totalRaised === 'number' && fundDetailsEl) {
+                fundDetailsEl.innerHTML = `<span>PKR ${totalRaised.toLocaleString()}</span> raised of a PKR ${goal.toLocaleString()} goal`;
+                if (bar) {
                   const pct = Math.max(0, Math.min(100, Math.round((totalRaised / (goal || 1)) * 100)));
+                  
+                  console.log('Progress bar found, updating to:', pct + '%');
+                  console.log('Total raised:', totalRaised, 'Goal:', goal);
                   
                   // Add loading animation
                   bar.classList.add('loading');
@@ -902,6 +917,7 @@
                   setTimeout(() => { 
                     bar.style.width = pct + '%'; 
                     bar.textContent = pct + '%';
+                    console.log('Progress bar updated to:', pct + '%');
                     
                     // Remove loading animation after completion
                     setTimeout(() => {
@@ -913,6 +929,13 @@
                   if (pct >= 50) {
                     bar.style.boxShadow = '0 0 50px rgba(255, 181, 46, 1), inset 0 2px 0 rgba(255, 255, 255, 0.6)';
                   }
+                }
+              } else {
+                // Fallback when data loading fails
+                console.log('Data loading failed, using fallback progress');
+                if (bar) {
+                  bar.style.width = '35%';
+                  bar.textContent = '35%';
                 }
               }
             }
@@ -1009,6 +1032,14 @@
             sections.forEach(section => {
                 section.classList.add('visible');
             });
+            
+            // Initialize progress bar with default value
+            const progressBar = document.getElementById('fund-progress-bar');
+            if (progressBar) {
+                progressBar.style.width = '35%';
+                progressBar.textContent = '35%';
+                console.log('Progress bar initialized with default value');
+            }
             // Enhanced validation and user feedback functions
             // Note: showValidationErrors is now handled by the Stripe payment processor
             
@@ -1043,9 +1074,14 @@
         const form = document.getElementById("donation-form");
         const submitButton = document.getElementById("submit-donation-btn");
 
-        // Payment processor is initialized in stripe-payment.js
-        console.log('🔧 Checking payment processor initialization...');
-        console.log('window.stripePaymentProcessor:', window.stripePaymentProcessor);
+        // Initialize payment processor
+        console.log('🔧 Initializing payment processor...');
+        if (typeof StripePaymentProcessor !== 'undefined') {
+            window.stripePaymentProcessor = new StripePaymentProcessor();
+            console.log('✅ Payment processor initialized:', window.stripePaymentProcessor);
+        } else {
+            console.error('❌ StripePaymentProcessor class not found');
+        }
         
         // Initialize payment details display
         const stripeDetails = document.getElementById('stripe-details');

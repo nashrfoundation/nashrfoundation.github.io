@@ -32,6 +32,10 @@
     
     <!-- Firebase SDKs will be dynamically imported by admin.js -->
     <script src="admin-notifications.js" defer></script>
+    <script src="media-management.js" defer></script>
+    <script src="security-management.js" defer></script>
+    <!-- QR Code Generation -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
 <body>
     <!-- Login Modal -->
@@ -169,6 +173,29 @@
                         <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
                     Settings
+                </a></li>
+                <li><a href="#emails" class="nav-link" data-section="emails">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                        <polyline points="22,6 12,13 2,6"></polyline>
+                    </svg>
+                    Email Management
+                </a></li>
+                <li><a href="#media" class="nav-link" data-section="media">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                        <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                        <polyline points="21,15 16,10 5,21"></polyline>
+                    </svg>
+                    Media Management
+                </a></li>
+                <li><a href="#security" class="nav-link" data-section="security">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                        <circle cx="12" cy="16" r="1"></circle>
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    </svg>
+                    Security & Monitoring
                 </a></li>
                 <li><a href="#logs" class="nav-link" data-section="logs">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -590,6 +617,716 @@
                                 <option value="weekly">Weekly</option>
                                 <option value="monthly">Monthly</option>
                             </select>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Email Management Section -->
+            <section id="emails" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Email Management</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="sendTestEmail()">Send Test Email</button>
+                        <button class="btn btn-secondary" onclick="refreshEmailTemplates()">Refresh</button>
+                    </div>
+                </div>
+                
+                <div class="email-management-grid">
+                    <!-- Email Templates -->
+                    <div class="email-card">
+                        <div class="card-header">
+                            <h3>Email Templates</h3>
+                            <button class="btn btn-sm btn-outline" onclick="addEmailTemplate()">Add Template</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="template-list" id="email-templates-list">
+                                <!-- Templates will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Donor Thank You Emails -->
+                    <div class="email-card">
+                        <div class="card-header">
+                            <h3>Donor Thank You Emails</h3>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="auto-thank-you" onchange="toggleAutoThankYou()">
+                                <label for="auto-thank-you">Auto Send</label>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="form-group">
+                                <label for="thank-you-subject">Subject Line</label>
+                                <input type="text" id="thank-you-subject" class="form-control" 
+                                       value="Thank you for your generous donation to Nashr Foundation" 
+                                       placeholder="Enter email subject">
+                            </div>
+                            <div class="form-group">
+                                <label for="thank-you-template">Email Template</label>
+                                <textarea id="thank-you-template" class="form-control" rows="8" 
+                                          placeholder="Enter email template with placeholders like {{donor_name}}, {{amount}}, {{date}}">
+Dear {{donor_name}},
+
+Thank you for your generous donation of PKR {{amount}} to Nashr Foundation. Your contribution makes a real difference in our mission to help those in need.
+
+Your donation was received on {{date}} and will be used to support our ongoing programs and initiatives.
+
+We are grateful for your support and commitment to making a positive impact in our community.
+
+With heartfelt thanks,
+The Nashr Foundation Team
+
+---
+This is an automated message. Please do not reply to this email.
+                                </textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="thank-you-delay">Send Delay (minutes)</label>
+                                <input type="number" id="thank-you-delay" class="form-control" 
+                                       value="5" min="0" max="1440" placeholder="Minutes after donation">
+                            </div>
+                            <button class="btn btn-primary" onclick="saveThankYouTemplate()">Save Template</button>
+                            <button class="btn btn-outline" onclick="previewThankYouEmail()">Preview</button>
+                        </div>
+                    </div>
+                    
+                    <!-- Email Analytics -->
+                    <div class="email-card">
+                        <div class="card-header">
+                            <h3>Email Analytics</h3>
+                            <select id="email-analytics-period" class="form-control" onchange="updateEmailAnalytics()">
+                                <option value="7">Last 7 days</option>
+                                <option value="30">Last 30 days</option>
+                                <option value="90">Last 90 days</option>
+                            </select>
+                        </div>
+                        <div class="card-content">
+                            <div class="analytics-grid">
+                                <div class="metric-card">
+                                    <div class="metric-value" id="emails-sent">0</div>
+                                    <div class="metric-label">Emails Sent</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value" id="emails-delivered">0</div>
+                                    <div class="metric-label">Delivered</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value" id="emails-opened">0</div>
+                                    <div class="metric-label">Opened</div>
+                                </div>
+                                <div class="metric-card">
+                                    <div class="metric-value" id="emails-clicked">0</div>
+                                    <div class="metric-label">Clicked</div>
+                                </div>
+                            </div>
+                            <div class="email-chart-container">
+                                <canvas id="email-analytics-chart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Email Queue -->
+                    <div class="email-card">
+                        <div class="card-header">
+                            <h3>Email Queue</h3>
+                            <button class="btn btn-sm btn-outline" onclick="processEmailQueue()">Process Queue</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="queue-stats">
+                                <div class="queue-item">
+                                    <span class="queue-label">Pending:</span>
+                                    <span class="queue-value" id="pending-emails">0</span>
+                                </div>
+                                <div class="queue-item">
+                                    <span class="queue-label">Failed:</span>
+                                    <span class="queue-value" id="failed-emails">0</span>
+                                </div>
+                                <div class="queue-item">
+                                    <span class="queue-label">Sent Today:</span>
+                                    <span class="queue-value" id="sent-today">0</span>
+                                </div>
+                            </div>
+                            <div class="queue-list" id="email-queue-list">
+                                <!-- Queue items will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Media Management Section -->
+            <section id="media" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Media & Asset Management</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="uploadNewAsset()">Upload Asset</button>
+                        <button class="btn btn-secondary" onclick="refreshMediaLibrary()">Refresh</button>
+                        <button class="btn btn-outline" onclick="optimizeAllImages()">Optimize All</button>
+                    </div>
+                </div>
+                
+                <div class="media-management-grid">
+                    <!-- Asset Upload -->
+                    <div class="media-card">
+                        <div class="card-header">
+                            <h3>Asset Upload</h3>
+                            <div class="upload-stats">
+                                <span id="upload-progress">Ready</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="upload-area" id="upload-area">
+                                <div class="upload-icon">📁</div>
+                                <p>Drag & drop files here or click to browse</p>
+                                <input type="file" id="file-input" multiple accept="image/*,.svg,.webp,.png,.jpg,.jpeg" style="display: none;">
+                                <button class="btn btn-outline" onclick="document.getElementById('file-input').click()">Choose Files</button>
+                            </div>
+                            <div class="upload-options">
+                                <div class="form-group">
+                                    <label for="asset-category">Category</label>
+                                    <select id="asset-category" class="form-control">
+                                        <option value="gallery">Gallery</option>
+                                        <option value="hero">Hero Background</option>
+                                        <option value="logo">Logo/Brand</option>
+                                        <option value="social">Social Media</option>
+                                        <option value="general">General</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="auto-optimize">
+                                        <input type="checkbox" id="auto-optimize" checked> Auto-optimize images
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="generate-thumbnails">
+                                        <input type="checkbox" id="generate-thumbnails" checked> Generate thumbnails
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Image Gallery -->
+                    <div class="media-card">
+                        <div class="card-header">
+                            <h3>Image Gallery</h3>
+                            <div class="gallery-controls">
+                                <select id="gallery-filter" class="form-control" onchange="filterGallery()">
+                                    <option value="all">All Images</option>
+                                    <option value="gallery">Gallery</option>
+                                    <option value="hero">Hero Background</option>
+                                    <option value="logo">Logo/Brand</option>
+                                    <option value="social">Social Media</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="gallery-grid" id="gallery-grid">
+                                <!-- Images will be loaded here -->
+                            </div>
+                            <div class="gallery-pagination" id="gallery-pagination">
+                                <!-- Pagination will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Hero Background Management -->
+                    <div class="media-card">
+                        <div class="card-header">
+                            <h3>Hero Background</h3>
+                            <button class="btn btn-sm btn-outline" onclick="setHeroBackground()">Set Current</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="current-hero" id="current-hero">
+                                <img id="current-hero-image" src="hero_background.webp" alt="Current Hero Background" style="width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px;">
+                                <div class="hero-info">
+                                    <h4>Current Hero Background</h4>
+                                    <p id="hero-filename">No background set</p>
+                                    <div class="hero-actions">
+                                        <button class="btn btn-sm btn-primary" onclick="changeHeroBackground()">Change</button>
+                                        <button class="btn btn-sm btn-outline" onclick="previewHeroBackground()">Preview</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="hero-options">
+                                <div class="form-group">
+                                    <label for="hero-position">Background Position</label>
+                                    <select id="hero-position" class="form-control" onchange="updateHeroPosition()">
+                                        <option value="center center">Center</option>
+                                        <option value="top center">Top</option>
+                                        <option value="bottom center">Bottom</option>
+                                        <option value="left center">Left</option>
+                                        <option value="right center">Right</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="hero-overlay">Overlay Opacity</label>
+                                    <input type="range" id="hero-overlay" min="0" max="100" value="70" class="form-control" onchange="updateHeroOverlay()">
+                                    <span id="overlay-value">70%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Logo & Brand Assets -->
+                    <div class="media-card">
+                        <div class="card-header">
+                            <h3>Logo & Brand Assets</h3>
+                            <button class="btn btn-sm btn-outline" onclick="uploadBrandAsset()">Upload Brand</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="brand-assets" id="brand-assets">
+                                <div class="brand-item">
+                                    <div class="brand-preview">
+                                        <img id="logo-preview" src="logo.webp" alt="Logo" style="width: 80px; height: 80px; object-fit: contain;">
+                                    </div>
+                                    <div class="brand-info">
+                                        <h4>Main Logo</h4>
+                                        <p>Used in header and branding</p>
+                                        <button class="btn btn-sm btn-outline" onclick="changeLogo()">Change</button>
+                                    </div>
+                                </div>
+                                <div class="brand-item">
+                                    <div class="brand-preview">
+                                        <img id="favicon-preview" src="logo.webp" alt="Favicon" style="width: 32px; height: 32px; object-fit: contain;">
+                                    </div>
+                                    <div class="brand-info">
+                                        <h4>Favicon</h4>
+                                        <p>Browser tab icon</p>
+                                        <button class="btn btn-sm btn-outline" onclick="changeFavicon()">Change</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="brand-settings">
+                                <div class="form-group">
+                                    <label for="logo-size">Logo Size</label>
+                                    <select id="logo-size" class="form-control" onchange="updateLogoSize()">
+                                        <option value="small">Small (80px)</option>
+                                        <option value="medium" selected>Medium (120px)</option>
+                                        <option value="large">Large (160px)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="logo-position">Logo Position</label>
+                                    <select id="logo-position" class="form-control" onchange="updateLogoPosition()">
+                                        <option value="left">Left</option>
+                                        <option value="center" selected>Center</option>
+                                        <option value="right">Right</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Social Media Templates -->
+                    <div class="media-card">
+                        <div class="card-header">
+                            <h3>Social Media Templates</h3>
+                            <button class="btn btn-sm btn-outline" onclick="createSocialTemplate()">Create Template</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="social-templates" id="social-templates">
+                                <div class="template-item">
+                                    <div class="template-preview">
+                                        <div class="social-preview facebook">
+                                            <div class="social-content">
+                                                <h4>Facebook Post</h4>
+                                                <p>1200x630px</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="template-actions">
+                                        <button class="btn btn-sm btn-outline" onclick="editSocialTemplate('facebook')">Edit</button>
+                                        <button class="btn btn-sm btn-outline" onclick="generateSocialPost('facebook')">Generate</button>
+                                    </div>
+                                </div>
+                                <div class="template-item">
+                                    <div class="template-preview">
+                                        <div class="social-preview instagram">
+                                            <div class="social-content">
+                                                <h4>Instagram Post</h4>
+                                                <p>1080x1080px</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="template-actions">
+                                        <button class="btn btn-sm btn-outline" onclick="editSocialTemplate('instagram')">Edit</button>
+                                        <button class="btn btn-sm btn-outline" onclick="generateSocialPost('instagram')">Generate</button>
+                                    </div>
+                                </div>
+                                <div class="template-item">
+                                    <div class="template-preview">
+                                        <div class="social-preview twitter">
+                                            <div class="social-content">
+                                                <h4>Twitter Post</h4>
+                                                <p>1200x675px</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="template-actions">
+                                        <button class="btn btn-sm btn-outline" onclick="editSocialTemplate('twitter')">Edit</button>
+                                        <button class="btn btn-sm btn-outline" onclick="generateSocialPost('twitter')">Generate</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Image Optimization -->
+                    <div class="media-card">
+                        <div class="card-header">
+                            <h3>Image Optimization</h3>
+                            <div class="optimization-stats">
+                                <span id="optimization-progress">Ready</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="optimization-options">
+                                <div class="form-group">
+                                    <label for="quality-level">Quality Level</label>
+                                    <select id="quality-level" class="form-control">
+                                        <option value="high">High (90%)</option>
+                                        <option value="medium" selected>Medium (80%)</option>
+                                        <option value="low">Low (70%)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="format-conversion">Convert to WebP</label>
+                                    <input type="checkbox" id="format-conversion" checked>
+                                </div>
+                                <div class="form-group">
+                                    <label for="resize-images">Resize Large Images</label>
+                                    <input type="checkbox" id="resize-images" checked>
+                                </div>
+                                <div class="form-group">
+                                    <label for="max-width">Max Width (px)</label>
+                                    <input type="number" id="max-width" class="form-control" value="1920">
+                                </div>
+                            </div>
+                            <div class="optimization-actions">
+                                <button class="btn btn-primary" onclick="optimizeSelectedImages()">Optimize Selected</button>
+                                <button class="btn btn-outline" onclick="optimizeAllImages()">Optimize All</button>
+                                <button class="btn btn-outline" onclick="generateThumbnails()">Generate Thumbnails</button>
+                            </div>
+                            <div class="optimization-results" id="optimization-results">
+                                <!-- Results will be shown here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- CDN & Backup -->
+                    <div class="media-card">
+                        <div class="card-header">
+                            <h3>CDN & Backup</h3>
+                            <div class="cdn-status">
+                                <span id="cdn-status" class="status-indicator">Offline</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="cdn-settings">
+                                <div class="form-group">
+                                    <label for="cdn-provider">CDN Provider</label>
+                                    <select id="cdn-provider" class="form-control" onchange="updateCDNProvider()">
+                                        <option value="none">None</option>
+                                        <option value="cloudflare">Cloudflare</option>
+                                        <option value="aws">AWS CloudFront</option>
+                                        <option value="jsdelivr">jsDelivr</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="cdn-url-group" style="display: none;">
+                                    <label for="cdn-url">CDN URL</label>
+                                    <input type="url" id="cdn-url" class="form-control" placeholder="https://cdn.example.com">
+                                </div>
+                                <div class="form-group">
+                                    <label for="auto-upload">Auto-upload to CDN</label>
+                                    <input type="checkbox" id="auto-upload" onchange="toggleAutoUpload()">
+                                </div>
+                            </div>
+                            <div class="backup-actions">
+                                <button class="btn btn-primary" onclick="createBackup()">Create Backup</button>
+                                <button class="btn btn-outline" onclick="restoreBackup()">Restore Backup</button>
+                                <button class="btn btn-outline" onclick="downloadBackup()">Download Backup</button>
+                            </div>
+                            <div class="backup-list" id="backup-list">
+                                <!-- Backup list will be shown here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Security & Monitoring Section -->
+            <section id="security" class="dashboard-section">
+                <div class="section-header">
+                    <h2>Security & Monitoring</h2>
+                    <div class="header-actions">
+                        <button class="btn btn-primary" onclick="runSecurityScan()">Run Security Scan</button>
+                        <button class="btn btn-secondary" onclick="refreshSecurityData()">Refresh</button>
+                        <button class="btn btn-outline" onclick="exportSecurityReport()">Export Report</button>
+                    </div>
+                </div>
+                
+                <div class="security-monitoring-grid">
+                    <!-- Two-Factor Authentication -->
+                    <div class="security-card">
+                        <div class="card-header">
+                            <h3>Two-Factor Authentication</h3>
+                            <div class="toggle-switch">
+                                <input type="checkbox" id="2fa-enabled" onchange="toggle2FA()">
+                                <label for="2fa-enabled">Enable 2FA</label>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="2fa-status" id="2fa-status">
+                                <div class="status-indicator offline">Disabled</div>
+                                <p>Two-factor authentication is currently disabled</p>
+                            </div>
+                            <div class="2fa-setup" id="2fa-setup" style="display: none;">
+                                <div class="qr-code-container">
+                                    <div id="qr-code"></div>
+                                    <p>Scan this QR code with your authenticator app</p>
+                                </div>
+                                <div class="form-group">
+                                    <label for="2fa-code">Enter 6-digit code</label>
+                                    <input type="text" id="2fa-code" class="form-control" maxlength="6" placeholder="000000">
+                                </div>
+                                <button class="btn btn-primary" onclick="verify2FACode()">Verify & Enable</button>
+                            </div>
+                            <div class="2fa-recovery">
+                                <h4>Recovery Codes</h4>
+                                <div id="recovery-codes" class="recovery-codes-list">
+                                    <!-- Recovery codes will be shown here -->
+                                </div>
+                                <button class="btn btn-outline" onclick="generateRecoveryCodes()">Generate New Codes</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Session Management -->
+                    <div class="security-card">
+                        <div class="card-header">
+                            <h3>Session Management</h3>
+                            <button class="btn btn-sm btn-outline" onclick="terminateAllSessions()">Terminate All</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="session-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Active Sessions:</span>
+                                    <span class="stat-value" id="active-sessions">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Session Timeout:</span>
+                                    <span class="stat-value" id="session-timeout">30 min</span>
+                                </div>
+                            </div>
+                            <div class="session-settings">
+                                <div class="form-group">
+                                    <label for="session-timeout-select">Session Timeout</label>
+                                    <select id="session-timeout-select" class="form-control" onchange="updateSessionTimeout()">
+                                        <option value="15">15 minutes</option>
+                                        <option value="30" selected>30 minutes</option>
+                                        <option value="60">1 hour</option>
+                                        <option value="120">2 hours</option>
+                                        <option value="480">8 hours</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="concurrent-sessions">Max Concurrent Sessions</label>
+                                    <input type="number" id="concurrent-sessions" class="form-control" value="3" min="1" max="10" onchange="updateConcurrentSessions()">
+                                </div>
+                            </div>
+                            <div class="active-sessions" id="active-sessions-list">
+                                <!-- Active sessions will be listed here -->
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SEO Monitoring -->
+                    <div class="security-card">
+                        <div class="card-header">
+                            <h3>SEO Monitoring</h3>
+                            <div class="seo-score">
+                                <span class="score-label">SEO Score:</span>
+                                <span class="score-value" id="seo-score">85/100</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="seo-metrics">
+                                <div class="metric-item">
+                                    <div class="metric-icon">🔍</div>
+                                    <div class="metric-info">
+                                        <h4>Page Speed</h4>
+                                        <span class="metric-value" id="page-speed">Good</span>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-icon">📱</div>
+                                    <div class="metric-info">
+                                        <h4>Mobile Friendly</h4>
+                                        <span class="metric-value" id="mobile-friendly">Yes</span>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-icon">🔗</div>
+                                    <div class="metric-info">
+                                        <h4>Meta Tags</h4>
+                                        <span class="metric-value" id="meta-tags">Complete</span>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-icon">🖼️</div>
+                                    <div class="metric-info">
+                                        <h4>Image Alt Tags</h4>
+                                        <span class="metric-value" id="alt-tags">85%</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="seo-issues" id="seo-issues">
+                                <h4>Issues Found</h4>
+                                <div class="issues-list">
+                                    <!-- SEO issues will be listed here -->
+                                </div>
+                            </div>
+                            <div class="seo-actions">
+                                <button class="btn btn-primary" onclick="runSEOAudit()">Run SEO Audit</button>
+                                <button class="btn btn-outline" onclick="fixSEOIssues()">Auto-Fix Issues</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Audit Logs -->
+                    <div class="security-card">
+                        <div class="card-header">
+                            <h3>Security Audit Logs</h3>
+                            <div class="security-level">
+                                <span class="level-label">Security Level:</span>
+                                <span class="level-value high">High</span>
+                            </div>
+                        </div>
+                        <div class="card-content">
+                            <div class="security-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Failed Logins:</span>
+                                    <span class="stat-value" id="failed-logins">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Suspicious Activity:</span>
+                                    <span class="stat-value" id="suspicious-activity">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Blocked IPs:</span>
+                                    <span class="stat-value" id="blocked-ips">0</span>
+                                </div>
+                            </div>
+                            <div class="security-filters">
+                                <select id="security-filter" class="form-control" onchange="filterSecurityLogs()">
+                                    <option value="all">All Events</option>
+                                    <option value="login">Login Attempts</option>
+                                    <option value="failed">Failed Logins</option>
+                                    <option value="suspicious">Suspicious Activity</option>
+                                    <option value="blocked">Blocked IPs</option>
+                                </select>
+                            </div>
+                            <div class="security-logs" id="security-logs-list">
+                                <!-- Security logs will be listed here -->
+                            </div>
+                            <div class="security-actions">
+                                <button class="btn btn-outline" onclick="clearSecurityLogs()">Clear Logs</button>
+                                <button class="btn btn-outline" onclick="exportSecurityLogs()">Export Logs</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- IP Whitelist/Blacklist -->
+                    <div class="security-card">
+                        <div class="card-header">
+                            <h3>IP Management</h3>
+                            <button class="btn btn-sm btn-outline" onclick="addIPRule()">Add Rule</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="ip-rules">
+                                <div class="rule-type">
+                                    <h4>Whitelist</h4>
+                                    <div class="ip-list" id="whitelist-ips">
+                                        <!-- Whitelisted IPs will be shown here -->
+                                    </div>
+                                </div>
+                                <div class="rule-type">
+                                    <h4>Blacklist</h4>
+                                    <div class="ip-list" id="blacklist-ips">
+                                        <!-- Blacklisted IPs will be shown here -->
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="ip-form">
+                                <div class="form-group">
+                                    <label for="ip-address">IP Address</label>
+                                    <input type="text" id="ip-address" class="form-control" placeholder="192.168.1.1">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ip-rule-type">Rule Type</label>
+                                    <select id="ip-rule-type" class="form-control">
+                                        <option value="whitelist">Whitelist</option>
+                                        <option value="blacklist">Blacklist</option>
+                                    </select>
+                                </div>
+                                <button class="btn btn-primary" onclick="addIPAddress()">Add IP</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Settings -->
+                    <div class="security-card">
+                        <div class="card-header">
+                            <h3>Security Settings</h3>
+                            <button class="btn btn-sm btn-outline" onclick="saveSecuritySettings()">Save Settings</button>
+                        </div>
+                        <div class="card-content">
+                            <div class="security-options">
+                                <div class="form-group">
+                                    <label for="password-policy">
+                                        <input type="checkbox" id="password-policy" checked> Enforce Strong Passwords
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="login-notifications">
+                                        <input type="checkbox" id="login-notifications" checked> Email Login Notifications
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="auto-logout">
+                                        <input type="checkbox" id="auto-logout" checked> Auto-logout on Inactivity
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="rate-limiting">
+                                        <input type="checkbox" id="rate-limiting" checked> Enable Rate Limiting
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label for="security-headers">
+                                        <input type="checkbox" id="security-headers" checked> Security Headers
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="security-monitoring">
+                                <h4>Real-time Monitoring</h4>
+                                <div class="monitoring-status">
+                                    <div class="status-item">
+                                        <span class="status-label">Firewall:</span>
+                                        <span class="status-value online">Active</span>
+                                    </div>
+                                    <div class="status-item">
+                                        <span class="status-label">DDoS Protection:</span>
+                                        <span class="status-value online">Active</span>
+                                    </div>
+                                    <div class="status-item">
+                                        <span class="status-label">SSL Certificate:</span>
+                                        <span class="status-value online">Valid</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

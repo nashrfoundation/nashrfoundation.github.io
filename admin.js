@@ -3488,19 +3488,29 @@ function showInfo(message) {
     showNotification(message, 'info');
 }
 
-function showNotification(message, type) {
-    try {
-        // Minimal, non-intrusive notification; no mock/demo messages
-        const el = document.createElement('div');
-        el.className = `notification ${type}`;
-        el.textContent = message;
-        document.body.appendChild(el);
-        setTimeout(() => { if (el.parentNode) el.remove(); }, 4000);
-    } catch (_) {
-        // Fallback to console
-        if (type === 'error') console.error(message); else console.log(message);
-    }
+// Loading functions
+function showLoading(message = 'Loading...') {
+    // Remove existing loading
+    const existing = document.querySelector('.loading-overlay');
+    if (existing) existing.remove();
+    
+    const loading = document.createElement('div');
+    loading.className = 'loading-overlay';
+    loading.innerHTML = `
+        <div class="loading-content">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">${message}</div>
+        </div>
+    `;
+    document.body.appendChild(loading);
 }
+
+function hideLoading() {
+    const loading = document.querySelector('.loading-overlay');
+    if (loading) loading.remove();
+}
+
+// Remove duplicate showNotification function
 
 // Initialize on page load
 if (document.readyState === 'loading') {
@@ -3557,3 +3567,582 @@ function cleanup() {
 
 // Cleanup on page unload
 window.addEventListener('beforeunload', cleanup);
+
+// ==================== EMAIL MANAGEMENT SYSTEM ====================
+
+// Email templates and settings
+let emailTemplates = [];
+let emailQueue = [];
+let emailAnalytics = {
+    sent: 0,
+    delivered: 0,
+    opened: 0,
+    clicked: 0
+};
+
+// Initialize email management
+async function initializeEmailManagement() {
+    try {
+        await loadEmailTemplates();
+        await loadEmailQueue();
+        await loadEmailAnalytics();
+        setupEmailRealtimeUpdates();
+    } catch (error) {
+        console.error('Failed to initialize email management:', error);
+    }
+}
+
+// Load email templates from Supabase
+async function loadEmailTemplates() {
+    try {
+        const { data, error } = await supabase
+            .from('email_templates')
+            .select('*')
+            .order('created_at', { ascending: false });
+            
+        if (error) throw error;
+        
+        emailTemplates = data || [];
+        displayEmailTemplates();
+    } catch (error) {
+        console.error('Error loading email templates:', error);
+        // Create default templates if none exist
+        createDefaultTemplates();
+    }
+}
+
+// Create default email templates
+async function createDefaultTemplates() {
+    const defaultTemplates = [
+        {
+            name: 'Donor Thank You',
+            subject: 'Thank you for your generous donation to Nashr Foundation',
+            template: `Dear {{donor_name}},
+
+Thank you for your generous donation of PKR {{amount}} to Nashr Foundation. Your contribution makes a real difference in our mission to help those in need.
+
+Your donation was received on {{date}} and will be used to support our ongoing programs and initiatives.
+
+We are grateful for your support and commitment to making a positive impact in our community.
+
+With heartfelt thanks,
+The Nashr Foundation Team
+
+---
+This is an automated message. Please do not reply to this email.`,
+            type: 'donor_thank_you',
+            is_active: true
+        },
+        {
+            name: 'Newsletter Welcome',
+            subject: 'Welcome to Nashr Foundation Newsletter',
+            template: `Dear {{subscriber_name}},
+
+Welcome to the Nashr Foundation newsletter! We're excited to have you join our community of supporters.
+
+You'll receive regular updates about our programs, success stories, and how your support is making a difference in people's lives.
+
+Thank you for your interest in our mission.
+
+Best regards,
+The Nashr Foundation Team`,
+            type: 'newsletter_welcome',
+            is_active: true
+        }
+    ];
+    
+    try {
+        const { error } = await supabase
+            .from('email_templates')
+            .insert(defaultTemplates);
+            
+        if (!error) {
+            await loadEmailTemplates();
+        }
+    } catch (error) {
+        console.error('Error creating default templates:', error);
+    }
+}
+
+// Display email templates
+function displayEmailTemplates() {
+    const container = document.getElementById('email-templates-list');
+    if (!container) return;
+    
+    if (emailTemplates.length === 0) {
+        container.innerHTML = '<p class="text-muted">No email templates found. <button class="btn btn-sm btn-outline" onclick="addEmailTemplate()">Create your first template</button></p>';
+        return;
+    }
+    
+    container.innerHTML = emailTemplates.map(template => `
+        <div class="template-item">
+            <div>
+                <div class="template-name">${template.name}</div>
+                <small class="text-muted">${template.type} • ${template.is_active ? 'Active' : 'Inactive'}</small>
+            </div>
+            <div class="template-actions">
+                <button class="btn btn-sm btn-outline" onclick="editEmailTemplate('${template.id}')">Edit</button>
+                <button class="btn btn-sm btn-outline" onclick="previewEmailTemplate('${template.id}')">Preview</button>
+                <button class="btn btn-sm btn-danger" onclick="deleteEmailTemplate('${template.id}')">Delete</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Add new email template
+async function addEmailTemplate() {
+    const name = prompt('Enter template name:');
+    if (!name) return;
+    
+    const newTemplate = {
+        name: name,
+        subject: '',
+        template: '',
+        type: 'custom',
+        is_active: true
+    };
+    
+    try {
+        const { data, error } = await supabase
+            .from('email_templates')
+            .insert([newTemplate])
+            .select()
+            .single();
+            
+        if (error) throw error;
+        
+        await loadEmailTemplates();
+        showSuccess('Email template created successfully!');
+        logActivity('email_template_created', `Created template: ${name}`);
+    } catch (error) {
+        console.error('Error creating template:', error);
+        showError('Failed to create email template');
+    }
+}
+
+// Save thank you email template
+async function saveThankYouTemplate() {
+    const subject = document.getElementById('thank-you-subject')?.value;
+    const template = document.getElementById('thank-you-template')?.value;
+    const delay = document.getElementById('thank-you-delay')?.value;
+    
+    if (!subject || !template) {
+        showError('Please fill in all required fields');
+        return;
+    }
+    
+    try {
+        // Update or create thank you template
+        const { error } = await supabase
+            .from('email_templates')
+            .upsert({
+                name: 'Donor Thank You',
+                subject: subject,
+                template: template,
+                type: 'donor_thank_you',
+                is_active: true,
+                settings: { delay_minutes: parseInt(delay) || 5 }
+            });
+            
+        if (error) throw error;
+        
+        showSuccess('Thank you email template saved successfully!');
+        logActivity('email_template_updated', 'Updated donor thank you template');
+    } catch (error) {
+        console.error('Error saving template:', error);
+        showError('Failed to save email template');
+    }
+}
+
+// Preview thank you email
+function previewThankYouEmail() {
+    const subject = document.getElementById('thank-you-subject')?.value;
+    const template = document.getElementById('thank-you-template')?.value;
+    
+    if (!subject || !template) {
+        showError('Please fill in the template first');
+        return;
+    }
+    
+    // Replace placeholders with sample data
+    const previewContent = template
+        .replace(/\{\{donor_name\}\}/g, 'John Doe')
+        .replace(/\{\{amount\}\}/g, '5,000')
+        .replace(/\{\{date\}\}/g, new Date().toLocaleDateString());
+    
+    showEmailPreview(subject, previewContent);
+}
+
+// Show email preview modal
+function showEmailPreview(subject, content) {
+    const modal = document.createElement('div');
+    modal.className = 'email-preview-modal';
+    modal.innerHTML = `
+        <div class="email-preview-content">
+            <div class="email-preview-header">
+                <h3>Email Preview</h3>
+                <button class="btn btn-sm btn-outline" onclick="this.closest('.email-preview-modal').remove()">Close</button>
+            </div>
+            <div class="email-preview-body">
+                <h4>Subject: ${subject}</h4>
+                <div style="white-space: pre-line; margin-top: 1rem;">${content}</div>
+            </div>
+        </div>
+    `;
+    
+    document.body.appendChild(modal);
+    
+    // Close on background click
+    modal.addEventListener('click', (e) => {
+        if (e.target === modal) {
+            modal.remove();
+        }
+    });
+}
+
+// Toggle auto thank you emails
+async function toggleAutoThankYou() {
+    const checkbox = document.getElementById('auto-thank-you');
+    const isEnabled = checkbox.checked;
+    
+    try {
+        const { error } = await supabase
+            .from('settings')
+            .upsert({
+                key: 'auto_thank_you_emails',
+                value: isEnabled.toString()
+            });
+            
+        if (error) throw error;
+        
+        showSuccess(`Auto thank you emails ${isEnabled ? 'enabled' : 'disabled'}`);
+        logActivity('email_settings_updated', `Auto thank you emails ${isEnabled ? 'enabled' : 'disabled'}`);
+    } catch (error) {
+        console.error('Error updating email settings:', error);
+        showError('Failed to update email settings');
+    }
+}
+
+// Load email queue
+async function loadEmailQueue() {
+    try {
+        const { data, error } = await supabase
+            .from('email_queue')
+            .select('*')
+            .order('created_at', { ascending: false })
+            .limit(50);
+            
+        if (error) throw error;
+        
+        emailQueue = data || [];
+        updateEmailQueueDisplay();
+    } catch (error) {
+        console.error('Error loading email queue:', error);
+    }
+}
+
+// Update email queue display
+function updateEmailQueueDisplay() {
+    const pendingCount = emailQueue.filter(email => email.status === 'pending').length;
+    const failedCount = emailQueue.filter(email => email.status === 'failed').length;
+    const sentToday = emailQueue.filter(email => {
+        const today = new Date().toDateString();
+        const emailDate = new Date(email.sent_at || email.created_at).toDateString();
+        return email.status === 'sent' && emailDate === today;
+    }).length;
+    
+    document.getElementById('pending-emails').textContent = pendingCount;
+    document.getElementById('failed-emails').textContent = failedCount;
+    document.getElementById('sent-today').textContent = sentToday;
+    
+    // Update queue list
+    const queueList = document.getElementById('email-queue-list');
+    if (queueList) {
+        if (emailQueue.length === 0) {
+            queueList.innerHTML = '<p class="text-muted">No emails in queue</p>';
+        } else {
+            queueList.innerHTML = emailQueue.slice(0, 10).map(email => `
+                <div class="queue-list-item">
+                    <div>
+                        <div>${email.recipient_email}</div>
+                        <small class="text-muted">${email.subject}</small>
+                    </div>
+                    <span class="queue-status ${email.status}">${email.status}</span>
+                </div>
+            `).join('');
+        }
+    }
+}
+
+// Process email queue
+async function processEmailQueue() {
+    try {
+        showLoading('Processing email queue...');
+        
+        const { data, error } = await supabase
+            .from('email_queue')
+            .select('*')
+            .eq('status', 'pending')
+            .order('created_at', { ascending: true })
+            .limit(10);
+            
+        if (error) throw error;
+        
+        let processed = 0;
+        for (const email of data || []) {
+            try {
+                await sendEmail(email);
+                processed++;
+            } catch (error) {
+                console.error('Failed to send email:', error);
+            }
+        }
+        
+        hideLoading();
+        showSuccess(`Processed ${processed} emails from queue`);
+        await loadEmailQueue();
+        logActivity('email_queue_processed', `Processed ${processed} emails`);
+    } catch (error) {
+        hideLoading();
+        console.error('Error processing email queue:', error);
+        showError('Failed to process email queue');
+    }
+}
+
+// Send individual email
+async function sendEmail(emailData) {
+    try {
+        // Use your email service (EmailJS, Resend, etc.)
+        const response = await fetch(window.RESEND_FUNCTION_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                to: emailData.recipient_email,
+                subject: emailData.subject,
+                html: emailData.content,
+                type: 'donor_thank_you'
+            })
+        });
+        
+        if (!response.ok) {
+            throw new Error('Email service error');
+        }
+        
+        // Update email status
+        await supabase
+            .from('email_queue')
+            .update({ 
+                status: 'sent', 
+                sent_at: new Date().toISOString() 
+            })
+            .eq('id', emailData.id);
+            
+    } catch (error) {
+        // Update email status to failed
+        await supabase
+            .from('email_queue')
+            .update({ 
+                status: 'failed', 
+                error_message: error.message 
+            })
+            .eq('id', emailData.id);
+            
+        throw error;
+    }
+}
+
+// Send test email
+async function sendTestEmail() {
+    const testEmail = prompt('Enter test email address:');
+    if (!testEmail) return;
+    
+    try {
+        showLoading('Sending test email...');
+        
+        const testData = {
+            recipient_email: testEmail,
+            subject: 'Test Email from Nashr Foundation Admin',
+            content: 'This is a test email to verify the email system is working correctly.',
+            status: 'pending'
+        };
+        
+        const { error } = await supabase
+            .from('email_queue')
+            .insert([testData]);
+            
+        if (error) throw error;
+        
+        hideLoading();
+        showSuccess('Test email added to queue');
+        await loadEmailQueue();
+        logActivity('test_email_sent', `Test email sent to ${testEmail}`);
+    } catch (error) {
+        hideLoading();
+        console.error('Error sending test email:', error);
+        showError('Failed to send test email');
+    }
+}
+
+// Load email analytics
+async function loadEmailAnalytics() {
+    try {
+        const { data, error } = await supabase
+            .from('email_analytics')
+            .select('*')
+            .gte('date', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString());
+            
+        if (error) throw error;
+        
+        // Calculate totals
+        emailAnalytics = {
+            sent: data?.reduce((sum, item) => sum + (item.sent || 0), 0) || 0,
+            delivered: data?.reduce((sum, item) => sum + (item.delivered || 0), 0) || 0,
+            opened: data?.reduce((sum, item) => sum + (item.opened || 0), 0) || 0,
+            clicked: data?.reduce((sum, item) => sum + (item.clicked || 0), 0) || 0
+        };
+        
+        updateEmailAnalyticsDisplay();
+    } catch (error) {
+        console.error('Error loading email analytics:', error);
+    }
+}
+
+// Update email analytics display
+function updateEmailAnalyticsDisplay() {
+    document.getElementById('emails-sent').textContent = emailAnalytics.sent;
+    document.getElementById('emails-delivered').textContent = emailAnalytics.delivered;
+    document.getElementById('emails-opened').textContent = emailAnalytics.opened;
+    document.getElementById('emails-clicked').textContent = emailAnalytics.clicked;
+}
+
+// Update email analytics when period changes
+function updateEmailAnalytics() {
+    loadEmailAnalytics();
+}
+
+// Refresh email templates
+function refreshEmailTemplates() {
+    loadEmailTemplates();
+}
+
+// Setup real-time updates for email system
+function setupEmailRealtimeUpdates() {
+    // Subscribe to email queue changes
+    supabase
+        .channel('email_queue_changes')
+        .on('postgres_changes', 
+            { event: '*', schema: 'public', table: 'email_queue' },
+            () => {
+                loadEmailQueue();
+            }
+        )
+        .subscribe();
+        
+    // Subscribe to email templates changes
+    supabase
+        .channel('email_templates_changes')
+        .on('postgres_changes', 
+            { event: '*', schema: 'public', table: 'email_templates' },
+            () => {
+                loadEmailTemplates();
+            }
+        )
+        .subscribe();
+}
+
+// Auto-send thank you email after donation
+async function sendDonorThankYouEmail(donorData) {
+    try {
+        // Check if auto thank you emails are enabled
+        const { data: settings } = await supabase
+            .from('settings')
+            .select('value')
+            .eq('key', 'auto_thank_you_emails')
+            .single();
+            
+        if (!settings?.value || settings.value !== 'true') {
+            return; // Auto emails disabled
+        }
+        
+        // Get thank you template
+        const { data: template } = await supabase
+            .from('email_templates')
+            .select('*')
+            .eq('type', 'donor_thank_you')
+            .eq('is_active', true)
+            .single();
+            
+        if (!template) {
+            console.warn('No thank you email template found');
+            return;
+        }
+        
+        // Replace placeholders
+        const subject = template.subject;
+        const content = template.template
+            .replace(/\{\{donor_name\}\}/g, donorData.name || 'Valued Supporter')
+            .replace(/\{\{amount\}\}/g, donorData.amount?.toLocaleString() || '0')
+            .replace(/\{\{date\}\}/g, new Date().toLocaleDateString());
+            
+        // Get send delay
+        const delay = template.settings?.delay_minutes || 5;
+        const sendAt = new Date(Date.now() + delay * 60 * 1000);
+        
+        // Add to email queue
+        const { error } = await supabase
+            .from('email_queue')
+            .insert([{
+                recipient_email: donorData.email,
+                subject: subject,
+                content: content,
+                status: 'pending',
+                send_at: sendAt.toISOString(),
+                metadata: {
+                    donor_id: donorData.id,
+                    donation_amount: donorData.amount,
+                    template_id: template.id
+                }
+            }]);
+            
+        if (error) throw error;
+        
+        console.log('Thank you email queued for:', donorData.email);
+        logActivity('donor_thank_you_queued', `Thank you email queued for ${donorData.email}`);
+        
+    } catch (error) {
+        console.error('Error queuing thank you email:', error);
+    }
+}
+
+// Initialize email management when admin loads
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize email management after user is authenticated
+    if (currentUser) {
+        initializeEmailManagement();
+        initializeMediaManagement();
+        initializeSecurityManagement();
+    }
+});
+
+// ==================== MEDIA MANAGEMENT SYSTEM ====================
+
+// Media management variables
+let mediaLibrary = [];
+let selectedImages = [];
+let currentPage = 1;
+let itemsPerPage = 20;
+let currentFilter = 'all';
+
+// Initialize media management
+async function initializeMediaManagement() {
+    try {
+        // Call the media management initialization from the separate file
+        if (typeof window.initializeMediaManagement === 'function') {
+            window.initializeMediaManagement();
+        }
+    } catch (error) {
+        console.error('Failed to initialize media management:', error);
+    }
+}

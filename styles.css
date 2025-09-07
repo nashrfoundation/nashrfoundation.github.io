@@ -355,12 +355,15 @@ header .container {
     align-items: center;
     justify-content: space-between;
     overflow: visible;
+    gap: 1rem;
 }
 
 .logo {
     display: flex;
     align-items: center;
     overflow: visible;
+    order: 1;
+    flex-shrink: 0;
 }
 
 .logo img {
@@ -469,6 +472,8 @@ nav ul li a.active::after {
     display: flex;
     align-items: center;
     gap: var(--spacing-xs);
+    order: 3;
+    flex-shrink: 0;
 }
 
 .social-icons a {
@@ -521,6 +526,8 @@ nav ul li a.active::after {
 
 .donate-button {
     margin-left: var(--spacing-md);
+    flex-shrink: 0;
+    order: 5;
 }
 
 .mobile-menu-toggle {
@@ -530,6 +537,8 @@ nav ul li a.active::after {
     width: 30px;
     height: 21px;
     cursor: pointer;
+    order: 4;
+    flex-shrink: 0;
     background: transparent;
     border: none;
     z-index: 1000;
@@ -571,13 +580,16 @@ nav ul li a.active::after {
 }
 
 /* Offset hero for fixed header */
-.hero-background { margin-top: 80px; height: calc(100vh - 80px) !important; }
+.hero-background { 
+    margin-top: 80px; 
+    height: calc(100vh - 80px) !important; 
+}
 
 .hero-bg-image {
     position: absolute !important;
     top: 0 !important;
-    right: 0 !important;
-    width: 60% !important;
+    left: 0 !important;
+    width: 100% !important;
     height: 100% !important;
     object-fit: cover !important;
     object-position: center center !important;
@@ -593,8 +605,8 @@ nav ul li a.active::after {
 /* Ensure perfect horizontal centering on larger screens */
 @media (min-width: 1024px) {
   .hero-bg-image {
-    right: 0 !important;
-    width: 60% !important;
+    left: 0 !important;
+    width: 100% !important;
     transform: none !important;
   }
 }
@@ -638,7 +650,7 @@ nav ul li a.active::after {
 @media (max-width: 768px) {
     .hero-background { position: relative !important; width: 100vw !important; height: calc(100vh - 96px) !important; z-index: 1 !important; pointer-events: none !important; margin-top: 96px; }
     
-    .hero-bg-image { top: 0 !important; height: 100% !important; object-position: center center !important; right: 0 !important; width: 100% !important; }
+    .hero-bg-image { top: 0 !important; height: 100% !important; object-position: center center !important; left: 0 !important; width: 100% !important; }
     
     .hero-background .hero-content { 
         padding: 2rem; 
@@ -1828,6 +1840,19 @@ footer {
     100% { background-position: calc(200px + 100%) 0; }
 }
 
+/* Scroll Progress Bar */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--accent));
+    z-index: 1000;
+    transition: width 0.1s ease-out;
+    box-shadow: 0 0 10px rgba(42, 141, 156, 0.5);
+}
+
 /* Progress Bar */
 .progress-bar {
     width: 100%;
@@ -2403,6 +2428,9 @@ body.donate-page section {
     display: none;
     gap: var(--spacing-2xl);
     align-items: center;
+    order: 2;
+    flex: 1;
+    justify-content: center;
 }
 
 .nav-btn {
@@ -3312,9 +3340,19 @@ section::before {
 
 /* ===== Requested Fixes: Mobile hamburger placement and Donate validation ===== */
 @media (max-width: 768px) {
-    header .container { display: flex; align-items: center; }
+    header .container { 
+        display: flex; 
+        align-items: center; 
+        justify-content: space-between;
+    }
     /* Ensure hamburger only on mobile and at right side */
-    .mobile-menu-toggle { display: flex; margin-left: auto; order: 5; }
+    .mobile-menu-toggle { 
+        display: flex; 
+        order: 4; 
+    }
+    .donate-button {
+        order: 5;
+    }
 }
 
 /* ===== Real-time Notifications ===== */
@@ -4508,6 +4546,7 @@ body.donate-page .field-success {
     
     .scroll-progress {
         transition: none;
+        height: 2px;
     }
 }
 

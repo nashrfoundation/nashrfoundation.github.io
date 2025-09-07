@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal Test - Nashr Foundation</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .warning { background: #fff3cd; color: #856404; border: 1px solid #ffeaa7; }
+        .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .test-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔧 Admin Portal Test Suite</h1>
+    <p>This page tests all admin portal features and identifies any errors.</p>
+    
+    <div class="test-section">
+        <h2>📋 Test Results</h2>
+        <div id="test-results"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>🧪 Run Tests</h2>
+        <div class="test-grid">
+            <button onclick="testJavaScriptFunctions()">Test JS Functions</button>
+            <button onclick="test2FA()">Test 2FA System</button>
+            <button onclick="testEmailManagement()">Test Email Management</button>
+            <button onclick="testMediaManagement()">Test Media Management</button>
+            <button onclick="testSecurityFeatures()">Test Security Features</button>
+            <button onclick="testDatabaseConnection()">Test Database</button>
+            <button onclick="runAllTests()">Run All Tests</button>
+        </div>
+    </div>
+    
+    <div class="test-section">
+        <h2>📊 Feature Status</h2>
+        <div id="feature-status"></div>
+    </div>
+
+    <!-- Load required scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+    <script src="admin.js"></script>
+    <script src="security-management.js"></script>
+    <script src="media-management.js"></script>
+    
+    <script>
+        // Test results container
+        const testResults = document.getElementById('test-results');
+        const featureStatus = document.getElementById('feature-status');
+        
+        // Test configuration
+        const supabaseConfig = {
+            url: 'https://jtuhnndwhotxjjolwcuz.supabase.co',
+            anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp0dWhubmR3aG90eGpqb2x3Y3V6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY0NjU3MDEsImV4cCI6MjA3MjA0MTcwMX0.HJhOCxGDgDERcBfdgBQJsiGoaev5RAtX819eWuMGkhc'
+        };
+        
+        let supabase;
+        
+        // Initialize Supabase
+        async function initSupabase() {
+            try {
+                const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+                supabase = createClient(supabaseConfig.url, supabaseConfig.anonKey);
+                return true;
+            } catch (error) {
+                addTestResult('Supabase initialization failed', 'error', error.message);
+                return false;
+            }
+        }
+        
+        // Add test result
+        function addTestResult(message, type, details = '') {
+            const result = document.createElement('div');
+            result.className = `test-result ${type}`;
+            result.innerHTML = `
+                <strong>${message}</strong>
+                ${details ? `<br><small>${details}</small>` : ''}
+            `;
+            testResults.appendChild(result);
+        }
+        
+        // Test JavaScript functions
+        async function testJavaScriptFunctions() {
+            addTestResult('Testing JavaScript Functions...', 'info');
+            
+            const functions = [
+                'showLoading', 'hideLoading', 'showSuccess', 'showError', 'showNotification',
+                'toggle2FA', 'setup2FA', 'verify2FACode', 'generate2FASecret', 'generateQRCode',
+                'verifyTOTPCode', 'generateTOTPCode', 'loadSecurityData', 'loadMediaLibrary'
+            ];
+            
+            let passed = 0;
+            let failed = 0;
+            
+            functions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    addTestResult(`✅ ${funcName}()`, 'success');
+                    passed++;
+                } else {
+                    addTestResult(`❌ ${funcName}()`, 'error', 'Function not found');
+                    failed++;
+                }
+            });
+            
+            addTestResult(`JavaScript Functions: ${passed} passed, ${failed} failed`, 
+                failed === 0 ? 'success' : 'warning');
+        }
+        
+        // Test 2FA system
+        async function test2FA() {
+            addTestResult('Testing 2FA System...', 'info');
+            
+            try {
+                // Test secret generation
+                if (typeof generate2FASecret === 'function') {
+                    const secret = generate2FASecret();
+                    if (secret && secret.length === 32) {
+                        addTestResult('✅ 2FA Secret Generation', 'success');
+                    } else {
+                        addTestResult('❌ 2FA Secret Generation', 'error', 'Invalid secret format');
+                    }
+                } else {
+                    addTestResult('❌ generate2FASecret function missing', 'error');
+                }
+                
+                // Test QR code generation
+                if (typeof generateQRCode === 'function') {
+                    const qrUrl = generateQRCode('TEST123456789012345678901234567890');
+                    if (qrUrl && qrUrl.includes('qrserver.com')) {
+                        addTestResult('✅ QR Code Generation', 'success');
+                    } else {
+                        addTestResult('❌ QR Code Generation', 'error', 'Invalid QR URL');
+                    }
+                } else {
+                    addTestResult('❌ generateQRCode function missing', 'error');
+                }
+                
+                // Test TOTP verification
+                if (typeof verifyTOTPCode === 'function' && typeof generateTOTPCode === 'function') {
+                    const secret = 'TEST123456789012345678901234567890';
+                    const code = generateTOTPCode(secret, Math.floor(Date.now() / 1000 / 30));
+                    const isValid = verifyTOTPCode(secret, code);
+                    
+                    if (isValid) {
+                        addTestResult('✅ TOTP Verification', 'success');
+                    } else {
+                        addTestResult('❌ TOTP Verification', 'error', 'Code verification failed');
+                    }
+                } else {
+                    addTestResult('❌ TOTP functions missing', 'error');
+                }
+                
+            } catch (error) {
+                addTestResult('❌ 2FA Test Error', 'error', error.message);
+            }
+        }
+        
+        // Test email management
+        async function testEmailManagement() {
+            addTestResult('Testing Email Management...', 'info');
+            
+            const emailFunctions = [
+                'loadEmailTemplates', 'createDefaultTemplates', 'displayEmailTemplates',
+                'addEmailTemplate', 'saveThankYouTemplate', 'previewThankYouEmail',
+                'loadEmailQueue', 'processEmailQueue', 'sendTestEmail'
+            ];
+            
+            let passed = 0;
+            emailFunctions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    addTestResult(`✅ ${funcName}()`, 'success');
+                    passed++;
+                } else {
+                    addTestResult(`❌ ${funcName}()`, 'error', 'Function not found');
+                }
+            });
+            
+            addTestResult(`Email Management: ${passed}/${emailFunctions.length} functions available`, 
+                passed === emailFunctions.length ? 'success' : 'warning');
+        }
+        
+        // Test media management
+        async function testMediaManagement() {
+            addTestResult('Testing Media Management...', 'info');
+            
+            const mediaFunctions = [
+                'loadMediaLibrary', 'setupMediaEventListeners', 'loadCurrentHeroBackground',
+                'loadBrandAssets', 'loadBackupList', 'setupCDNStatus'
+            ];
+            
+            let passed = 0;
+            mediaFunctions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    addTestResult(`✅ ${funcName}()`, 'success');
+                    passed++;
+                } else {
+                    addTestResult(`❌ ${funcName}()`, 'error', 'Function not found');
+                }
+            });
+            
+            addTestResult(`Media Management: ${passed}/${mediaFunctions.length} functions available`, 
+                passed === mediaFunctions.length ? 'success' : 'warning');
+        }
+        
+        // Test security features
+        async function testSecurityFeatures() {
+            addTestResult('Testing Security Features...', 'info');
+            
+            const securityFunctions = [
+                'loadSecurityLogs', 'loadActiveSessions', 'loadSEOMetrics',
+                'loadIPRules', 'loadSecuritySettings', 'runSecurityScan'
+            ];
+            
+            let passed = 0;
+            securityFunctions.forEach(funcName => {
+                if (typeof window[funcName] === 'function') {
+                    addTestResult(`✅ ${funcName}()`, 'success');
+                    passed++;
+                } else {
+                    addTestResult(`❌ ${funcName}()`, 'error', 'Function not found');
+                }
+            });
+            
+            addTestResult(`Security Features: ${passed}/${securityFunctions.length} functions available`, 
+                passed === securityFunctions.length ? 'success' : 'warning');
+        }
+        
+        // Test database connection
+        async function testDatabaseConnection() {
+            addTestResult('Testing Database Connection...', 'info');
+            
+            if (!supabase) {
+                const initialized = await initSupabase();
+                if (!initialized) return;
+            }
+            
+            try {
+                // Test basic connection
+                const { data, error } = await supabase
+                    .from('settings')
+                    .select('key')
+                    .limit(1);
+                
+                if (error) {
+                    addTestResult('❌ Database Connection', 'error', error.message);
+                } else {
+                    addTestResult('✅ Database Connection', 'success', 'Connected to Supabase');
+                }
+                
+                // Test email_templates table
+                const { data: templates, error: templateError } = await supabase
+                    .from('email_templates')
+                    .select('id, name')
+                    .limit(1);
+                
+                if (templateError) {
+                    addTestResult('❌ Email Templates Table', 'error', templateError.message);
+                } else {
+                    addTestResult('✅ Email Templates Table', 'success', 'Table accessible');
+                }
+                
+                // Test email_queue table
+                const { data: queue, error: queueError } = await supabase
+                    .from('email_queue')
+                    .select('id')
+                    .limit(1);
+                
+                if (queueError) {
+                    addTestResult('❌ Email Queue Table', 'error', queueError.message);
+                } else {
+                    addTestResult('✅ Email Queue Table', 'success', 'Table accessible');
+                }
+                
+            } catch (error) {
+                addTestResult('❌ Database Test Error', 'error', error.message);
+            }
+        }
+        
+        // Run all tests
+        async function runAllTests() {
+            testResults.innerHTML = '';
+            addTestResult('🚀 Running All Tests...', 'info');
+            
+            await testJavaScriptFunctions();
+            await test2FA();
+            await testEmailManagement();
+            await testMediaManagement();
+            await testSecurityFeatures();
+            await testDatabaseConnection();
+            
+            addTestResult('✅ All Tests Completed!', 'success');
+        }
+        
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', async () => {
+            await initSupabase();
+            addTestResult('Admin Portal Test Suite Ready', 'info', 'Click "Run All Tests" to begin');
+        });
+    </script>
+</body>
+</html>

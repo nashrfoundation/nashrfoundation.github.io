@@ -165,25 +165,25 @@ class PaymentProcessor {
         console.log('Amount:', amount);
         console.log('Payment Links:', this.paymentLinks);
         
-        const paymentLink = this.paymentLinks[amount];
-        console.log('Selected Link:', paymentLink);
+        const debugPaymentLink = this.paymentLinks[amount];
+        console.log('Selected Link:', debugPaymentLink);
         
-        if (!paymentLink) {
+        if (!debugPaymentLink) {
             console.error('❌ No payment link found for amount:', amount);
             return;
         }
         
         // Test the link
         console.log('🧪 Testing link accessibility...');
-        fetch(paymentLink, { method: 'HEAD', mode: 'no-cors' })
+        fetch(debugPaymentLink, { method: 'HEAD', mode: 'no-cors' })
             .then(() => {
                 console.log('✅ Link is accessible');
                 console.log('🚀 Attempting redirection...');
-                this.redirectToPayment(paymentLink);
+                this.redirectToPayment(debugPaymentLink);
             })
             .catch(error => {
                 console.error('❌ Link test failed:', error);
-                console.log('🔗 Manual link:', paymentLink);
+                console.log('🔗 Manual link:', debugPaymentLink);
             });
     }
 
