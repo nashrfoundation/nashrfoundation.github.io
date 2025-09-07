@@ -338,10 +338,10 @@ async function getCachedSettings() {
         // Convert key-value rows to object format, but also check direct columns
         const settingsObj = {};
         if (Array.isArray(settingsRows)) {
-            // First, check if we have direct columns (hybrid format)
+            // Handle hybrid format: direct columns + key-value rows
             const firstRow = settingsRows[0];
-            if (firstRow && firstRow.title !== undefined) {
-                // Direct column format - use the first row
+            if (firstRow) {
+                // Get direct column values
                 settingsObj.title = firstRow.title || '';
                 settingsObj.description = firstRow.description || '';
                 settingsObj.keywords = firstRow.keywords || '';
@@ -354,19 +354,34 @@ async function getCachedSettings() {
                 settingsObj.total_raised = Number(firstRow.total_raised) || 0;
                 settingsObj.admin_email_notifications = firstRow.admin_email_notifications || 'all';
                 settingsObj.backup_frequency = firstRow.backup_frequency || 'daily';
-            } else {
-                // Key-value format
-                settingsRows.forEach(row => {
-                    if (row.key && row.value !== null) {
-                        // Convert numeric values
-                        if (['fundraising_goal', 'total_raised'].includes(row.key)) {
-                            settingsObj[row.key] = Number(row.value) || 0;
-                        } else {
-                            settingsObj[row.key] = row.value;
-                        }
-                    }
-                });
             }
+            
+            // Override with key-value rows if they exist
+            settingsRows.forEach(row => {
+                if (row.key && row.value !== null) {
+                    // Map key-value to standard field names
+                    const keyMapping = {
+                        'site_name': 'title',
+                        'site_title': 'title',
+                        'site_description': 'description',
+                        'site_keywords': 'keywords',
+                        'facebook_url': 'facebook',
+                        'instagram_url': 'instagram',
+                        'twitter_url': 'twitter',
+                        'youtube_url': 'youtube',
+                        'contact_email': 'contact_email'
+                    };
+                    
+                    const fieldName = keyMapping[row.key] || row.key;
+                    
+                    // Convert numeric values
+                    if (['fundraising_goal', 'total_raised'].includes(fieldName)) {
+                        settingsObj[fieldName] = Number(row.value) || 0;
+                    } else {
+                        settingsObj[fieldName] = row.value;
+                    }
+                }
+            });
         }
         
         settingsCache = settingsObj;
@@ -1405,6 +1420,47 @@ function saveSettings() {
                         .eq('id', firstRow.id);
                     
                     if (updateErr) throw updateErr;
+                    
+                    // Also update/create key-value rows for important fields
+                    const keyValueUpdates = [
+                        { key: 'site_name', value: settingsData.title },
+                        { key: 'site_title', value: settingsData.title },
+                        { key: 'site_description', value: settingsData.description },
+                        { key: 'site_keywords', value: settingsData.keywords },
+                        { key: 'facebook_url', value: settingsData.facebook },
+                        { key: 'instagram_url', value: settingsData.instagram },
+                        { key: 'twitter_url', value: settingsData.twitter },
+                        { key: 'youtube_url', value: settingsData.youtube },
+                        { key: 'fundraising_goal', value: String(settingsData.fundraising_goal) },
+                        { key: 'total_raised', value: String(settingsData.total_raised) }
+                    ];
+                    
+                    // Upsert key-value rows
+                    for (const kv of keyValueUpdates) {
+                        if (kv.value && kv.value.trim() !== '') {
+                            const { data: existing } = await supabase
+                                .from('settings')
+                                .select('id')
+                                .eq('key', kv.key)
+                                .limit(1);
+                            
+                            if (existing && existing.length > 0) {
+                                await supabase
+                                    .from('settings')
+                                    .update({ value: kv.value, updated_at: now })
+                                    .eq('key', kv.key);
+                            } else {
+                                await supabase
+                                    .from('settings')
+                                    .insert([{
+                                        key: kv.key,
+                                        value: kv.value,
+                                        created_at: now,
+                                        updated_at: now
+                                    }]);
+                            }
+                        }
+                    }
                 } else {
                     // Key-value format - upsert each setting
                     const existingMap = {};

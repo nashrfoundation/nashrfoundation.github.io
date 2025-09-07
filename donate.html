@@ -623,11 +623,26 @@
               // Then override with key-value rows if they exist
               settingsRows.forEach(row => {
                 if (row.key && row.value !== null) {
+                  // Map key-value to standard field names
+                  const keyMapping = {
+                    'site_name': 'title',
+                    'site_title': 'title',
+                    'site_description': 'description',
+                    'site_keywords': 'keywords',
+                    'facebook_url': 'facebook',
+                    'instagram_url': 'instagram',
+                    'twitter_url': 'twitter',
+                    'youtube_url': 'youtube',
+                    'contact_email': 'contact_email'
+                  };
+                  
+                  const fieldName = keyMapping[row.key] || row.key;
+                  
                   // Convert numeric values
-                  if (['fundraising_goal', 'total_raised'].includes(row.key)) {
-                    s[row.key] = Number(row.value) || 0;
+                  if (['fundraising_goal', 'total_raised'].includes(fieldName)) {
+                    s[fieldName] = Number(row.value) || 0;
                   } else {
-                    s[row.key] = row.value;
+                    s[fieldName] = row.value;
                   }
                 }
               });
