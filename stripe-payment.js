@@ -4,10 +4,10 @@
 class PaymentProcessor {
     constructor() {
         this.paymentLinks = {
-            1000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01',
-            2500: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01', 
-            5000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01',
-            10000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01'
+            1000: 'https://buy.stripe.com/cNi9AV1MUfd3bAt7UsaEE01',
+            2500: 'https://buy.stripe.com/cNi9AV1MUfd3bAt7UsaEE01', 
+            5000: 'https://buy.stripe.com/cNi9AV1MUfd3bAt7UsaEE01',
+            10000: 'https://buy.stripe.com/cNi9AV1MUfd3bAt7UsaEE01'
         };
         this.initializePaymentLinks();
         this.validatePaymentLinks();
@@ -35,6 +35,13 @@ class PaymentProcessor {
                 console.log(`✅ Payment link for ${amount}: ${link}`);
             }
         });
+    }
+    
+    getClosestAmount(amount) {
+        const availableAmounts = Object.keys(this.paymentLinks).map(Number).sort((a, b) => a - b);
+        return availableAmounts.reduce((prev, curr) => 
+            Math.abs(curr - amount) < Math.abs(prev - amount) ? curr : prev
+        );
     }
 
     // Test method to verify Stripe links are working
@@ -191,6 +198,15 @@ class PaymentProcessor {
             const countryCode = document.getElementById('country-code')?.value || '+92';
             const anonymous = document.getElementById('anonymous-donation')?.checked || false;
             const leaderboardConsent = document.getElementById('leaderboard-consent')?.checked || false;
+            
+            // Get payment link for amount
+            let paymentLink = this.paymentLinks[amount];
+            if (!paymentLink) {
+                // Use closest amount or default to 2500
+                const closestAmount = this.getClosestAmount(amount);
+                paymentLink = this.paymentLinks[closestAmount];
+                console.log(`💰 Using payment link for closest amount: ${closestAmount}`);
+            }
 
             console.log('📝 Donor info:', { donorName, donorEmail, donorPhone, anonymous, leaderboardConsent });
 

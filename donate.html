@@ -133,21 +133,32 @@
     <style>
         .fund-tracker { padding: 40px 20px; background: #000000; color: #f0f0f0; text-align: center; }
         .fund-tracker h2, .fund-tracker p { color: #ffffff; }
-        .progress-bar-container { background: #333333; border: 1px solid #555555; border-radius: 50px; overflow: hidden; max-width: 800px; margin: 20px auto; }
+        .progress-bar-container { 
+            background: #1a1a1a; 
+            border: 2px solid #444; 
+            border-radius: 50px; 
+            overflow: hidden; 
+            max-width: 800px; 
+            margin: 20px auto; 
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
         .fund-details { font-size: 1.2em; font-weight: bold; font-family: 'Merriweather', serif; color: #f0f0f0; }
         .progress-bar { 
-            background: linear-gradient(90deg, var(--accent) 0%, var(--accent-light) 100%); 
-            height: 35px; 
+            background: linear-gradient(90deg, #ffb52e 0%, #ffd700 50%, #ffb52e 100%); 
+            height: 40px; 
             width: 0; 
             text-align: center; 
-            line-height: 35px; 
-            color: white; 
-            transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1); 
+            line-height: 40px; 
+            color: #000; 
+            transition: width 2s cubic-bezier(0.4, 0, 0.2, 1); 
             border-radius: 50px; 
             font-weight: bold; 
-            box-shadow: 0 2px 10px rgba(255, 181, 46, 0.3); 
+            box-shadow: 0 0 20px rgba(255, 181, 46, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.3); 
             position: relative; 
             overflow: hidden; 
+            font-size: 14px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
         }
         
         .progress-bar::after {
@@ -487,6 +498,20 @@
             font-weight: bold;
         }
         
+        .form-group label.valid::after {
+            content: "✓";
+            color: #27ae60;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
+        .form-group label.invalid::after {
+            content: "✗";
+            color: #e74c3c;
+            font-weight: bold;
+            margin-left: 8px;
+        }
+        
         .form-group label.optional::after {
             content: "(optional)";
             color: var(--text-secondary);
@@ -657,23 +682,22 @@
                             <div class="form-group"> 
                                 <label for="donor-name" class="required">Full Name</label> 
                                 <input class="form-control" id="donor-name" name="name" placeholder="e.g. Aisha Khan" required type="text"/> 
-                                <div class="input-hint">Enter your full name as it appears on your ID</div>
                             </div>
                             <div class="form-group"> 
-                                <label for="donor-email" class="required">Email (for receipt)</label> 
-                                <input class="form-control" id="donor-email" name="email" placeholder="name@example.com" type="email"/> 
-                                <div class="input-hint">We'll send you a receipt and updates about your donation</div>
+                                <label for="donor-email" class="required">Email</label> 
+                                <input class="form-control" id="donor-email" name="email" placeholder="name@example.com" type="email" required/> 
                             </div>
-
-                            <details class="form-group" style="background:#111;border:1px solid #333;border-radius:8px;padding:10px 12px;">
-                              <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;color:#ccc;">Additional options</summary>
-                              <div class="form-group" style="margin-top:10px;">
-                                <label for="donor-phone">Phone (optional)</label>
-                                <div class="phone-input"> <select id="country-code" name="country_code"> <option value="+92" selected>+92 (PK)</option> <option value="+1">+1 (US)</option> <option value="+44">+44 (UK)</option> </select> <input class="form-control" id="donor-phone" name="phone" placeholder="3XXXXXXXXX" type="tel" /> </div>
-                              </div>
-                              <div class="checkbox-group"> <input checked id="leaderboard-consent" name="leaderboard_consent" type="checkbox" value="yes"/> <label for="leaderboard-consent">Show my name on the leaderboard</label> </div>
-                              <div class="checkbox-group"> <input id="anonymous-donation" name="anonymous_donation" type="checkbox" value="yes"/> <label for="anonymous-donation">Make my donation anonymous</label> </div>
-                            </details>
+                            <div class="form-group"> 
+                                <label for="donor-phone" class="required">Phone Number</label> 
+                                <div class="phone-input"> 
+                                    <select id="country-code" name="country_code"> 
+                                        <option value="+92" selected>🇵🇰 +92</option> 
+                                        <option value="+1">🇺🇸 +1</option> 
+                                        <option value="+44">🇬🇧 +44</option> 
+                                    </select> 
+                                    <input class="form-control" id="donor-phone" name="phone" placeholder="3XXXXXXXXX" type="tel" required/> 
+                                </div>
+                            </div>
                             <div class="form-submit"> 
                 <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button> 
             </div>
@@ -1062,6 +1086,7 @@
         
         function validateNameField(input) {
             const value = input.value.trim();
+            const label = input.parentNode.querySelector('label');
             const errorElement = input.parentNode.querySelector('.field-error');
             const successElement = input.parentNode.querySelector('.field-success');
             
@@ -1071,23 +1096,40 @@
             
             if (value.length === 0) {
                 showFieldError(input, 'Please enter your full name');
+                if (label) {
+                    label.classList.remove('valid');
+                    label.classList.add('invalid');
+                }
                 return false;
             } else if (value.length < 2) {
                 showFieldError(input, 'Name must be at least 2 characters long');
+                if (label) {
+                    label.classList.remove('valid');
+                    label.classList.add('invalid');
+                }
                 return false;
             } else if (!/^[a-zA-Z\s\u0600-\u06FF]+$/.test(value)) {
                 showFieldError(input, 'Name can only contain letters and spaces');
+                if (label) {
+                    label.classList.remove('valid');
+                    label.classList.add('invalid');
+                }
                 return false;
             } else {
                 showFieldSuccess(input, 'Name looks good!');
                 input.classList.remove('invalid');
                 input.classList.add('valid');
+                if (label) {
+                    label.classList.remove('invalid');
+                    label.classList.add('valid');
+                }
                 return true;
             }
         }
         
         function validateEmailField(input) {
             const value = input.value.trim();
+            const label = input.parentNode.querySelector('label');
             const errorElement = input.parentNode.querySelector('.field-error');
             const successElement = input.parentNode.querySelector('.field-success');
             
@@ -1097,14 +1139,26 @@
             
             if (value.length === 0) {
                 showFieldError(input, 'Please enter your email address');
+                if (label) {
+                    label.classList.remove('valid');
+                    label.classList.add('invalid');
+                }
                 return false;
             } else if (!isValidEmail(value)) {
                 showFieldError(input, 'Please enter a valid email address (e.g., name@example.com)');
+                if (label) {
+                    label.classList.remove('valid');
+                    label.classList.add('invalid');
+                }
                 return false;
             } else {
                 showFieldSuccess(input, 'Email address is valid!');
                 input.classList.remove('invalid');
                 input.classList.add('valid');
+                if (label) {
+                    label.classList.remove('invalid');
+                    label.classList.add('valid');
+                }
                 return true;
             }
         }
@@ -1112,6 +1166,7 @@
         function validatePhoneField(input) {
             const value = input.value.trim();
             const countryCode = document.getElementById('country-code')?.value || '+92';
+            const label = input.parentNode.querySelector('label');
             const errorElement = input.parentNode.querySelector('.field-error');
             const successElement = input.parentNode.querySelector('.field-success');
             
@@ -1120,9 +1175,12 @@
             if (successElement) successElement.remove();
             
             if (value.length === 0) {
-                // Phone is optional, so no error for empty
-                input.classList.remove('invalid', 'valid');
-                return true;
+                showFieldError(input, 'Please enter your phone number');
+                if (label) {
+                    label.classList.remove('valid');
+                    label.classList.add('invalid');
+                }
+                return false;
             } else if (!isValidPhoneNumber(value, countryCode)) {
                 let message = 'Please enter a valid phone number';
                 if (countryCode === '+92') {
@@ -1133,11 +1191,19 @@
                     message = 'Please enter a valid UK number';
                 }
                 showFieldError(input, message);
+                if (label) {
+                    label.classList.remove('valid');
+                    label.classList.add('invalid');
+                }
                 return false;
             } else {
                 showFieldSuccess(input, 'Phone number is valid!');
                 input.classList.remove('invalid');
                 input.classList.add('valid');
+                if (label) {
+                    label.classList.remove('invalid');
+                    label.classList.add('valid');
+                }
                 return true;
             }
         }
