@@ -86,6 +86,18 @@
             addResult(`❌ QR code generation error: ${error.message}`, 'error');
         }
         
+        // Test 7: Check for variable conflicts
+        try {
+            // Test if media management functions are accessible
+            if (typeof changeMediaPage === 'function') {
+                addResult('✅ Media management functions accessible', 'success');
+            } else {
+                addResult('❌ Media management functions not accessible', 'error');
+            }
+        } catch (error) {
+            addResult(`❌ Media management test error: ${error.message}`, 'error');
+        }
+        
         addResult('🎉 Quick test completed!', 'info');
     </script>
 </body>

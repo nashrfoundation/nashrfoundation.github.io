@@ -4128,12 +4128,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // ==================== MEDIA MANAGEMENT SYSTEM ====================
 
-// Media management variables
-let mediaLibrary = [];
-let selectedImages = [];
-let mediaCurrentPage = 1;
-let mediaItemsPerPage = 20;
-let currentFilter = 'all';
+// Media management variables are defined in media-management.js
 
 // Initialize media management
 async function initializeMediaManagement() {
