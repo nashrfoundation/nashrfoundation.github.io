@@ -515,13 +515,18 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group"> <label for="donor-name">Your Name</label> <input class="form-control" id="donor-name" name="name" placeholder="Enter your full name" required type="text"/> </div>
-                            <div class="form-group"> <label for="donor-email">Email Address</label> <input class="form-control" id="donor-email" name="email" placeholder="Enter your email address" type="email"/> </div>
-                            <div class="form-group"> <label for="donor-phone">Phone Number</label> <div class="phone-input"> <select id="country-code" name="country_code"> <option value="+92" selected>+92 (Pakistan)</option> <option value="+1">+1 (USA)</option> <option value="+44">+44 (UK)</option> </select> <input class="form-control" id="donor-phone" name="phone" placeholder="Enter your phone number" type="tel" /> </div> </div>
-                            <div class="form-group">
-                                <div class="checkbox-group"> <input checked id="leaderboard-consent" name="leaderboard_consent" type="checkbox" value="yes"/> <label for="leaderboard-consent">I consent to having my name displayed on the donor leaderboard</label> </div>
-                                <div class="checkbox-group"> <input id="anonymous-donation" name="anonymous_donation" type="checkbox" value="yes"/> <label for="anonymous-donation">Make my donation anonymous</label> </div>
-                            </div>
+                            <div class="form-group"> <label for="donor-name">Full Name</label> <input class="form-control" id="donor-name" name="name" placeholder="e.g. Aisha Khan" required type="text"/> </div>
+                            <div class="form-group"> <label for="donor-email">Email (for receipt)</label> <input class="form-control" id="donor-email" name="email" placeholder="name@example.com" type="email"/> </div>
+
+                            <details class="form-group" style="background:#111;border:1px solid #333;border-radius:8px;padding:10px 12px;">
+                              <summary style="cursor:pointer;list-style:none;display:flex;align-items:center;gap:8px;color:#ccc;">Additional options</summary>
+                              <div class="form-group" style="margin-top:10px;">
+                                <label for="donor-phone">Phone (optional)</label>
+                                <div class="phone-input"> <select id="country-code" name="country_code"> <option value="+92" selected>+92 (PK)</option> <option value="+1">+1 (US)</option> <option value="+44">+44 (UK)</option> </select> <input class="form-control" id="donor-phone" name="phone" placeholder="3XXXXXXXXX" type="tel" /> </div>
+                              </div>
+                              <div class="checkbox-group"> <input checked id="leaderboard-consent" name="leaderboard_consent" type="checkbox" value="yes"/> <label for="leaderboard-consent">Show my name on the leaderboard</label> </div>
+                              <div class="checkbox-group"> <input id="anonymous-donation" name="anonymous_donation" type="checkbox" value="yes"/> <label for="anonymous-donation">Make my donation anonymous</label> </div>
+                            </details>
                             <div class="form-submit"> 
                 <button class="btn btn-large" id="submit-donation-btn" type="submit">Complete Donation</button> 
             </div>
@@ -609,7 +614,18 @@
               setSocial('a[data-social="twitter"]', s.twitter);
               setSocial('a[data-social="youtube"]', s.youtube);
               const goal = s.fundraising_goal != null ? Number(s.fundraising_goal) : 200000;
-              const totalRaised = s.total_raised != null ? Number(s.total_raised) : undefined;
+              let totalRaised = s.total_raised != null ? Number(s.total_raised) : undefined;
+              try {
+                if (typeof totalRaised !== 'number') {
+                  // Fallback: compute from donations table if settings.total_raised is missing
+                  const { data: donations, error: donationsErr } = await sb
+                    .from('donations')
+                    .select('amount, payment_status');
+                  if (!donationsErr && Array.isArray(donations)) {
+                    totalRaised = donations.filter(d => d.payment_status === 'completed').reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                  }
+                }
+              } catch (e) {}
               if (typeof totalRaised === 'number' && fundDetailsEl) {
                 fundDetailsEl.innerHTML = `<span>PKR ${totalRaised.toLocaleString()}</span> raised of a PKR ${goal.toLocaleString()} goal`;
                 const bar = document.getElementById('fund-progress-bar');

@@ -1284,7 +1284,23 @@ async function loadSettingsData() {
             if (document.getElementById('youtube-url')) document.getElementById('youtube-url').value = s.youtube || '';
             if (document.getElementById('fundraising-goal-amount')) document.getElementById('fundraising-goal-amount').value = (s.fundraising_goal != null ? s.fundraising_goal : '');
             if (document.getElementById('goal-description')) document.getElementById('goal-description').value = s.goal_description || '';
-            if (document.getElementById('total-raised-amount')) document.getElementById('total-raised-amount').value = (s.total_raised != null ? s.total_raised : '');
+            if (document.getElementById('total-raised-amount')) {
+                let totalRaisedValue = (s.total_raised != null ? s.total_raised : '');
+                try {
+                    if (totalRaisedValue === '' || totalRaisedValue == null) {
+                        // Fallback: compute from donations table if settings.total_raised missing
+                        const { data: donations, error: donationsErr } = await supabase
+                            .from('donations')
+                            .select('amount, payment_status');
+                        if (!donationsErr && Array.isArray(donations)) {
+                            totalRaisedValue = donations
+                                .filter(d => d.payment_status === 'completed')
+                                .reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                        }
+                    }
+                } catch(e) {}
+                document.getElementById('total-raised-amount').value = totalRaisedValue;
+            }
             if (document.getElementById('admin-email-notifications')) document.getElementById('admin-email-notifications').value = s.admin_email_notifications || 'all';
             if (document.getElementById('backup-frequency')) document.getElementById('backup-frequency').value = s.backup_frequency || 'daily';
             // Auto-configure newsletter endpoint if provided in settings and not already set

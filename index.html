@@ -587,6 +587,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             const yt = document.querySelector('a[href*="youtube.com"]'); if (yt && s.youtube) yt.href = s.youtube;
           }
           // Load content for hero texts
+          // Compute total raised fallback if needed and expose globally for reuse
+          try {
+            const goal = s && s.fundraising_goal != null ? Number(s.fundraising_goal) : 200000;
+            let totalRaised = s && s.total_raised != null ? Number(s.total_raised) : undefined;
+            if (typeof totalRaised !== 'number') {
+              const { data: donations, error: donationsErr } = await supabase
+                .from('donations')
+                .select('amount, payment_status');
+              if (!donationsErr && Array.isArray(donations)) {
+                totalRaised = donations.filter(d => d.payment_status === 'completed').reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+              }
+            }
+            window.NF_TOTAL_RAISED = totalRaised;
+            window.NF_GOAL = goal;
+          } catch (e) {}
+
           const { data: contentRows } = await supabase.from('content').select('*').limit(1);
           const c = Array.isArray(contentRows) ? contentRows[0] : null;
           if (c) {
