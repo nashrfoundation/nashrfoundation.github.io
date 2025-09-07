@@ -1390,6 +1390,10 @@ function saveSettings() {
                 }
                 showSuccess('Settings saved successfully!');
                 logActivity('settings_update', 'System settings updated');
+                // Ensure fresh values across app
+                try { invalidateSettingsCache(); } catch(e) {}
+                try { await loadSettingsData(); } catch(e) {}
+                try { await loadOverviewData(); } catch(e) {}
             } catch (err) {
                 console.error('Failed to save settings:', err);
                 showError('Failed to save settings. Please try again.');
