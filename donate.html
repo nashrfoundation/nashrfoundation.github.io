@@ -797,7 +797,7 @@
 
           (async () => {
             try {
-            const sb = await ensureSupabase();
+              const sb = await ensureSupabase();
               if (!sb) {
                 console.warn('Supabase not available, using fallback data');
                 return;
@@ -866,18 +866,29 @@
               setSocial('a[data-social="youtube"]', s.youtube);
               const goal = s.fundraising_goal != null ? Number(s.fundraising_goal) : 200000;
               let totalRaised = s.total_raised != null ? Number(s.total_raised) : undefined;
+              
+              console.log('Initial totalRaised from settings:', totalRaised);
+              console.log('Goal:', goal);
+              
               try {
-                if (typeof totalRaised !== 'number') {
-                  // Fallback: compute from donations table if settings.total_raised is missing
+                if (typeof totalRaised !== 'number' || totalRaised === 0) {
+                  // Fallback: compute from donations table if settings.total_raised is missing or 0
+                  console.log('Calculating total from donations table...');
                   const { data: donations, error: donationsErr } = await sb
                     .from('donations')
                     .select('amount, payment_status');
                   if (!donationsErr && Array.isArray(donations)) {
                     // Include all donations, not just completed ones
                     totalRaised = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
+                    console.log('Calculated total from donations:', totalRaised);
+                    console.log('Donations data:', donations);
+                  } else {
+                    console.error('Error fetching donations:', donationsErr);
                   }
                 }
-              } catch (e) {}
+              } catch (e) {
+                console.error('Error calculating total raised:', e);
+              }
               if (typeof totalRaised === 'number' && fundDetailsEl) {
                 fundDetailsEl.innerHTML = `<span>PKR ${totalRaised.toLocaleString()}</span> raised of a PKR ${goal.toLocaleString()} goal`;
                 const bar = document.getElementById('fund-progress-bar');
@@ -1323,7 +1334,7 @@
           // Name field validation
           if (nameField) {
             nameField.addEventListener('blur', function() {
-              const anonymous = anonymousCheckbox.checked;
+              const anonymous = anonymousCheckbox ? anonymousCheckbox.checked : false;
               if (!anonymous && (!this.value || this.value.trim().length < 2)) {
                 this.classList.add('invalid');
                 showFieldError(this, 'Name too short');
@@ -1496,3 +1507,4 @@
     <script src="desktop-enhancements.js" defer></script>
 </body>
 </html>
+

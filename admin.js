@@ -3283,26 +3283,6 @@ function exportLeaderboardCsv() {
     downloadCSV(csv, 'leaderboard.csv');
 }
 
-function exportLogs() {
-    try {
-        const rows = logsData && logsData.length ? logsData : [];
-        let csv = 'Timestamp,User,Action,Details,IP\n';
-        rows.forEach(l => {
-            const ts = formatDateTime(l.timestamp || '-');
-            const user = (l.user || 'Unknown').replace(/,/g, '');
-            const action = (l.action || 'Unknown').replace(/,/g, '');
-            const details = ((l.details ?? '') + '').replace(/\n/g, ' ').replace(/,/g, '');
-            const ip = (l.ip || '').replace(/,/g, '');
-            csv += `${ts},${user},${action},${details},${ip}\n`;
-        });
-        downloadCSV(csv, 'activity_logs.csv');
-        showSuccess('Activity logs exported successfully!');
-        logActivity('logs_export', 'Activity logs exported');
-    } catch (e) {
-        console.error(e);
-        showError('Failed to export logs.');
-    }
-}
 
 function exportSubscribers() {
     try {
@@ -3324,17 +3304,6 @@ function exportSubscribers() {
     }
 }
 
-function downloadCSV(csv, filename) {
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
-}
 
 // Helper function to show loading state in a section
 function showSectionLoading(selector, message = 'Loading...') {
