@@ -3,11 +3,12 @@
 
 class PaymentProcessor {
     constructor() {
+        // Stripe payment links - using the provided test link
         this.paymentLinks = {
-            1000: 'https://buy.stripe.com/cNi9AV1MUfd3bAt7UsaEE01',
-            2500: 'https://buy.stripe.com/cNi9AV1MUfd3bAt7UsaEE01', 
-            5000: 'https://buy.stripe.com/cNi9AV1MUfd3bAt7UsaEE01',
-            10000: 'https://buy.stripe.com/cNi9AV1MUfd3bAt7UsaEE01'
+            1000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01',
+            2500: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01', 
+            5000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01',
+            10000: 'https://buy.stripe.com/test_cNi9AV1MUfd3bAt7UsaEE01'
         };
         this.initializePaymentLinks();
         this.validatePaymentLinks();
@@ -254,6 +255,9 @@ class PaymentProcessor {
                 if (closestAmount) {
                     paymentLink = this.paymentLinks[closestAmount];
                     console.log(`🔄 Using closest payment link for amount ${closestAmount} instead of ${amount}`);
+                    
+                    // Show user notification about using closest amount
+                    this.showInfoMessage(`Using closest available amount: PKR ${closestAmount} (requested: PKR ${amount})`);
                 } else {
                     this.showErrorMessage('Payment link not configured for this amount. Please contact us.');
                     return;
@@ -421,7 +425,7 @@ class PaymentProcessor {
 
     showSuccessMessage(message) {
         // Remove existing messages
-        const existingMessages = document.querySelectorAll('.success-message, .error-message');
+        const existingMessages = document.querySelectorAll('.success-message, .error-message, .info-message');
         existingMessages.forEach(msg => msg.remove());
 
         const successDiv = document.createElement('div');
@@ -439,6 +443,28 @@ class PaymentProcessor {
                 successDiv.remove();
             }
         }, 10000);
+    }
+
+    showInfoMessage(message) {
+        // Remove existing messages
+        const existingMessages = document.querySelectorAll('.success-message, .error-message, .info-message');
+        existingMessages.forEach(msg => msg.remove());
+
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'info-message';
+        infoDiv.textContent = message;
+
+        const form = document.getElementById('donation-form');
+        if (form) {
+            form.insertBefore(infoDiv, form.firstChild);
+        }
+
+        // Auto-remove after 8 seconds
+        setTimeout(() => {
+            if (infoDiv.parentNode) {
+                infoDiv.remove();
+            }
+        }, 8000);
     }
 
     // Validation helper methods

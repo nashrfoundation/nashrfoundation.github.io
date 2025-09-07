@@ -19,6 +19,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
     <script src="admin.js"></script>
     <script src="security-management.js"></script>
+    <script src="media-management.js"></script>
     
     <script>
         const results = document.getElementById('results');
@@ -44,7 +45,14 @@
             addResult(`❌ Syntax error in security-management.js: ${error.message}`, 'error');
         }
         
-        // Test 3: Check if functions are defined
+        // Test 3: Check for syntax errors in media-management.js
+        try {
+            addResult('✅ No syntax errors in media-management.js', 'success');
+        } catch (error) {
+            addResult(`❌ Syntax error in media-management.js: ${error.message}`, 'error');
+        }
+        
+        // Test 4: Check if functions are defined
         const functions = ['showLoading', 'hideLoading', 'generate2FASecret', 'generateQRCode', 'verifyTOTPCode'];
         functions.forEach(func => {
             if (typeof window[func] === 'function') {
@@ -54,7 +62,7 @@
             }
         });
         
-        // Test 4: Test 2FA functions
+        // Test 5: Test 2FA functions
         try {
             const secret = generate2FASecret();
             if (secret && secret.length === 32) {
@@ -66,7 +74,7 @@
             addResult(`❌ 2FA secret generation error: ${error.message}`, 'error');
         }
         
-        // Test 5: Test QR code generation
+        // Test 6: Test QR code generation
         try {
             const qrUrl = generateQRCode('TEST123456789012345678901234567890');
             if (qrUrl && qrUrl.includes('qrserver.com')) {

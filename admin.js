@@ -4132,7 +4132,7 @@ document.addEventListener('DOMContentLoaded', () => {
 let mediaLibrary = [];
 let selectedImages = [];
 let mediaCurrentPage = 1;
-let itemsPerPage = 20;
+let mediaItemsPerPage = 20;
 let currentFilter = 'all';
 
 // Initialize media management

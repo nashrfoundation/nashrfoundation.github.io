@@ -3,8 +3,8 @@
 // Media management variables
 let mediaLibrary = [];
 let selectedImages = [];
-let currentPage = 1;
-let itemsPerPage = 20;
+let mediaCurrentPage = 1;
+let mediaItemsPerPage = 20;
 let currentFilter = 'all';
 
 // Setup media event listeners
@@ -166,8 +166,8 @@ function displayMediaGallery() {
         ? mediaLibrary 
         : mediaLibrary.filter(item => item.category === currentFilter);
     
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
+    const startIndex = (mediaCurrentPage - 1) * mediaItemsPerPage;
+    const endIndex = startIndex + mediaItemsPerPage;
     const pageMedia = filteredMedia.slice(startIndex, endIndex);
     
     if (pageMedia.length === 0) {
@@ -196,7 +196,7 @@ function updatePagination(totalItems) {
     const container = document.getElementById('gallery-pagination');
     if (!container) return;
     
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const totalPages = Math.ceil(totalItems / mediaItemsPerPage);
     
     if (totalPages <= 1) {
         container.innerHTML = '';
@@ -206,30 +206,30 @@ function updatePagination(totalItems) {
     let paginationHTML = '';
     
     // Previous button
-    if (currentPage > 1) {
-        paginationHTML += `<button class="btn btn-sm btn-outline" onclick="changePage(${currentPage - 1})">Previous</button>`;
+    if (mediaCurrentPage > 1) {
+        paginationHTML += `<button class="btn btn-sm btn-outline" onclick="changeMediaPage(${mediaCurrentPage - 1})">Previous</button>`;
     }
     
     // Page numbers
     for (let i = 1; i <= totalPages; i++) {
-        if (i === currentPage) {
+        if (i === mediaCurrentPage) {
             paginationHTML += `<button class="btn btn-sm btn-primary">${i}</button>`;
         } else {
-            paginationHTML += `<button class="btn btn-sm btn-outline" onclick="changePage(${i})">${i}</button>`;
+            paginationHTML += `<button class="btn btn-sm btn-outline" onclick="changeMediaPage(${i})">${i}</button>`;
         }
     }
     
     // Next button
-    if (currentPage < totalPages) {
-        paginationHTML += `<button class="btn btn-sm btn-outline" onclick="changePage(${currentPage + 1})">Next</button>`;
+    if (mediaCurrentPage < totalPages) {
+        paginationHTML += `<button class="btn btn-sm btn-outline" onclick="changeMediaPage(${mediaCurrentPage + 1})">Next</button>`;
     }
     
     container.innerHTML = paginationHTML;
 }
 
 // Change page
-function changePage(page) {
-    currentPage = page;
+function changeMediaPage(page) {
+    mediaCurrentPage = page;
     displayMediaGallery();
 }
 
@@ -237,7 +237,7 @@ function changePage(page) {
 function filterGallery() {
     const filter = document.getElementById('gallery-filter')?.value || 'all';
     currentFilter = filter;
-    currentPage = 1;
+    mediaCurrentPage = 1;
     displayMediaGallery();
 }
 
