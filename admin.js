@@ -26,6 +26,8 @@ let logsCurrentPage = 1;
 let subscribersCurrentPage = 1;
 const itemsPerPage = 10;
 let hasLoggedLoginEvent = false;
+let settingsCache = null;
+let settingsCacheTime = null;
 
 // Using Supabase Auth (email/password). Create admins in Supabase Console.
 
@@ -264,10 +266,15 @@ async function loadDashboardData() {
         // Show loading states
         document.getElementById('recent-activity-list').innerHTML = '<div class="loading">Loading recent donations...</div>';
         
-        await Promise.all([
-            loadOverviewData(),
-            loadLeaderboardData()
-        ]);
+        // Load overview data first (which includes leaderboard data)
+        await loadOverviewData();
+        
+        // Only load leaderboard data if we're on the leaderboard section
+        // to avoid redundant calls
+        const activeSection = document.querySelector('.admin-section.active');
+        if (activeSection && activeSection.id === 'leaderboard') {
+            await loadLeaderboardData();
+        }
         
         updateLastUpdatedTime();
     } catch (error) {
@@ -308,6 +315,42 @@ async function loadSectionData(section) {
     }
 }
 
+// Helper function to get cached settings
+async function getCachedSettings() {
+    const now = Date.now();
+    const cacheExpiry = 5 * 60 * 1000; // 5 minutes
+    
+    if (settingsCache && settingsCacheTime && (now - settingsCacheTime) < cacheExpiry) {
+        return settingsCache;
+    }
+    
+    try {
+        const { data: settingsRows, error } = await supabase
+            .from('settings')
+            .select('*')
+            .limit(1);
+            
+        if (error) {
+            console.error('Settings fetch error:', error);
+            return null;
+        }
+        
+        settingsCache = Array.isArray(settingsRows) ? settingsRows[0] : null;
+        settingsCacheTime = now;
+        
+        return settingsCache;
+    } catch (error) {
+        console.error('Failed to fetch settings:', error);
+        return null;
+    }
+}
+
+// Helper function to invalidate settings cache
+function invalidateSettingsCache() {
+    settingsCache = null;
+    settingsCacheTime = null;
+}
+
 // Overview Section
 async function loadOverviewData() {
     try {
@@ -328,17 +371,9 @@ async function loadOverviewData() {
             throw new Error(`Failed to fetch leaderboard for overview: ${donationsError.message}`);
         }
         
-        // Fetch fundraising goal from settings (if available)
-        // Some deployments may have multiple rows in `settings`; pick the most recent/first
-        const { data: settingsRows, error: settingsError } = await supabase
-            .from('settings')
-            .select('fundraising_goal')
-            .limit(1);
-            
-        console.log('Settings data fetched:', settingsRows);
-        console.log('Settings fetch error:', settingsError);
-            
-        const goalAmount = (Array.isArray(settingsRows) && settingsRows[0]?.fundraising_goal) || 200000;
+        // Get fundraising goal from cached settings
+        const settings = await getCachedSettings();
+        const goalAmount = settings?.fundraising_goal || 200000;
         
         const overviewDonations = (leaderboardRows || []).map(row => ({
             name: row.name || 'Anonymous',
@@ -1156,9 +1191,9 @@ async function sendNewsletter() {
             return;
         }
         
-        // Check if email service is available (fallback to EmailJS)
-        if (!window.emailService) {
-            showError('Email service not loaded. Please refresh the page.');
+        // Check if MailerLite service is available
+        if (!window.mailerLiteService || !window.mailerLiteService.initialized) {
+            showError('MailerLite service not loaded or not initialized. Please refresh the page and check your MailerLite configuration.');
             if (sendButton) {
                 sendButton.innerHTML = originalText;
                 sendButton.disabled = false;
@@ -1166,69 +1201,26 @@ async function sendNewsletter() {
             return;
         }
         
-        console.log('Sending newsletter via EmailJS...');
+        console.log('Sending newsletter via MailerLite...');
         console.log('Recipients:', recipients.length);
         
-        // Send emails using the email service (EmailJS)
-        let sentCount = 0;
-        const maxRetries = 2;
-        
-        // Send emails one by one to avoid rate limits
-        for (let i = 0; i < recipients.length; i++) {
-            const recipient = recipients[i];
-            let attempt = 0;
+        try {
+            // Send newsletter using MailerLite service
+            const result = await window.mailerLiteService.sendNewsletter(
+                subject,
+                content,
+                recipients
+            );
             
-            while (true) {
-                try {
-                    console.log(`Sending to ${recipient} (${i + 1}/${recipients.length})`);
-                    
-                    // Use the email service (EmailJS)
-                    const result = await window.emailService.sendEmail(
-                        recipient,
-                        subject,
-                        content,
-                        'newsletter'
-                    );
-                    
-                    console.log('Email sent successfully:', { 
-                        recipient, 
-                        result,
-                        attempt: attempt + 1
-                    });
-                    
-                    sentCount++;
-                    break;
-                    
-                } catch (err) {
-                    console.log('Email send error:', { 
-                        error: err.message, 
-                        recipient,
-                        attempt: attempt + 1, 
-                        maxRetries: maxRetries + 1,
-                        willRetry: attempt < maxRetries
-                    });
-                    
-                    if (attempt >= maxRetries) {
-                        console.error('Max retries reached for recipient:', recipient);
-                        throw new Error(`Failed to send to ${recipient}: ${err.message}`);
-                    }
-                    
-                    // Wait before retry (exponential backoff)
-                    const delay = 1000 * Math.pow(2, attempt);
-                    console.log(`Retrying in ${delay}ms...`);
-                    await new Promise(r => setTimeout(r, delay));
-                    attempt++;
-                }
-            }
+            console.log('Newsletter sent successfully via MailerLite:', result);
             
-            // Small delay between emails to avoid rate limits
-            if (i < recipients.length - 1) {
-                await new Promise(r => setTimeout(r, 100));
-            }
+            showSuccess(`Newsletter sent to ${result.totalSent || recipients.length} recipients via MailerLite!`);
+            await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${result.totalSent || recipients.length} recipients via MailerLite`);
+            
+        } catch (error) {
+            console.error('MailerLite newsletter sending failed:', error);
+            throw new Error(`Failed to send newsletter via MailerLite: ${error.message}`);
         }
-        
-        showSuccess(`Newsletter sent to ${sentCount} recipients!`);
-        await logActivity('newsletter_sent', `Newsletter "${subject}" sent to ${sentCount} recipients via EmailJS`);
         
         // Clear form
         document.getElementById('newsletter-subject').value = '';
@@ -1259,13 +1251,8 @@ async function sendNewsletter() {
 // Settings Management
 async function loadSettingsData() {
     try {
-        // Load current settings from Supabase
-        const { data: settingsRows, error } = await supabase
-            .from('settings')
-            .select('*')
-            .limit(1);
-        if (error) throw error;
-        const s = Array.isArray(settingsRows) ? settingsRows[0] : null;
+        // Load current settings from cache or Supabase
+        const s = await getCachedSettings();
         if (s) {
             if (document.getElementById('site-title')) document.getElementById('site-title').value = s.title || '';
             if (document.getElementById('site-description')) document.getElementById('site-description').value = s.description || '';
@@ -2052,6 +2039,36 @@ function configureEmailJS(serviceId, templateId, publicKey) {
         showSuccess('EmailJS configured successfully!');
     } else {
         showError('EmailJS service not loaded. Please refresh the page.');
+    }
+}
+
+// Helper function to test MailerLite service
+async function testMailerLiteService() {
+    try {
+        if (!window.mailerLiteService) {
+            showError('MailerLite service not loaded. Please refresh the page.');
+            return;
+        }
+
+        if (!window.mailerLiteService.initialized) {
+            showError('MailerLite service not initialized. Please check your API key configuration.');
+            return;
+        }
+
+        showInfo('Testing MailerLite service...');
+        
+        const result = await window.mailerLiteService.testService();
+        
+        if (result.success) {
+            showSuccess(`MailerLite test successful! ${result.message}`);
+            console.log('MailerLite test result:', result);
+        } else {
+            showError(`MailerLite test failed: ${result.message}`);
+        }
+        
+    } catch (error) {
+        console.error('MailerLite test error:', error);
+        showError(`MailerLite test failed: ${error.message}`);
     }
 }
 

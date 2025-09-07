@@ -156,17 +156,44 @@ class MailerLiteService {
                 recipients: recipients.length 
             });
 
+            // Ensure newsletter group exists
+            await this.ensureNewsletterGroup();
+
+            // If we have specific recipients, we need to add them to the newsletter group first
+            if (recipients.length > 0) {
+                console.log('Adding recipients to newsletter group...');
+                let addedCount = 0;
+                let errorCount = 0;
+
+                for (const email of recipients) {
+                    try {
+                        await this.addSubscriber(email, '', { source: 'admin_newsletter' });
+                        addedCount++;
+                    } catch (error) {
+                        console.warn(`Failed to add ${email} to newsletter group:`, error.message);
+                        errorCount++;
+                    }
+                }
+
+                console.log(`Added ${addedCount} recipients to newsletter group, ${errorCount} errors`);
+            }
+
             // Create a campaign in MailerLite
             const campaignData = {
                 name: `Newsletter - ${subject} - ${new Date().toISOString()}`,
                 type: 'regular',
-                emails: [{
-                    subject: subject,
-                    from_name: 'Nashr Foundation',
-                    from: 'nashrfoundationpk@gmail.com',
-                    content: content
-                }],
-                groups: ['newsletter'] // Send to newsletter group
+                subject: subject,
+                from: {
+                    name: 'Nashr Foundation',
+                    email: 'nashrfoundationpk@gmail.com'
+                },
+                content: {
+                    html: content,
+                    text: this.stripHtml(content)
+                },
+                recipients: {
+                    groups: this.groupId ? [this.groupId] : ['newsletter']
+                }
             };
 
             console.log('Creating campaign with data:', campaignData);

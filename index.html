@@ -123,7 +123,9 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
     
     <!-- Asynchronously load the full stylesheet. -->
     <link rel="stylesheet" href="styles.css" media="print" onload="this.media='all'">
+    <link rel="stylesheet" href="mobile-enhancements.css" media="print" onload="this.media='all'">
     <noscript><link rel="stylesheet" href="styles.css"></noscript>
+    <noscript><link rel="stylesheet" href="mobile-enhancements.css"></noscript>
 </head>
 <body>
     <!-- Skip Navigation for Accessibility -->
@@ -409,6 +411,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- Deferred scripts that do not block rendering -->
     <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.min.js" defer></script>
     <script src="parallax.js" defer></script>
+    <script src="mobile-interactions.js" defer></script>
     <script src="ui-enhancements.js" defer></script>
     <script src="mobile-pwa.js" defer></script>
     <script src="desktop-enhancements.js" defer></script>

@@ -217,7 +217,11 @@ class EmailJSService {
         this.serviceId = serviceId;
         this.templateId = templateId;
         this.publicKey = publicKey;
-        console.log('EmailJS configured:', { serviceId, templateId, publicKey: publicKey.substring(0, 10) + '...' });
+        console.log('EmailJS configured:', {
+            serviceId: serviceId,
+            templateId: templateId,
+            publicKey: publicKey ? publicKey.substring(0, 10) + '...' : 'not set'
+        });
     }
 
     // Test different template IDs to find a working one

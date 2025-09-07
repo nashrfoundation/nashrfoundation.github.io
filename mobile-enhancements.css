@@ -1,0 +1,410 @@
+/* Mobile UI/UX Enhancements for Nashr Foundation */
+
+/* ===== 1. ENHANCED MOBILE NAVIGATION ===== */
+
+/* Enhanced existing navigation for mobile */
+@media (max-width: 768px) {
+    /* Improve existing nav styling */
+    nav {
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-radius: 0 0 16px 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    nav ul {
+        padding: 1.5rem;
+        gap: 0.5rem;
+    }
+    
+    nav ul li a {
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    nav ul li a::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(42, 141, 156, 0.3), transparent);
+        transition: left 0.6s ease;
+    }
+    
+    nav ul li a:active::before {
+        left: 100%;
+    }
+    
+    nav ul li a:active {
+        background: rgba(42, 141, 156, 0.2);
+        transform: translateX(4px);
+    }
+    
+    /* Enhanced nav button styling */
+    .nav-btn {
+        min-height: 48px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 600;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+    
+    .nav-btn:active {
+        transform: scale(0.98);
+    }
+}
+
+/* ===== 2. IMPROVED TOUCH TARGETS ===== */
+
+@media (max-width: 768px) {
+    /* Larger touch targets for better accessibility */
+    .btn {
+        min-height: 48px;
+        min-width: 48px;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .btn:active {
+        transform: scale(0.98);
+    }
+    
+    /* Enhanced amount options for donation */
+    .amount-option {
+        min-height: 56px;
+        padding: 16px;
+        border-radius: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .amount-option:active {
+        transform: scale(0.95);
+    }
+    
+    /* Better form controls */
+    .form-control {
+        min-height: 48px;
+        padding: 14px 16px;
+        border-radius: 12px;
+        font-size: 16px; /* Prevents zoom on iOS */
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+    }
+    
+    .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 4px rgba(42, 141, 156, 0.2);
+        transform: translateY(-1px);
+    }
+}
+
+/* ===== 3. ENHANCED HERO SECTION ===== */
+
+@media (max-width: 768px) {
+    .hero-content {
+        padding: 0 20px;
+        text-align: center;
+    }
+    
+    .hero-content h1 {
+        font-size: clamp(2rem, 8vw, 3rem);
+        line-height: 1.2;
+        margin-bottom: 16px;
+        text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+    }
+    
+    .hero-content p {
+        font-size: clamp(1rem, 4vw, 1.25rem);
+        line-height: 1.4;
+        margin-bottom: 24px;
+        opacity: 0.95;
+    }
+    
+    .hero-content .btn {
+        min-height: 52px;
+        padding: 16px 32px;
+        font-size: 18px;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(42, 141, 156, 0.3);
+    }
+}
+
+/* ===== 4. IMPROVED CARD LAYOUTS ===== */
+
+@media (max-width: 768px) {
+    .aim-item, .involvement-option {
+        padding: 24px 20px;
+        border-radius: 16px;
+        margin-bottom: 16px;
+        background: linear-gradient(145deg, rgba(58, 58, 58, 0.8), rgba(44, 44, 44, 0.8));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .aim-item:active, .involvement-option:active {
+        transform: translateY(2px);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    
+    .aim-icon {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 16px;
+    }
+    
+    .aim-item h3, .involvement-option h3 {
+        font-size: 18px;
+        margin-bottom: 12px;
+        color: var(--primary-light);
+    }
+    
+    .aim-item p, .involvement-option p {
+        font-size: 14px;
+        line-height: 1.5;
+        opacity: 0.9;
+    }
+}
+
+/* ===== 5. ENHANCED DONATION FORM ===== */
+
+@media (max-width: 768px) {
+    .donation-form-container {
+        margin: 0 16px;
+        padding: 24px 20px;
+        border-radius: 20px;
+        background: linear-gradient(145deg, rgba(26, 26, 26, 0.95), rgba(44, 44, 44, 0.95));
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .donation-tabs {
+        margin-bottom: 24px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: rgba(255, 255, 255, 0.05);
+    }
+    
+    .donation-tab {
+        padding: 16px;
+        font-size: 16px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+    
+    .donation-tab.active {
+        background: var(--primary);
+        color: white;
+    }
+    
+    .amount-options {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        margin-bottom: 24px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        font-size: 14px;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--text-primary);
+    }
+    
+    .checkbox-group {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .checkbox-group input[type="checkbox"] {
+        width: 20px;
+        height: 20px;
+        margin-top: 2px;
+        accent-color: var(--primary);
+    }
+    
+    .checkbox-group label {
+        font-size: 14px;
+        line-height: 1.4;
+        margin-bottom: 0;
+    }
+}
+
+/* ===== 6. IMPROVED SCROLLING & ANIMATIONS ===== */
+
+@media (max-width: 768px) {
+    /* Smooth scrolling with momentum */
+    html {
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Better section spacing */
+    section {
+        padding: 40px 0;
+        scroll-margin-top: 80px;
+    }
+    
+    /* Enhanced loading states */
+    .loading-spinner {
+        width: 40px;
+        height: 40px;
+        border: 3px solid rgba(255, 255, 255, 0.1);
+        border-top: 3px solid var(--primary);
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+}
+
+/* ===== 7. ENHANCED FEEDBACK & VALIDATION ===== */
+
+@media (max-width: 768px) {
+    .validation-message, .error-message, .success-message {
+        padding: 16px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.4;
+        margin: 16px 0;
+        animation: slideInDown 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .field-error, .field-success {
+        padding: 8px 12px;
+        border-radius: 8px;
+        font-size: 12px;
+        margin-top: 4px;
+    }
+    
+    /* Better visual feedback for form states */
+    .form-control.success {
+        border-color: var(--success);
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.05), rgba(5, 150, 105, 0.05));
+    }
+    
+    .form-control.error {
+        border-color: var(--error);
+        background: linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.05));
+        animation: shake 0.5s ease-in-out;
+    }
+    
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-3px); }
+        75% { transform: translateX(3px); }
+    }
+}
+
+/* ===== 8. IMPROVED FOOTER ===== */
+
+@media (max-width: 768px) {
+    footer {
+        padding: 40px 0 20px 0;
+        text-align: center;
+    }
+    
+    .footer-content {
+        flex-direction: column;
+        gap: 24px;
+    }
+    
+    .footer-social {
+        justify-content: center;
+        gap: 16px;
+    }
+    
+    .footer-social a {
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+    }
+    
+    .footer-social a:active {
+        transform: scale(0.95);
+        background: rgba(42, 141, 156, 0.2);
+    }
+}
+
+/* ===== 9. ENHANCED ACCESSIBILITY ===== */
+
+@media (max-width: 768px) {
+    /* Better focus indicators */
+    .btn:focus-visible,
+    .form-control:focus-visible,
+    .amount-option:focus-visible {
+        outline: 3px solid var(--primary);
+        outline-offset: 2px;
+    }
+    
+    /* Improved skip link */
+    .skip-link {
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: var(--primary);
+        color: white;
+        padding: 8px;
+        text-decoration: none;
+        border-radius: 4px;
+        z-index: 1000;
+        transition: top 0.3s;
+    }
+    
+    .skip-link:focus {
+        top: 6px;
+    }
+}
+
+/* ===== 10. PERFORMANCE OPTIMIZATIONS ===== */
+
+@media (max-width: 768px) {
+    /* Reduce animations on low-end devices */
+    @media (prefers-reduced-motion: reduce) {
+        * {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+    }
+    
+    /* Optimize for touch devices */
+    @media (hover: none) and (pointer: coarse) {
+        .btn:hover,
+        .amount-option:hover,
+        .form-control:hover {
+            transform: none;
+        }
+        
+        .btn:active,
+        .amount-option:active,
+        .form-control:active {
+            transform: scale(0.98);
+        }
+    }
+}
