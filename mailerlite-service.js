@@ -178,7 +178,7 @@ class MailerLiteService {
                 console.log(`Added ${addedCount} recipients to newsletter group, ${errorCount} errors`);
             }
 
-            // Create a campaign in MailerLite
+            // Create a campaign in MailerLite using default sender
             const campaignData = {
                 name: `Newsletter - ${subject} - ${new Date().toISOString()}`,
                 type: 'regular',
@@ -186,12 +186,12 @@ class MailerLiteService {
                 emails: [{
                     subject: subject,
                     from_name: 'Nashr Foundation',
-                    from: 'nashrfoundationpk@gmail.com',
+                    // No 'from' field - let MailerLite use default sender
                     content: content
                 }],
                 filter: this.groupId ? [{
-                    type: 'group',
-                    value: this.groupId
+                    type: ['group'], // Must be array
+                    value: [this.groupId] // Must be array
                 }] : []
             };
 
@@ -377,6 +377,31 @@ class MailerLiteService {
         }
     }
 
+    // Get account's verified senders
+    async getVerifiedSenders() {
+        try {
+            const response = await fetch(`${this.baseUrl}/senders`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${this.apiKey}`,
+                    'Accept': 'application/json'
+                }
+            });
+
+            if (!response.ok) {
+                const result = await response.json();
+                throw new Error(`MailerLite API error: ${result.message || 'Unknown error'}`);
+            }
+
+            const result = await response.json();
+            return result.data || [];
+
+        } catch (error) {
+            console.error('❌ Failed to get verified senders:', error);
+            return [];
+        }
+    }
+
     // Test the service
     async testService() {
         try {
@@ -408,10 +433,11 @@ class MailerLiteService {
 
             return {
                 success: true,
-                message: 'MailerLite service is working',
+                message: 'MailerLite service is working (using default sender)',
                 data: {
                     groupsCount: result.data?.length || 0,
-                    newsletterGroup: result.data?.find(group => group.name === 'newsletter') ? 'Found' : 'Not found'
+                    newsletterGroup: result.data?.find(group => group.name === 'newsletter') ? 'Found' : 'Not found',
+                    sender: 'Using MailerLite default sender'
                 }
             };
 
