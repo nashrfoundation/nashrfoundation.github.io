@@ -42,6 +42,10 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeSupabase();
     setupEventListeners();
     checkAuthState();
+    
+    // Setup navigation event listeners
+    setupNavigationListeners();
+    
     // Initialize real-time features after Supabase is ready
     setTimeout(() => {
         setupRealtimeUpdates();
@@ -3512,6 +3516,169 @@ function hideLoading() {
 
 // Remove duplicate showNotification function
 
+// Section Navigation Function
+function showSection(sectionName) {
+    // Hide all sections
+    document.querySelectorAll('.dashboard-section').forEach(section => {
+        section.classList.remove('active');
+    });
+    
+    // Show the selected section
+    const targetSection = document.getElementById(sectionName);
+    if (targetSection) {
+        targetSection.classList.add('active');
+    }
+}
+
+// Setup navigation event listeners
+function setupNavigationListeners() {
+    // Vertical navigation event listeners
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all links (both vertical and horizontal)
+            document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+            document.querySelectorAll('.horizontal-nav-link').forEach(l => l.classList.remove('active'));
+            
+            // Add active class to clicked link
+            this.classList.add('active');
+            
+            // Get section name
+            const section = this.getAttribute('data-section');
+            
+            // Update horizontal navigation as well
+            const horizontalLink = document.querySelector(`.horizontal-nav-link[data-section="${section}"]`);
+            if (horizontalLink) {
+                horizontalLink.classList.add('active');
+                scrollToActiveLink(horizontalLink);
+            }
+            
+            // Show the section
+            showSection(section);
+        });
+    });
+}
+
+// Horizontal Navigation Functions
+function scrollNav(direction) {
+    const scrollContainer = document.querySelector('.horizontal-nav-scroll');
+    if (!scrollContainer) return;
+    
+    const scrollAmount = 200;
+    const currentScroll = scrollContainer.scrollLeft;
+    
+    if (direction === 'left') {
+        scrollContainer.scrollTo({
+            left: currentScroll - scrollAmount,
+            behavior: 'smooth'
+        });
+    } else if (direction === 'right') {
+        scrollContainer.scrollTo({
+            left: currentScroll + scrollAmount,
+            behavior: 'smooth'
+        });
+    }
+    
+    // Update scroll button states
+    updateScrollButtons();
+}
+
+function updateScrollButtons() {
+    const scrollContainer = document.querySelector('.horizontal-nav-scroll');
+    const leftBtn = document.querySelector('.nav-scroll-left');
+    const rightBtn = document.querySelector('.nav-scroll-right');
+    
+    if (!scrollContainer || !leftBtn || !rightBtn) return;
+    
+    const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+    
+    // Update left button
+    if (scrollLeft <= 0) {
+        leftBtn.disabled = true;
+        leftBtn.style.opacity = '0.5';
+    } else {
+        leftBtn.disabled = false;
+        leftBtn.style.opacity = '1';
+    }
+    
+    // Update right button
+    if (scrollLeft >= scrollWidth - clientWidth - 1) {
+        rightBtn.disabled = true;
+        rightBtn.style.opacity = '0.5';
+    } else {
+        rightBtn.disabled = false;
+        rightBtn.style.opacity = '1';
+    }
+}
+
+// Setup horizontal navigation event listeners
+function setupHorizontalNavigation() {
+    const scrollContainer = document.querySelector('.horizontal-nav-scroll');
+    const horizontalLinks = document.querySelectorAll('.horizontal-nav-link');
+    
+    if (scrollContainer) {
+        // Update scroll buttons on scroll
+        scrollContainer.addEventListener('scroll', updateScrollButtons);
+        
+        // Initial button state
+        updateScrollButtons();
+    }
+    
+    // Handle horizontal navigation clicks
+    horizontalLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all links
+            horizontalLinks.forEach(l => l.classList.remove('active'));
+            
+            // Add active class to clicked link
+            this.classList.add('active');
+            
+            // Get section name
+            const section = this.getAttribute('data-section');
+            
+            // Update vertical navigation as well
+            const verticalLink = document.querySelector(`.nav-link[data-section="${section}"]`);
+            if (verticalLink) {
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                verticalLink.classList.add('active');
+            }
+            
+            // Show the section
+            showSection(section);
+            
+            // Scroll to active link
+            scrollToActiveLink(this);
+        });
+    });
+}
+
+function scrollToActiveLink(activeLink) {
+    const scrollContainer = document.querySelector('.horizontal-nav-scroll');
+    if (!scrollContainer || !activeLink) return;
+    
+    const containerRect = scrollContainer.getBoundingClientRect();
+    const linkRect = activeLink.getBoundingClientRect();
+    
+    // Check if link is visible
+    const isVisible = linkRect.left >= containerRect.left && 
+                     linkRect.right <= containerRect.right;
+    
+    if (!isVisible) {
+        // Scroll to center the active link
+        const scrollLeft = activeLink.offsetLeft - 
+                          (scrollContainer.clientWidth / 2) + 
+                          (activeLink.clientWidth / 2);
+        
+        scrollContainer.scrollTo({
+            left: scrollLeft,
+            behavior: 'smooth'
+        });
+    }
+}
+
 // Initialize on page load
 if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', initializeApp);
@@ -4123,6 +4290,9 @@ document.addEventListener('DOMContentLoaded', () => {
         initializeEmailManagement();
         initializeMediaManagement();
         initializeSecurityManagement();
+        
+        // Initialize horizontal navigation
+        setupHorizontalNavigation();
     }
 });
 

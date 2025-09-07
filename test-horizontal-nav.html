@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Horizontal Navigation</title>
+    <link rel="stylesheet" href="admin-styles.css">
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--bg-primary);
+            font-family: var(--font-family);
+        }
+        
+        .test-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .test-section {
+            display: none;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: var(--border-radius-lg);
+            margin-top: 2rem;
+        }
+        
+        .test-section.active {
+            display: block;
+        }
+        
+        .test-section h2 {
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+        
+        .test-section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1 style="color: var(--text-primary); text-align: center; margin-bottom: 2rem;">Horizontal Navigation Test</h1>
+        
+        <!-- Horizontal Scroll Navigation -->
+        <div class="horizontal-nav-container">
+            <div class="horizontal-nav-scroll">
+                <nav class="horizontal-nav">
+                    <a href="#dashboard" class="horizontal-nav-link active" data-section="dashboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="3" width="7" height="7"></rect>
+                            <rect x="14" y="14" width="7" height="7"></rect>
+                            <rect x="3" y="14" width="7" height="7"></rect>
+                        </svg>
+                        <span>Dashboard</span>
+                    </a>
+                    <a href="#donations" class="horizontal-nav-link" data-section="donations">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path>
+                        </svg>
+                        <span>Donations</span>
+                    </a>
+                    <a href="#leaderboard" class="horizontal-nav-link" data-section="leaderboard">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2L4 9l8 7 8-7-8-7z"></path>
+                            <path d="M12 22l8-7"></path>
+                            <path d="M4 9l8 7"></path>
+                        </svg>
+                        <span>Leaderboard</span>
+                    </a>
+                    <a href="#content" class="horizontal-nav-link" data-section="content">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"></path>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"></path>
+                        </svg>
+                        <span>Content</span>
+                    </a>
+                    <a href="#newsletter" class="horizontal-nav-link" data-section="newsletter">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <span>Newsletter</span>
+                    </a>
+                    <a href="#subscribers" class="horizontal-nav-link" data-section="subscribers">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <span>Subscribers</span>
+                    </a>
+                    <a href="#settings" class="horizontal-nav-link" data-section="settings">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="3"></circle>
+                            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                        </svg>
+                        <span>Settings</span>
+                    </a>
+                    <a href="#emails" class="horizontal-nav-link" data-section="emails">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                        <span>Email</span>
+                    </a>
+                    <a href="#media" class="horizontal-nav-link" data-section="media">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                            <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                            <polyline points="21,15 16,10 5,21"></polyline>
+                        </svg>
+                        <span>Media</span>
+                    </a>
+                    <a href="#security" class="horizontal-nav-link" data-section="security">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                            <circle cx="12" cy="16" r="1"></circle>
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                        </svg>
+                        <span>Security</span>
+                    </a>
+                    <a href="#logs" class="horizontal-nav-link" data-section="logs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                        </svg>
+                        <span>Logs</span>
+                    </a>
+                </nav>
+            </div>
+            <button class="nav-scroll-btn nav-scroll-left" onclick="scrollNav('left')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </svg>
+            </button>
+            <button class="nav-scroll-btn nav-scroll-right" onclick="scrollNav('right')">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </svg>
+            </button>
+        </div>
+
+        <!-- Test Sections -->
+        <div id="dashboard" class="test-section active">
+            <h2>Dashboard</h2>
+            <p>This is the dashboard section. The horizontal navigation is working correctly!</p>
+        </div>
+
+        <div id="donations" class="test-section">
+            <h2>Donations</h2>
+            <p>This is the donations section. You can navigate between sections using the horizontal scroll navigation.</p>
+        </div>
+
+        <div id="leaderboard" class="test-section">
+            <h2>Leaderboard</h2>
+            <p>This is the leaderboard section. The navigation buttons on the left and right help you scroll through the navigation items.</p>
+        </div>
+
+        <div id="content" class="test-section">
+            <h2>Content</h2>
+            <p>This is the content section. On mobile devices, the text labels are hidden and only icons are shown.</p>
+        </div>
+
+        <div id="newsletter" class="test-section">
+            <h2>Newsletter</h2>
+            <p>This is the newsletter section. The horizontal navigation provides a modern and intuitive way to navigate through the admin portal.</p>
+        </div>
+
+        <div id="subscribers" class="test-section">
+            <h2>Subscribers</h2>
+            <p>This is the subscribers section. The navigation automatically scrolls to keep the active item visible.</p>
+        </div>
+
+        <div id="settings" class="test-section">
+            <h2>Settings</h2>
+            <p>This is the settings section. The horizontal navigation is fully responsive and works on all device sizes.</p>
+        </div>
+
+        <div id="emails" class="test-section">
+            <h2>Email Management</h2>
+            <p>This is the email management section. The navigation provides smooth scrolling and visual feedback.</p>
+        </div>
+
+        <div id="media" class="test-section">
+            <h2>Media Management</h2>
+            <p>This is the media management section. The horizontal navigation makes it easy to access all admin features.</p>
+        </div>
+
+        <div id="security" class="test-section">
+            <h2>Security & Monitoring</h2>
+            <p>This is the security and monitoring section. The navigation system is fully integrated with the admin portal.</p>
+        </div>
+
+        <div id="logs" class="test-section">
+            <h2>Activity Logs</h2>
+            <p>This is the activity logs section. The horizontal navigation provides an excellent user experience for admin portal navigation.</p>
+        </div>
+    </div>
+
+    <script>
+        // Section Navigation Function
+        function showSection(sectionName) {
+            // Hide all sections
+            document.querySelectorAll('.test-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            
+            // Show the selected section
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.classList.add('active');
+            }
+        }
+
+        // Horizontal Navigation Functions
+        function scrollNav(direction) {
+            const scrollContainer = document.querySelector('.horizontal-nav-scroll');
+            if (!scrollContainer) return;
+            
+            const scrollAmount = 200;
+            const currentScroll = scrollContainer.scrollLeft;
+            
+            if (direction === 'left') {
+                scrollContainer.scrollTo({
+                    left: currentScroll - scrollAmount,
+                    behavior: 'smooth'
+                });
+            } else if (direction === 'right') {
+                scrollContainer.scrollTo({
+                    left: currentScroll + scrollAmount,
+                    behavior: 'smooth'
+                });
+            }
+            
+            // Update scroll button states
+            updateScrollButtons();
+        }
+
+        function updateScrollButtons() {
+            const scrollContainer = document.querySelector('.horizontal-nav-scroll');
+            const leftBtn = document.querySelector('.nav-scroll-left');
+            const rightBtn = document.querySelector('.nav-scroll-right');
+            
+            if (!scrollContainer || !leftBtn || !rightBtn) return;
+            
+            const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+            
+            // Update left button
+            if (scrollLeft <= 0) {
+                leftBtn.disabled = true;
+                leftBtn.style.opacity = '0.5';
+            } else {
+                leftBtn.disabled = false;
+                leftBtn.style.opacity = '1';
+            }
+            
+            // Update right button
+            if (scrollLeft >= scrollWidth - clientWidth - 1) {
+                rightBtn.disabled = true;
+                rightBtn.style.opacity = '0.5';
+            } else {
+                rightBtn.disabled = false;
+                rightBtn.style.opacity = '1';
+            }
+        }
+
+        function scrollToActiveLink(activeLink) {
+            const scrollContainer = document.querySelector('.horizontal-nav-scroll');
+            if (!scrollContainer || !activeLink) return;
+            
+            const containerRect = scrollContainer.getBoundingClientRect();
+            const linkRect = activeLink.getBoundingClientRect();
+            
+            // Check if link is visible
+            const isVisible = linkRect.left >= containerRect.left && 
+                             linkRect.right <= containerRect.right;
+            
+            if (!isVisible) {
+                // Scroll to center the active link
+                const scrollLeft = activeLink.offsetLeft - 
+                                  (scrollContainer.clientWidth / 2) + 
+                                  (activeLink.clientWidth / 2);
+                
+                scrollContainer.scrollTo({
+                    left: scrollLeft,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        // Setup horizontal navigation event listeners
+        function setupHorizontalNavigation() {
+            const scrollContainer = document.querySelector('.horizontal-nav-scroll');
+            const horizontalLinks = document.querySelectorAll('.horizontal-nav-link');
+            
+            if (scrollContainer) {
+                // Update scroll buttons on scroll
+                scrollContainer.addEventListener('scroll', updateScrollButtons);
+                
+                // Initial button state
+                updateScrollButtons();
+            }
+            
+            // Handle horizontal navigation clicks
+            horizontalLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    
+                    // Remove active class from all links
+                    horizontalLinks.forEach(l => l.classList.remove('active'));
+                    
+                    // Add active class to clicked link
+                    this.classList.add('active');
+                    
+                    // Get section name
+                    const section = this.getAttribute('data-section');
+                    
+                    // Show the section
+                    showSection(section);
+                    
+                    // Scroll to active link
+                    scrollToActiveLink(this);
+                });
+            });
+        }
+
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            setupHorizontalNavigation();
+        });
+    </script>
+</body>
+</html>
