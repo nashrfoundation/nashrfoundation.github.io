@@ -577,9 +577,19 @@ nav ul li a.active::after {
     width: 100% !important;
     height: 120% !important;
     object-fit: cover !important;
+    object-position: center center !important;
     z-index: -1 !important;
     transform: translateZ(0) !important;
     will-change: transform !important;
+}
+
+/* Ensure perfect horizontal centering on larger screens */
+@media (min-width: 1024px) {
+  .hero-bg-image {
+    left: 50% !important;
+    width: 100vw !important;
+    transform: translateX(-50%) translateZ(0) !important;
+  }
 }
 
 .hero-background .hero-content {

@@ -1351,16 +1351,42 @@ function saveSettings() {
                     .limit(1);
                 if (fetchErr) throw fetchErr;
                 if (Array.isArray(existing) && existing[0]?.id) {
-                    const { error: updateErr } = await supabase
+                    let { error: updateErr } = await supabase
                         .from('settings')
                         .update(payload)
                         .eq('id', existing[0].id);
-                    if (updateErr) throw updateErr;
+                    if (updateErr) {
+                        // Retry without total_raised if column missing
+                        if ((updateErr.message || '').includes('total_raised')) {
+                            const retryPayload = { ...payload };
+                            delete retryPayload.total_raised;
+                            const { error: retryErr } = await supabase
+                                .from('settings')
+                                .update(retryPayload)
+                                .eq('id', existing[0].id);
+                            if (retryErr) throw retryErr;
+                            showInfo('Saved without total raised (add column in Supabase to enable this setting).');
+                        } else {
+                            throw updateErr;
+                        }
+                    }
                 } else {
-                    const { error: insertErr } = await supabase
+                    let { error: insertErr } = await supabase
                         .from('settings')
                         .insert([payload]);
-                    if (insertErr) throw insertErr;
+                    if (insertErr) {
+                        if ((insertErr.message || '').includes('total_raised')) {
+                            const retryPayload = { ...payload };
+                            delete retryPayload.total_raised;
+                            const { error: retryErr } = await supabase
+                                .from('settings')
+                                .insert([retryPayload]);
+                            if (retryErr) throw retryErr;
+                            showInfo('Saved without total raised (add column in Supabase to enable this setting).');
+                        } else {
+                            throw insertErr;
+                        }
+                    }
                 }
                 showSuccess('Settings saved successfully!');
                 logActivity('settings_update', 'System settings updated');
