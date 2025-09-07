@@ -1797,7 +1797,7 @@ async function loadLogsData() {
     }
 }
 
-// Enhanced logs display with more details
+// Enhanced logs display with modern UI/UX
 function displayLogsTable(logs) {
     const tableBody = document.getElementById('logs-table-body');
     if (!tableBody) return;
@@ -1805,23 +1805,37 @@ function displayLogsTable(logs) {
     tableBody.innerHTML = '';
     
     if (logs.length === 0) {
-        tableBody.innerHTML = '<tr><td colspan="6" class="loading">No activity logs found</td></tr>';
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="no-data-state">
+                    <div class="no-data-content">
+                        <div class="no-data-icon">📊</div>
+                        <h3>No Activity Logs</h3>
+                        <p>Activity logs will appear here as users interact with the system.</p>
+                        <button class="btn btn-primary" onclick="loadLogsData()">Refresh</button>
+                    </div>
+                </td>
+            </tr>
+        `;
         return;
     }
     
-    logs.forEach(log => {
+    logs.forEach((log, index) => {
         const row = document.createElement('tr');
         row.className = `log-row log-${log.severity || 'info'}`;
+        row.style.animationDelay = `${index * 0.1}s`;
         
-        // Timestamp with relative time
+        // Timestamp with relative time and status indicator
         const timestampCell = document.createElement('td');
         const date = new Date(log.timestamp);
         const relativeTime = getRelativeTime(date);
+        const isRecent = (Date.now() - date.getTime()) < 300000; // 5 minutes
         timestampCell.innerHTML = `
             <div class="log-timestamp">
                 <div class="log-time">${date.toLocaleTimeString()}</div>
                 <div class="log-date">${date.toLocaleDateString()}</div>
-                <div class="log-relative">${relativeTime}</div>
+                <div class="log-relative ${isRecent ? 'recent' : ''}">${relativeTime}</div>
+                ${isRecent ? '<div class="status-indicator new"></div>' : ''}
             </div>
         `;
         
@@ -1841,14 +1855,19 @@ function displayLogsTable(logs) {
         const actionCell = document.createElement('td');
         const severityIcon = getSeverityIcon(log.severity || 'info');
         const categoryBadge = getCategoryBadge(log.category || 'general');
+        const actionType = log.action.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
         actionCell.innerHTML = `
             <div class="log-action">
                 <div class="action-header">
                     <span class="severity-icon">${severityIcon}</span>
-                    <span class="action-name">${log.action}</span>
+                    <span class="action-name">${actionType}</span>
                     ${categoryBadge}
                 </div>
                 <div class="action-details">${log.details}</div>
+                <div class="action-meta">
+                    <span class="action-source">${log.metadata?.user_agent ? 'Web' : 'System'}</span>
+                    ${log.metadata?.ip ? `<span class="action-ip">${log.metadata.ip}</span>` : ''}
+                </div>
             </div>
         `;
         

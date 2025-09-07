@@ -608,15 +608,16 @@ nav ul li a.active::after {
     color: var(--white);
     pointer-events: auto !important;
     position: absolute;
-    left: 20%;
+    left: 50%;
     top: 50%;
-    transform: translateY(-50%);
-    width: 35%;
-    max-width: 500px;
-    background: rgba(0, 0, 0, 0.6);
-    border-radius: 12px;
-    padding: 2rem;
-    backdrop-filter: blur(10px);
+    transform: translate(-50%, -50%);
+    width: 90%;
+    max-width: 600px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 16px;
+    padding: 2.5rem;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .hero-background .hero-content h1 {
@@ -640,17 +641,18 @@ nav ul li a.active::after {
     .hero-bg-image { top: 0 !important; height: 100% !important; object-position: center center !important; right: 0 !important; width: 100% !important; }
     
     .hero-background .hero-content { 
-        padding: 1.5rem; 
+        padding: 2rem; 
         pointer-events: auto !important; 
         position: absolute;
         left: 50%;
         top: 50%;
         transform: translate(-50%, -50%);
-        width: 90%;
-        max-width: 400px;
-        background: rgba(0, 0, 0, 0.7);
-        border-radius: 12px;
-        backdrop-filter: blur(10px);
+        width: 95%;
+        max-width: 450px;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 16px;
+        backdrop-filter: blur(15px);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
     }
     
     .hero-background .hero-content h1 {

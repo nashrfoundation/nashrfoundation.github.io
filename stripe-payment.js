@@ -199,15 +199,6 @@ class PaymentProcessor {
             const anonymous = document.getElementById('anonymous-donation')?.checked || false;
             const leaderboardConsent = document.getElementById('leaderboard-consent')?.checked || false;
             
-            // Get payment link for amount
-            let paymentLink = this.paymentLinks[amount];
-            if (!paymentLink) {
-                // Use closest amount or default to 2500
-                const closestAmount = this.getClosestAmount(amount);
-                paymentLink = this.paymentLinks[closestAmount];
-                console.log(`💰 Using payment link for closest amount: ${closestAmount}`);
-            }
-
             console.log('📝 Donor info:', { donorName, donorEmail, donorPhone, anonymous, leaderboardConsent });
 
             // Comprehensive validation before proceeding to Stripe
