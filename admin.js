@@ -2599,6 +2599,10 @@ function showError(message) {
     showNotification(message, 'error');
 }
 
+function showInfo(message) {
+    showNotification(message, 'info');
+}
+
 function showNotification(message, type) {
     try {
         // Minimal, non-intrusive notification; no mock/demo messages

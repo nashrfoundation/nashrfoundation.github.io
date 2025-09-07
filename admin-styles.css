@@ -1010,6 +1010,10 @@ textarea.form-control {
     background-color: var(--danger);
 }
 
+.notification.info {
+    background-color: var(--primary);
+}
+
 @keyframes slideInRight {
     from {
         transform: translateX(100%);

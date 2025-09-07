@@ -743,7 +743,7 @@
               const anonymous = anonymousCheckbox.checked;
               if (!anonymous && (!this.value || this.value.trim().length < 2)) {
                 this.classList.add('invalid');
-                showFieldError(this, 'Please enter your full name (at least 2 characters)');
+                showFieldError(this, 'Name too short');
               } else {
                 this.classList.remove('invalid');
                 clearFieldError(this);
@@ -756,7 +756,7 @@
             emailField.addEventListener('blur', function() {
               if (this.value && !isValidEmail(this.value)) {
                 this.classList.add('invalid');
-                showFieldError(this, 'Please enter a valid email address');
+                showFieldError(this, 'Invalid email');
               } else {
                 this.classList.remove('invalid');
                 clearFieldError(this);
@@ -770,7 +770,7 @@
               const countryCode = countryCodeField.value;
               if (this.value && !isValidPhoneNumber(this.value, countryCode)) {
                 this.classList.add('invalid');
-                showFieldError(this, 'Please enter a valid phone number');
+                showFieldError(this, 'Invalid phone');
               } else {
                 this.classList.remove('invalid');
                 clearFieldError(this);

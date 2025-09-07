@@ -199,31 +199,31 @@ class PaymentProcessor {
             
             // Name validation (required unless anonymous)
             if (!anonymous && (!donorName || donorName.trim().length < 2)) {
-                validationErrors.push('Name must be at least 2 characters');
+                validationErrors.push('Name too short');
             }
             
             // Email validation (if provided)
             if (donorEmail && !this.isValidEmail(donorEmail)) {
-                validationErrors.push('Invalid email address');
+                validationErrors.push('Invalid email');
             }
             
             // Phone validation (if provided)
             if (donorPhone && !this.isValidPhoneNumber(donorPhone, countryCode)) {
-                validationErrors.push('Invalid phone number');
+                validationErrors.push('Invalid phone');
             }
             
             // At least one contact method required
             if (!donorEmail && !donorPhone) {
-                validationErrors.push('Email or phone required');
+                validationErrors.push('Contact info required');
             }
             
             // Amount validation
             if (!amount || amount <= 0) {
                 validationErrors.push('Enter valid amount');
             } else if (amount < 100) {
-                validationErrors.push('Minimum PKR 100');
+                validationErrors.push('Min PKR 100');
             } else if (amount > 1000000) {
-                validationErrors.push('Maximum PKR 1M');
+                validationErrors.push('Max PKR 1M');
             }
             
             // If there are validation errors, show them and stop
@@ -463,8 +463,8 @@ class PaymentProcessor {
         existingMessages.forEach(msg => msg.remove());
 
         const errorDiv = document.createElement('div');
-        errorDiv.className = 'validation-message error-message';
-        errorDiv.innerHTML = '<strong>Fix these issues:</strong><ul>' + 
+        errorDiv.className = 'validation-errors';
+        errorDiv.innerHTML = '<ul>' + 
             errors.map(error => `<li>${error}</li>`).join('') + 
             '</ul>';
 
@@ -473,12 +473,12 @@ class PaymentProcessor {
             form.insertBefore(errorDiv, form.firstChild);
         }
 
-        // Auto-remove after 10 seconds
+        // Auto-remove after 8 seconds
         setTimeout(() => {
             if (errorDiv.parentNode) {
                 errorDiv.remove();
             }
-        }, 10000);
+        }, 8000);
     }
 
     // Real-time validation for form fields

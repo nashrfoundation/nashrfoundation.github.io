@@ -48,13 +48,7 @@ class EmailService {
 // Create global email service instance
 window.emailService = new EmailService();
 
-// Auto-configure EmailJS with your credentials
-if (window.emailJSService) {
-    window.emailJSService.configure(
-        'service_01wge0v',
-        'template_7pk902j',
-        '8vdEHnT9o9ThMp3qc'
-    );
-}
+// EmailJS configuration is handled in emailjs-service.js
+// No need to configure here since we're using MailerLite for newsletters
 
 console.log('📧 Email Service initialized with EmailJS');
