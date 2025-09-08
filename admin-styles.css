@@ -1681,8 +1681,12 @@ textarea.form-control {
 }
 
 .upload-icon {
-    font-size: 3rem;
-    margin-bottom: var(--spacing-md);
+    width: 48px;
+    height: 48px;
+    margin: 0 auto var(--spacing-md);
+    background: currentColor;
+    -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M19 20H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2z"/></svg>') no-repeat center / contain;
+            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M19 20H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2z"/></svg>') no-repeat center / contain;
 }
 
 .upload-options {

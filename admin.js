@@ -482,7 +482,7 @@ function setupLivePreview() {
         const previewBtn = document.createElement('button');
         previewBtn.type = 'button';
         previewBtn.className = 'btn btn-outline';
-        previewBtn.innerHTML = '👁️ Live Preview';
+        previewBtn.textContent = 'Live Preview';
         previewBtn.onclick = () => previewSettings();
         settingsForm.appendChild(previewBtn);
     }
@@ -491,7 +491,7 @@ function setupLivePreview() {
         const previewBtn = document.createElement('button');
         previewBtn.type = 'button';
         previewBtn.className = 'btn btn-outline';
-        previewBtn.innerHTML = '👁️ Live Preview';
+        previewBtn.textContent = 'Live Preview';
         previewBtn.onclick = () => previewContent();
         contentForm.appendChild(previewBtn);
     }
@@ -1984,12 +1984,12 @@ function getUserInitials(user) {
 
 function getSeverityIcon(severity) {
     const icons = {
-        'success': '✅',
-        'info': 'ℹ️',
-        'warning': '⚠️',
-        'error': '❌'
+        'success': '',
+        'info': '',
+        'warning': '',
+        'error': ''
     };
-    return icons[severity] || 'ℹ️';
+    return icons[severity] || '';
 }
 
 function getCategoryBadge(category) {
@@ -3528,6 +3528,50 @@ function showSection(sectionName) {
     if (targetSection) {
         targetSection.classList.add('active');
     }
+
+    // Trigger data load for the activated section (prevents stuck loading states)
+    try {
+        switch (sectionName) {
+            case 'dashboard':
+                if (typeof loadOverviewData === 'function') loadOverviewData();
+                break;
+            case 'donations':
+                if (typeof loadDonationsData === 'function') loadDonationsData();
+                break;
+            case 'leaderboard':
+                if (typeof loadLeaderboardData === 'function') loadLeaderboardData();
+                else if (typeof loadOverviewData === 'function') loadOverviewData();
+                break;
+            case 'newsletter':
+                if (typeof loadNewsletterData === 'function') loadNewsletterData();
+                break;
+            case 'subscribers':
+                if (typeof loadSubscribersData === 'function') loadSubscribersData();
+                break;
+            case 'content':
+                if (typeof loadContentData === 'function') loadContentData();
+                break;
+            case 'settings':
+                if (typeof loadSettingsData === 'function') loadSettingsData();
+                break;
+            case 'emails':
+                if (typeof initializeEmailManagement === 'function') initializeEmailManagement();
+                break;
+            case 'media':
+                if (typeof initializeMediaManagement === 'function') initializeMediaManagement();
+                break;
+            case 'security':
+                if (typeof loadSecurityData === 'function') loadSecurityData();
+                break;
+            case 'logs':
+                if (typeof loadLogsData === 'function') loadLogsData();
+                break;
+            default:
+                break;
+        }
+    } catch (e) {
+        console.warn('Section load trigger failed:', e);
+    }
 }
 
 // Setup navigation event listeners
@@ -3905,24 +3949,47 @@ async function saveThankYouTemplate() {
     }
     
     try {
-        // Update or create thank you template
-        const { error } = await supabase
+        // Check if a donor thank you template already exists
+        const { data: existingTemplates, error: selectError } = await supabase
             .from('email_templates')
-            .upsert({
-                name: 'Donor Thank You',
-                subject: subject,
-                template: template,
-                type: 'donor_thank_you',
-                is_active: true,
-                settings: { delay_minutes: parseInt(delay) || 5 }
-            });
-            
-        if (error) throw error;
-        
+            .select('id')
+            .eq('type', 'donor_thank_you')
+            .limit(1);
+
+        if (selectError) throw selectError;
+
+        const payload = {
+            name: 'Donor Thank You',
+            subject: subject,
+            template: template,
+            type: 'donor_thank_you',
+            is_active: true,
+            settings: { delay_minutes: parseInt(delay) || 5 }
+        };
+
+        if (Array.isArray(existingTemplates) && existingTemplates.length > 0) {
+            const existingId = existingTemplates[0].id;
+            const { error: updateError } = await supabase
+                .from('email_templates')
+                .update(payload)
+                .eq('id', existingId);
+            if (updateError) throw updateError;
+        } else {
+            const { error: insertError } = await supabase
+                .from('email_templates')
+                .insert([payload]);
+            if (insertError) throw insertError;
+        }
+
         showSuccess('Thank you email template saved successfully!');
         logActivity('email_template_updated', 'Updated donor thank you template');
     } catch (error) {
-        console.error('Error saving template:', error);
+        console.error('Error saving template:', error?.message || error);
+        try {
+            console.debug('Save template error details:', JSON.stringify(error));
+        } catch (_) {
+            console.debug('Save template error (non-serializable):', error);
+        }
         showError('Failed to save email template');
     }
 }

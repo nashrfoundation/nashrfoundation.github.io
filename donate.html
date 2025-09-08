@@ -620,8 +620,14 @@
         }
         
         .field-error::before {
-            content: "⚠️";
-            font-size: 1rem;
+            content: '';
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            margin-right: 6px;
+            background: currentColor;
+            -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M1 21h22L12 2 1 21zm12-3h-2v2h2v-2zm0-8h-2v6h2V10z"/></svg>') no-repeat center / contain;
+                    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M1 21h22L12 2 1 21zm12-3h-2v2h2v-2zm0-8h-2v6h2V10z"/></svg>') no-repeat center / contain;
         }
         
         .field-success {
@@ -639,8 +645,14 @@
         }
         
         .field-success::before {
-            content: "✅";
-            font-size: 1rem;
+            content: '';
+            display: inline-block;
+            width: 1em;
+            height: 1em;
+            margin-right: 6px;
+            background: currentColor;
+            -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M9 16.2l-3.5-3.5L4 14.2 9 19l12-12-1.5-1.5z"/></svg>') no-repeat center / contain;
+                    mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="black" d="M9 16.2l-3.5-3.5L4 14.2 9 19l12-12-1.5-1.5z"/></svg>') no-repeat center / contain;
         }
         
         .validation-message {

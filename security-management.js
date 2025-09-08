@@ -86,8 +86,9 @@ async function setup2FA() {
         document.getElementById('2fa-status').style.display = 'none';
         document.getElementById('2fa-setup').style.display = 'block';
         
-        // Store secret temporarily
+        // Store secret temporarily in both session and local storage to handle reloads
         sessionStorage.setItem('2fa_secret', secret);
+        localStorage.setItem('2fa_secret', secret);
         
         hideLoading();
         showSuccess('2FA setup initiated. Scan the QR code with your authenticator app.');
@@ -109,7 +110,12 @@ async function verify2FACode() {
     try {
         showLoading('Verifying 2FA code...');
         
-        const secret = sessionStorage.getItem('2fa_secret');
+        const secret = sessionStorage.getItem('2fa_secret') || localStorage.getItem('2fa_secret');
+        if (!secret) {
+            hideLoading();
+            showError('Setup not complete. Please enable 2FA and scan the QR again.');
+            return;
+        }
         const isValid = verifyTOTPCode(secret, code);
         
         if (isValid) {
@@ -149,7 +155,7 @@ async function verify2FACode() {
             
         } else {
             hideLoading();
-            showError('Invalid 2FA code. Please try again.');
+            showError('Invalid 2FA code. Codes refresh every 30s. Check device time and try again.');
         }
         
     } catch (error) {
@@ -233,7 +239,14 @@ async function loadActiveSessions() {
         updateSessionDisplay();
         
     } catch (error) {
-        console.error('Error loading active sessions:', error);
+        console.error('Error loading active sessions:', error?.message || error);
+        try {
+            // Log full error object for debugging in case message is missing
+            console.debug('Active sessions load error details:', JSON.stringify(error));
+        } catch (_) {
+            // Fallback when error is not serializable
+            console.debug('Active sessions load error (non-serializable):', error);
+        }
     }
 }
 
@@ -663,8 +676,9 @@ function verifyTOTPCode(secret, code) {
     // This is a simplified implementation
     try {
         const currentTime = Math.floor(Date.now() / 1000 / 30);
-        const expectedCode = generateTOTPCode(secret, currentTime);
-        return code === expectedCode;
+        // Allow small time drift: previous, current, next time windows
+        const windows = [-1, 0, 1];
+        return windows.some(w => generateTOTPCode(secret, currentTime + w) === code);
     } catch (error) {
         console.error('TOTP verification error:', error);
         return false;
