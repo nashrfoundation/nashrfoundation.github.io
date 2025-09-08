@@ -3556,6 +3556,9 @@ function setupNavigationListeners() {
             
             // Show the section
             showSection(section);
+
+            // Reflect in URL for deep-linking
+            try { window.location.hash = section; } catch (e) {}
         });
     });
 }
@@ -3651,6 +3654,9 @@ function setupHorizontalNavigation() {
             
             // Scroll to active link
             scrollToActiveLink(this);
+
+            // Reflect in URL for deep-linking
+            try { window.location.hash = section; } catch (e) {}
         });
     });
 }
@@ -4285,15 +4291,29 @@ async function sendDonorThankYouEmail(donorData) {
 
 // Initialize email management when admin loads
 document.addEventListener('DOMContentLoaded', () => {
-    // Initialize email management after user is authenticated
+    // Initialize modules if user already authenticated
     if (currentUser) {
         initializeEmailManagement();
         initializeMediaManagement();
         initializeSecurityManagement();
-        
-        // Initialize horizontal navigation
-        setupHorizontalNavigation();
     }
+    // Always initialize horizontal navigation so links are clickable regardless of auth timing
+    setupHorizontalNavigation();
+
+    // Open section from URL hash on load
+    const openSectionFromHash = () => {
+        const hash = (window.location.hash || '').replace('#', '');
+        if (!hash) return;
+        const link = document.querySelector(`.horizontal-nav-link[data-section="${hash}"]`);
+        if (link) {
+            link.click();
+        } else {
+            // Fallback: show section directly
+            showSection(hash);
+        }
+    };
+    openSectionFromHash();
+    window.addEventListener('hashchange', openSectionFromHash);
 });
 
 // ==================== MEDIA MANAGEMENT SYSTEM ====================
