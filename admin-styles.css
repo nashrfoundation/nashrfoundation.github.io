@@ -2441,13 +2441,18 @@ textarea.form-control {
 .horizontal-nav-scroll {
     overflow-x: auto;
     overflow-y: hidden;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    -ms-overflow-style: auto;
     scroll-behavior: smooth;
 }
 
 .horizontal-nav-scroll::-webkit-scrollbar {
-    display: none;
+    height: 6px;
+}
+.horizontal-nav-scroll::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: 3px;
 }
 
 .horizontal-nav {
@@ -2455,6 +2460,7 @@ textarea.form-control {
     gap: var(--spacing-sm);
     padding: var(--spacing-md) var(--spacing-lg);
     min-width: max-content;
+    white-space: nowrap;
 }
 
 .horizontal-nav-link {
