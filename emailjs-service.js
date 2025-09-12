@@ -294,6 +294,6 @@ window.emailJSService.configure(
     '8vdEHnT9o9ThMp3qc'
 );
 
-console.log('📧 EmailJS Service initialized');
-console.log('💡 To configure: emailJSService.configure(serviceId, templateId, publicKey)');
-console.log('💡 To test: emailJSService.testService()');
+console.log('EmailJS Service initialized');
+console.log('To configure: emailJSService.configure(serviceId, templateId, publicKey)');
+console.log('To test: emailJSService.testService()');

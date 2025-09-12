@@ -28,7 +28,7 @@ class PaymentProcessor {
     }
 
     validatePaymentLinks() {
-        console.log('🔍 Validating payment links...');
+        console.log('Validating payment links...');
         Object.entries(this.paymentLinks).forEach(([amount, link]) => {
             if (!link || !link.startsWith('https://buy.stripe.com/')) {
                 console.warn(`⚠️ Invalid payment link for amount ${amount}:`, link);
@@ -67,11 +67,11 @@ class PaymentProcessor {
 
     // Robust redirection method with multiple fallbacks
     redirectToPayment(paymentLink) {
-        console.log('🚀 Starting redirection process...');
+        console.log('Starting redirection process...');
         
         // Method 1: Try window.location.href (most common)
         try {
-            console.log('📍 Method 1: Using window.location.href');
+            console.log('Method 1: Using window.location.href');
             window.location.href = paymentLink;
             return;
         } catch (error) {
@@ -80,7 +80,7 @@ class PaymentProcessor {
         
         // Method 2: Try window.location.assign
         try {
-            console.log('📍 Method 2: Using window.location.assign');
+            console.log('Method 2: Using window.location.assign');
             window.location.assign(paymentLink);
             return;
         } catch (error) {
@@ -89,7 +89,7 @@ class PaymentProcessor {
         
         // Method 3: Try window.open (for popup blockers)
         try {
-            console.log('📍 Method 3: Using window.open');
+            console.log('Method 3: Using window.open');
             const newWindow = window.open(paymentLink, '_blank', 'noopener,noreferrer');
             if (newWindow) {
                 console.log('✅ Opened in new window');
@@ -101,7 +101,7 @@ class PaymentProcessor {
         
         // Method 4: Try creating a temporary link and clicking it
         try {
-            console.log('📍 Method 4: Using temporary link');
+            console.log('Method 4: Using temporary link');
             const tempLink = document.createElement('a');
             tempLink.href = paymentLink;
             tempLink.target = '_blank';
@@ -117,7 +117,7 @@ class PaymentProcessor {
         
         // Method 5: Try form submission
         try {
-            console.log('📍 Method 5: Using form submission');
+            console.log('Method 5: Using form submission');
             const form = document.createElement('form');
             form.method = 'GET';
             form.action = paymentLink;
@@ -179,18 +179,18 @@ class PaymentProcessor {
         fetch(debugPaymentLink, { method: 'HEAD', mode: 'no-cors' })
             .then(() => {
                 console.log('✅ Link is accessible');
-                console.log('🚀 Attempting redirection...');
+                console.log('Attempting redirection...');
                 this.redirectToPayment(debugPaymentLink);
             })
             .catch(error => {
                 console.error('❌ Link test failed:', error);
-                console.log('🔗 Manual link:', debugPaymentLink);
+                console.log('Manual link:', debugPaymentLink);
             });
     }
 
     async processDonation(amount) {
         try {
-            console.log('🚀 Starting donation process for amount:', amount);
+            console.log('Starting donation process for amount:', amount);
             
             // Get donor information for tracking
             const donorName = document.getElementById('donor-name')?.value || 'Anonymous';
@@ -200,7 +200,7 @@ class PaymentProcessor {
             const anonymous = document.getElementById('anonymous-donation')?.checked || false;
             const leaderboardConsent = document.getElementById('leaderboard-consent')?.checked || false;
             
-            console.log('📝 Donor info:', { donorName, donorEmail, donorPhone, anonymous, leaderboardConsent });
+            console.log('Donor info:', { donorName, donorEmail, donorPhone, anonymous, leaderboardConsent });
 
             // Comprehensive validation before proceeding to Stripe
             const validationErrors = [];
@@ -254,7 +254,7 @@ class PaymentProcessor {
                 
                 if (closestAmount) {
                     paymentLink = this.paymentLinks[closestAmount];
-                    console.log(`🔄 Using closest payment link for amount ${closestAmount} instead of ${amount}`);
+                    console.log(`Using closest payment link for amount ${closestAmount} instead of ${amount}`);
                     
                     // Show user notification about using closest amount
                     this.showInfoMessage(`Using closest available amount: PKR ${closestAmount} (requested: PKR ${amount})`);
@@ -264,7 +264,7 @@ class PaymentProcessor {
                 }
             }
 
-            console.log('🔗 Payment link:', paymentLink);
+            console.log('Payment link:', paymentLink);
 
             // Store donor info in localStorage for after payment
             const donorData = {
@@ -282,8 +282,8 @@ class PaymentProcessor {
             console.log('💾 Donor data stored in localStorage');
 
             // Redirect to payment page
-            console.log('🔄 Redirecting to payment page...');
-            console.log('🔗 Payment link:', paymentLink);
+            console.log('Redirecting to payment page...');
+            console.log('Payment link:', paymentLink);
             
             // Try multiple redirection methods for better compatibility
             this.redirectToPayment(paymentLink);
@@ -314,7 +314,7 @@ class PaymentProcessor {
             // Get stored donor data
             const storedData = localStorage.getItem('pendingDonation');
             if (!storedData) {
-                this.showSuccessMessage('🎉 Thank you! Your donation was successful!');
+                this.showSuccessMessage('Thank you! Your donation was successful!');
                 return;
             }
 
@@ -342,7 +342,7 @@ class PaymentProcessor {
             await this.updateLeaderboard(donationData);
 
             // Show success message
-            this.showSuccessMessage(`🎉 Thank you! Your donation of PKR ${donorData.amount} has been processed successfully!`);
+            this.showSuccessMessage(`Thank you! Your donation of PKR ${donorData.amount} has been processed successfully!`);
 
             // Clear stored data
             localStorage.removeItem('pendingDonation');

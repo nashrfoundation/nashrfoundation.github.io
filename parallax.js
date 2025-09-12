@@ -13,7 +13,7 @@ class ParallaxController {
     }
     
     init() {
-        console.log('🎨 Initializing parallax effect...');
+        console.log('Initializing parallax effect...');
         
         // Add scroll event listener with throttling
         window.addEventListener('scroll', this.handleScroll.bind(this), { passive: true });
@@ -67,7 +67,7 @@ class ParallaxController {
     // Method to adjust parallax speed
     setParallaxSpeed(speed) {
         this.parallaxSpeed = Math.max(0, Math.min(1, speed)); // Clamp between 0 and 1
-        console.log(`🎛️ Parallax speed set to: ${this.parallaxSpeed}`);
+        console.log(`Parallax speed set to: ${this.parallaxSpeed}`);
     }
     
     // Method to disable/enable parallax

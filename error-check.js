@@ -1,11 +1,11 @@
 // Comprehensive Error Check Script for Nashr Foundation Website
 // Run this in the browser console to check for potential issues
 
-console.log('🔍 Starting comprehensive error check...');
+console.log('Starting comprehensive error check...');
 
 // Check for missing images
 function checkMissingImages() {
-    console.log('📸 Checking for missing images...');
+    console.log('Checking for missing images...');
     const images = document.querySelectorAll('img');
     const missingImages = [];
     
@@ -80,7 +80,7 @@ function checkJavaScriptErrors() {
 
 // Check for CSS issues
 function checkCSSIssues() {
-    console.log('🎨 Checking for CSS issues...');
+    console.log('Checking for CSS issues...');
     
     // Check if critical CSS is loaded
     const criticalCSS = document.querySelector('style');
@@ -143,7 +143,7 @@ function checkAccessibility() {
 
 // Check for performance issues
 function checkPerformance() {
-    console.log('🚀 Checking performance...');
+    console.log('Checking performance...');
     
     // Check for large images
     const images = document.querySelectorAll('img');
@@ -167,14 +167,14 @@ function checkPerformance() {
     const externalScripts = document.querySelectorAll('script[src^="http"]');
     const externalStyles = document.querySelectorAll('link[href^="http"]');
     
-    console.log(`📊 External resources: ${externalScripts.length} scripts, ${externalStyles.length} stylesheets`);
+    console.log(`External resources: ${externalScripts.length} scripts, ${externalStyles.length} stylesheets`);
     
     return true;
 }
 
 // Check for mobile responsiveness
 function checkMobileResponsiveness() {
-    console.log('📱 Checking mobile responsiveness...');
+    console.log('Checking mobile responsiveness...');
     
     // Use matchMedia to respect CSS media queries
     const isMobile = window.matchMedia && window.matchMedia('(max-width: 768px)').matches;
@@ -197,7 +197,7 @@ function checkMobileResponsiveness() {
 
 // Check for SEO elements
 function checkSEO() {
-    console.log('🔍 Checking SEO elements...');
+    console.log('Checking SEO elements...');
     
     let issues = 0;
     
@@ -240,7 +240,7 @@ function checkSEO() {
 
 // Check for security headers (if possible)
 function checkSecurity() {
-    console.log('🔒 Checking security...');
+    console.log('Checking security...');
     
     // Check for HTTPS
     if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
@@ -260,7 +260,7 @@ function checkSecurity() {
 
 // Check for PWA features
 function checkPWA() {
-    console.log('📱 Checking PWA features...');
+    console.log('Checking PWA features...');
     
     let features = 0;
     
@@ -283,13 +283,13 @@ function checkPWA() {
         features++;
     }
     
-    console.log(`📊 PWA features: ${features}/3 available`);
+    console.log(`PWA features: ${features}/3 available`);
     return features > 0;
 }
 
 // Main error check function
 function runComprehensiveCheck() {
-    console.log('🚀 Starting comprehensive website check...\n');
+    console.log('Starting comprehensive website check...\n');
     
     const results = {
         images: checkMissingImages(),
@@ -303,7 +303,7 @@ function runComprehensiveCheck() {
         pwa: checkPWA()
     };
     
-    console.log('\n📊 CHECK RESULTS SUMMARY:');
+    console.log('\nCHECK RESULTS SUMMARY:');
     console.log('========================');
     
     Object.entries(results).forEach(([category, result]) => {
@@ -314,10 +314,10 @@ function runComprehensiveCheck() {
     const passedChecks = Object.values(results).filter(Boolean).length;
     const totalChecks = Object.keys(results).length;
     
-    console.log(`\n🎯 Overall Score: ${passedChecks}/${totalChecks} (${Math.round((passedChecks/totalChecks)*100)}%)`);
+    console.log(`\nOverall Score: ${passedChecks}/${totalChecks} (${Math.round((passedChecks/totalChecks)*100)}%)`);
     
     if (passedChecks === totalChecks) {
-        console.log('🎉 All checks passed! Your website is ready for production.');
+        console.log('All checks passed! Your website is ready for production.');
     } else {
         console.log('⚠️ Some checks failed. Please review the warnings above.');
     }

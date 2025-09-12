@@ -6,4 +6,4 @@
 window.BREVO_API_KEY = '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';
 window.BREVO_LIST_ID = '3';
 
-console.log('🔐 Secure Brevo configuration loaded');
+console.log('Secure Brevo configuration loaded');

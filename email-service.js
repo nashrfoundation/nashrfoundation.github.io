@@ -51,4 +51,4 @@ window.emailService = new EmailService();
 // EmailJS configuration is handled in emailjs-service.js
 // No need to configure here since we're using MailerLite for newsletters
 
-console.log('📧 Email Service initialized with EmailJS');
+console.log('Email Service initialized with EmailJS');

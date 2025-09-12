@@ -86,7 +86,7 @@ async function handleNewsletterSignup(e) {
                             console.warn('Welcome email failed:', e);
                         }
                         
-                        showNewsletterMessage('🎉 Welcome to our community! Thank you for subscribing to our newsletter. You\'ll receive updates about our impact and how your support makes a difference.', 'success', newsletterMessage);
+                        showNewsletterMessage('Welcome to our community! Thank you for subscribing to our newsletter. You\'ll receive updates about our impact and how your support makes a difference.', 'success', newsletterMessage);
                     }
                     
                     form.reset();
@@ -149,7 +149,7 @@ async function handleNewsletterSignup(e) {
         }
 
         // Show success message
-        showNewsletterMessage(`🎉 Welcome to our community! Thank you for subscribing to our newsletter. You'll receive updates about our impact and how your support makes a difference. Check your inbox for a welcome email!`, 'success', newsletterMessage);
+        showNewsletterMessage(`Welcome to our community! Thank you for subscribing to our newsletter. You'll receive updates about our impact and how your support makes a difference. Check your inbox for a welcome email!`, 'success', newsletterMessage);
         
         // Reset form
         form.reset();
@@ -235,19 +235,19 @@ async function sendWelcomeEmail(email, name) {
                     <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
                         <div style="display: flex; justify-content: space-around; text-align: center; flex-wrap: wrap;">
                             <div style="margin: 10px;">
-                                <strong style="color: #2A8D9C;">📚 Education</strong><br>
+                                <strong style="color: #2A8D9C;">Education</strong><br>
                                 <small>School supplies and learning opportunities</small>
                             </div>
                             <div style="margin: 10px;">
-                                <strong style="color: #2A8D9C;">🍽️ Food Security</strong><br>
+                                <strong style="color: #2A8D9C;">Food Security</strong><br>
                                 <small>Nutritious meals for families</small>
                             </div>
                             <div style="margin: 10px;">
-                                <strong style="color: #2A8D9C;">💧 Clean Water</strong><br>
+                                <strong style="color: #2A8D9C;">Clean Water</strong><br>
                                 <small>Safe drinking water access</small>
                             </div>
                             <div style="margin: 10px;">
-                                <strong style="color: #2A8D9C;">🏠 Basic Needs</strong><br>
+                                <strong style="color: #2A8D9C;">Basic Needs</strong><br>
                                 <small>Essential life supplies</small>
                             </div>
                         </div>

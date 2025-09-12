@@ -9,7 +9,7 @@ class MobileEnhancements {
     }
     
     init() {
-        console.log('📱 Initializing mobile enhancements...');
+        console.log('Initializing mobile enhancements...');
         
         this.setupTouchInteractions();
         this.setupSmoothScrolling();

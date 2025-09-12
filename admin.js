@@ -115,7 +115,7 @@ async function initializeSupabase() {
             const query = originalFrom(table);
             const originalSelect = query.select.bind(query);
             query.select = function(columns) {
-                console.log(`🔍 Supabase Query: ${table}.select(${columns})`);
+                console.log(`Supabase Query: ${table}.select(${columns})`);
                 return originalSelect(columns);
             };
             return query;
@@ -1826,7 +1826,7 @@ function setupLogsAutoRefresh() {
                 const lastKnownLog = logsData[0];
                 
                 if (!lastKnownLog || new Date(latestLog.timestamp) > new Date(lastKnownLog.timestamp)) {
-                    console.log('🔄 New activity logs detected, refreshing...');
+                    console.log('New activity logs detected, refreshing...');
                     await loadLogsData();
                     showNotification('New activity detected', 'info');
                 }
@@ -1849,7 +1849,7 @@ function displayLogsTable(logs) {
             <tr>
                 <td colspan="6" class="no-data-state">
                     <div class="no-data-content">
-                        <div class="no-data-icon">📊</div>
+                        <div class="no-data-icon">No Data</div>
                         <h3>No Activity Logs</h3>
                         <p>Activity logs will appear here as users interact with the system.</p>
                         <button class="btn btn-primary" onclick="loadLogsData()">Refresh</button>
@@ -1944,10 +1944,10 @@ function displayLogsTable(logs) {
         actionsCell.innerHTML = `
             <div class="log-actions">
                 <button class="btn btn-sm btn-outline" onclick="copyLogDetails('${JSON.stringify(log).replace(/'/g, "\\'")}')" title="Copy Details">
-                    📋
+                    Copy
                 </button>
                 <button class="btn btn-sm btn-outline" onclick="exportLogEntry('${log.id || ''}')" title="Export">
-                    📤
+                    Export
                 </button>
                 ${log.severity === 'error' ? `<button class="btn btn-sm btn-danger" onclick="markAsResolved('${log.id || ''}')" title="Mark as Resolved">✓</button>` : ''}
             </div>
@@ -3386,7 +3386,7 @@ async function logActivity(action, details, metadata = {}) {
         console.log('Activity logged:', logEntry);
         
         // Also log to browser console with more detail
-        console.group(`📝 Activity Log: ${action}`);
+        console.group(`Activity Log: ${action}`);
         console.log('User:', userEmail);
         console.log('Details:', details);
         console.log('Metadata:', logEntry.metadata);

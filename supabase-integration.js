@@ -198,7 +198,7 @@ class SupabaseIntegration {
     // Process complete donation (donation + leaderboard)
     async processCompleteDonation(donationData) {
         try {
-            console.log('🔄 Processing complete donation in Supabase...');
+            console.log('Processing complete donation in Supabase...');
             
             // 1. Store donation
             const storedDonation = await this.storeDonation(donationData);

@@ -51,7 +51,7 @@
     <p>This page tests all admin portal features and identifies any errors.</p>
     
     <div class="test-section">
-        <h2>📋 Test Results</h2>
+        <h2>Test Results</h2>
         <div id="test-results"></div>
     </div>
     
@@ -69,7 +69,7 @@
     </div>
     
     <div class="test-section">
-        <h2>📊 Feature Status</h2>
+        <h2>Feature Status</h2>
         <div id="feature-status"></div>
     </div>
 
@@ -316,7 +316,7 @@
         // Run all tests
         async function runAllTests() {
             testResults.innerHTML = '';
-            addTestResult('🚀 Running All Tests...', 'info');
+            addTestResult('Running All Tests...', 'info');
             
             await testJavaScriptFunctions();
             await test2FA();

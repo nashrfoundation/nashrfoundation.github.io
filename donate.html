@@ -668,7 +668,7 @@
         }
         
         .validation-message::before {
-            content: "📝";
+            content: "Note:";
             margin-right: 0.5rem;
             font-size: 1.2rem;
         }
@@ -753,7 +753,7 @@
         }
         
         .progress-indicator::before {
-            content: "🔄";
+            content: "Loading...";
             animation: spin 1s linear infinite;
         }
         
@@ -1134,7 +1134,7 @@
                     // Update status based on progress
                     if (statusEl) {
                       if (pct >= 100) {
-                        statusEl.textContent = 'Goal Reached! 🎉';
+                        statusEl.textContent = 'Goal Reached!';
                         statusEl.className = 'progress-status success';
                       } else if (pct >= 75) {
                         statusEl.textContent = 'Almost There!';
@@ -1325,7 +1325,7 @@
                                 const statusEl = document.getElementById('progress-status');
                                 if (statusEl) {
                                     if (pct >= 100) {
-                                        statusEl.textContent = 'Goal Reached! 🎉';
+                                        statusEl.textContent = 'Goal Reached!';
                                         statusEl.className = 'progress-status success';
                                     } else if (pct >= 75) {
                                         statusEl.textContent = 'Almost There!';
@@ -1469,7 +1469,7 @@
             submitButton.textContent = "Processing...";
 
             try {
-              console.log('🔄 Form submission - starting payment process');
+              console.log('Form submission - starting payment process');
               const amount = parseInt(document.getElementById("donation-amount-input").value);
               console.log('💰 Amount to process:', amount);
               
@@ -1495,7 +1495,7 @@
             }
         });
       } catch (error) {
-          console.error("🔥 Critical Firebase Initialization Error:", error);
+          console.error("Critical Firebase Initialization Error:", error);
           showErrorMessage("A critical error occurred while loading the donation form. Please refresh the page and try again.");
           
           // Disable form submission if Firebase fails

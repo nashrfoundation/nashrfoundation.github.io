@@ -194,7 +194,7 @@ function runAccessibilityAudit() {
     };
     
     console.log('\n');
-    console.log('📊 SUMMARY:');
+    console.log('SUMMARY:');
     console.log('===========');
     
     Object.entries(results).forEach(([category, result]) => {
@@ -205,15 +205,15 @@ function runAccessibilityAudit() {
     const passedChecks = Object.values(results).filter(Boolean).length;
     const totalChecks = Object.keys(results).length;
     
-    console.log(`\n🎯 Score: ${passedChecks}/${totalChecks} (${Math.round((passedChecks/totalChecks)*100)}%)`);
+    console.log(`\nScore: ${passedChecks}/${totalChecks} (${Math.round((passedChecks/totalChecks)*100)}%)`);
     
     if (passedChecks === totalChecks) {
-        console.log('🎉 All accessibility checks passed!');
+        console.log('All accessibility checks passed!');
     } else {
         console.log('⚠️ Some accessibility issues were found. Please review the warnings above.');
     }
     
-    console.log('\n💡 RECOMMENDATIONS:');
+    console.log('\nRECOMMENDATIONS:');
     console.log('===================');
     console.log('1. Use axe-core or browser accessibility tools for more detailed analysis');
     console.log('2. Test with screen readers (NVDA, VoiceOver, JAWS)');
