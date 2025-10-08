@@ -1069,7 +1069,7 @@
               setSocial('a[data-social="facebook"]', s.facebook);
               setSocial('a[data-social="twitter"]', s.twitter);
               setSocial('a[data-social="youtube"]', s.youtube);
-              const goal = s.fundraising_goal != null ? Number(s.fundraising_goal) : 200000;
+              const goal = s.fundraising_goal != null ? Number(s.fundraising_goal) : 1000000;
               let totalRaised = s.total_raised != null ? Number(s.total_raised) : undefined;
               
               console.log('Initial totalRaised from settings:', totalRaised);
@@ -1308,7 +1308,7 @@
                         
                         if (donations) {
                             const totalRaised = donations.reduce((sum, d) => sum + (Number(d.amount) || 0), 0);
-                            const goal = 200000; // Default goal
+                            const goal = 1000000; // Default goal
                             const pct = Math.max(0, Math.min(100, Math.round((totalRaised / goal) * 100)));
                             
                             if (progressBar && pct !== parseInt(progressBar.style.width)) {

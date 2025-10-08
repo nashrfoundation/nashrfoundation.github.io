@@ -650,7 +650,7 @@ async function loadOverviewData() {
         
         // Get fundraising goal and optional total override from cached settings
         const settings = await getCachedSettings();
-        const goalAmount = settings?.fundraising_goal || 200000;
+        const goalAmount = settings?.fundraising_goal || 1000000;
         const totalRaisedOverride = settings?.total_raised != null ? Number(settings.total_raised) : undefined;
         
         const overviewDonations = (leaderboardRows || []).map(row => ({
@@ -678,7 +678,7 @@ async function loadOverviewData() {
         console.error('Failed to load overview data:', error);
         showError('Failed to load overview data. Please refresh the page.');
         // Empty states
-        updateOverviewStats([], 200000, undefined);
+        updateOverviewStats([], 1000000, undefined);
         updateRecentActivity([]);
         hideSectionLoading('#overview .activity-list');
         hideSectionLoading('#overview .stats-grid');
@@ -753,7 +753,7 @@ function updateOverviewStats(donations, goalAmount, totalRaisedOverride) {
     });
     const todayAmount = todayDonations.reduce((sum, donation) => sum + (donation.amount || 0), 0);
     const totalDonors = donations.length;
-    const goal = goalAmount || 200000;
+    const goal = goalAmount || 1000000;
     const goalProgress = Math.max(0, Math.min(100, Math.round((totalRaised / goal) * 100)));
     
     // Update stats
