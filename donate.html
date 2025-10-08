@@ -1072,6 +1072,17 @@
               // Override old goal amount with new default
               const dbGoal = s.fundraising_goal != null ? Number(s.fundraising_goal) : null;
               const goal = (dbGoal === 200000) ? 1000000 : (dbGoal || 1000000);
+              
+              // Force cache invalidation for goal changes
+              console.log('Goal override applied:', { dbGoal, finalGoal: goal });
+              console.log('Cache buster timestamp:', Date.now());
+              
+              // Clear any cached progress data
+              if (typeof Storage !== 'undefined') {
+                localStorage.removeItem('fundraising_goal');
+                localStorage.removeItem('progress_percentage');
+                console.log('Cleared cached progress data');
+              }
               let totalRaised = s.total_raised != null ? Number(s.total_raised) : undefined;
               
               console.log('Initial totalRaised from settings:', totalRaised);
@@ -1095,12 +1106,15 @@
                 }
               } catch (e) {
                 console.error('Error calculating total raised:', e);
-                // Fallback: show default progress
+                // Fallback: show default progress based on new goal
                 const bar = document.getElementById('fund-progress-bar');
                 if (bar) {
-                  bar.style.width = '35%'; // Default 35% progress
-                  bar.textContent = '35%';
-                  console.log('Using fallback progress bar value');
+                  const fallbackGoal = 1000000; // New goal
+                  const fallbackRaised = 70000; // Current raised amount
+                  const fallbackPct = Math.round((fallbackRaised / fallbackGoal) * 100);
+                  bar.style.width = fallbackPct + '%';
+                  bar.textContent = fallbackPct + '%';
+                  console.log('Using fallback progress bar value:', fallbackPct + '%');
                 }
               }
               // Ensure progress bar is always visible
@@ -1192,8 +1206,11 @@
                 // Fallback when data loading fails
                 console.log('Data loading failed, using fallback progress');
                 if (bar) {
-                  bar.style.width = '35%';
-                  bar.textContent = '35%';
+                  const fallbackGoal = 1000000; // New goal
+                  const fallbackRaised = 70000; // Current raised amount
+                  const fallbackPct = Math.round((fallbackRaised / fallbackGoal) * 100);
+                  bar.style.width = fallbackPct + '%';
+                  bar.textContent = fallbackPct + '%';
                 }
               }
             }
@@ -1294,9 +1311,12 @@
             // Initialize progress bar with default value
             const progressBar = document.getElementById('fund-progress-bar');
             if (progressBar) {
-                progressBar.style.width = '35%';
-                progressBar.textContent = '35%';
-                console.log('Progress bar initialized with default value');
+                const fallbackGoal = 1000000; // New goal
+                const fallbackRaised = 70000; // Current raised amount
+                const fallbackPct = Math.round((fallbackRaised / fallbackGoal) * 100);
+                progressBar.style.width = fallbackPct + '%';
+                progressBar.textContent = fallbackPct + '%';
+                console.log('Progress bar initialized with default value:', fallbackPct + '%');
             }
             
             // Real-time progress bar updates (every 30 seconds)
