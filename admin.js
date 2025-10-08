@@ -368,7 +368,9 @@ async function getCachedSettings() {
                 settingsObj.instagram = firstRow.instagram || '';
                 settingsObj.twitter = firstRow.twitter || '';
                 settingsObj.youtube = firstRow.youtube || '';
-                settingsObj.fundraising_goal = Number(firstRow.fundraising_goal) || 0;
+                // Override old goal amount with new default
+                const dbGoal = Number(firstRow.fundraising_goal);
+                settingsObj.fundraising_goal = (dbGoal === 200000) ? 1000000 : (dbGoal || 1000000);
                 settingsObj.goal_description = firstRow.goal_description || '';
                 settingsObj.total_raised = Number(firstRow.total_raised) || 0;
                 settingsObj.admin_email_notifications = firstRow.admin_email_notifications || 'all';
@@ -395,7 +397,9 @@ async function getCachedSettings() {
                     
                     // Convert numeric values
                     if (['fundraising_goal', 'total_raised'].includes(fieldName)) {
-                        settingsObj[fieldName] = Number(row.value) || 0;
+                        const numValue = Number(row.value) || 0;
+                        // Override old goal amount with new default
+                        settingsObj[fieldName] = (fieldName === 'fundraising_goal' && numValue === 200000) ? 1000000 : numValue;
                     } else {
                         settingsObj[fieldName] = row.value;
                     }

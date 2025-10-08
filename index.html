@@ -627,7 +627,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           // Load content for hero texts
           // Compute total raised fallback if needed and expose globally for reuse
           try {
-            const goal = s && s.fundraising_goal != null ? Number(s.fundraising_goal) : 1000000;
+            // Override old goal amount with new default
+            const dbGoal = s && s.fundraising_goal != null ? Number(s.fundraising_goal) : null;
+            const goal = (dbGoal === 200000) ? 1000000 : (dbGoal || 1000000);
             let totalRaised = s && s.total_raised != null ? Number(s.total_raised) : undefined;
             if (typeof totalRaised !== 'number') {
               const { data: donations, error: donationsErr } = await supabase
